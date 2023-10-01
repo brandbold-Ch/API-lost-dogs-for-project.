@@ -9,7 +9,9 @@ const service = new appService();
 
 /**
  * Get all the lost dogs
- * @returns {Promise<Array>}
+ * @async
+ * @function
+ * @returns {Promise<Object[]>}
  * */
 
 exports.getAllLostDogs = async () => {

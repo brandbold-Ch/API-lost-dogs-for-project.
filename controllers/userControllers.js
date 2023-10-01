@@ -9,6 +9,8 @@ const service = new userService();
 
 /**
  * Get all users
+ * @async
+ * @function
  * @returns {Promise<Array>}
  * */
 
@@ -18,6 +20,8 @@ exports.getUsers = async () => {
 
 /**
  * Create new user
+ * @async
+ * @function
  * @param {Object} data - Body request data
  * @returns {Promise<void>}
  * */
@@ -28,6 +32,8 @@ exports.setUser = async (data) => {
 
 /**
  * Get user
+ * @async
+ * @function
  * @param {string} id - ID user
  * @returns {Promise<void>}
  * */
@@ -38,6 +44,8 @@ exports.getUser = async (id) => {
 
 /**
  * Get user credentials (email and password)
+ * @async
+ * @function
  * @param {string} id - ID user
  * @returns {Promise<Array>}
  * */
@@ -48,6 +56,8 @@ exports.getCredentials = async (id) => {
 
 /**
  * Delete user
+ * @async
+ * @function
  * @param {string} data - ID user
  * @returns {Promise<void>}
  * */
@@ -58,6 +68,8 @@ exports.delUser = async (id) => {
 
 /**
  * Update partial user
+ * @async
+ * @function
  * @param {string} id - ID user
  * @param {Object} data - Body request data
  * @returns {Promise<void>}
@@ -69,6 +81,8 @@ exports.updateUser = async (id, data) => {
 
 /**
  * Update partial credentials (email or password)
+ * @async
+ * @function
  * @param {string} id - ID user
  * @param {Object} data - Body request data
  * @returns {Promise<void>}
