@@ -1,6 +1,5 @@
 const User = require('../models/user');
 
-
 class AppServices {
 
     constructor() {}

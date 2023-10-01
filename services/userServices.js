@@ -1,5 +1,7 @@
 const User = require('../models/user')
 const Auth = require('../models/auth')
+const bcrypt = require('bcrypt')
+const e = require("express");
 
 class UserServices {
     constructor() {}
@@ -23,12 +25,23 @@ class UserServices {
          return User.find({_id: id})
     }
 
+    async getCredentials(id){
+        return Auth.find({user: id}, {user: 0, _id: 0})
+    }
+
     async delUser(id){
-         return User.deleteOne({_id: id})
+        await Auth.deleteOne({user: id})
+        await User.deleteOne({_id: id})
     }
 
     async updateUser(id, data){
-         return User.updateOne({_id: id}, {$set: data})
+        await User.updateOne({_id: id}, {$set: data}, {runValidators: true})
+    }
+
+    async updateCredentials(id, data){
+        let { email, password } = data
+        password = await bcrypt.hash(password, 10)
+        await Auth.updateOne({user: id}, {$set: {email: email, password: password}}, {runValidators: true})
     }
 }
 
