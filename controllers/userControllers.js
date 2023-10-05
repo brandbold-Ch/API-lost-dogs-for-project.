@@ -43,18 +43,6 @@ exports.getUser = async (id) => {
 }
 
 /**
- * Get user credentials (email and password)
- * @async
- * @function
- * @param {string} id - ID user
- * @returns {Promise<Array>}
- * */
-
-exports.getCredentials = async (id) => {
-    return await service.getCredentials(id)
-}
-
-/**
  * Delete user
  * @async
  * @function
@@ -77,17 +65,4 @@ exports.delUser = async (id) => {
 
 exports.updateUser = async (id, data) => {
     await service.updateUser(id, data)
-}
-
-/**
- * Update partial credentials (email or password)
- * @async
- * @function
- * @param {string} id - ID user
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- * */
-
-exports.updateCredentials = async (id, data) => {
-    await service.updateCredentials(id, data)
 }

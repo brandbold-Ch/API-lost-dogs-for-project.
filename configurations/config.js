@@ -12,4 +12,4 @@ module.exports = {
         database: 'Contactos',
         port: 27017
     }
-}
+};

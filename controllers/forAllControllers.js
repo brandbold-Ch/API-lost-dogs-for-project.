@@ -4,14 +4,14 @@
  * @file This module is for creating application services.
  */
 
-const appService = require('../services/appServices')
-const service = new appService();
+const forAllServices = require('../services/forAllServices')
+const service = new forAllServices();
 
 /**
  * Get all the lost dogs
  * @async
  * @function
- * @returns {Promise<Object[]>}
+ * @returns {Promise<Array>}
  * */
 
 exports.getAllLostDogs = async () => {

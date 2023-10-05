@@ -12,7 +12,7 @@ const User = require('../models/user');
  * @class
  */
 
-class AppServices {
+class ForAllServices {
 
     constructor() {}
 
@@ -26,7 +26,7 @@ class AppServices {
     async getAllLostDogs(){
         /**
          * Perform an aggregation operation to obtain information about lost dog owners.
-         * @memberof AppServices
+         * @memberof ForAllServices
          * @inner
          * @type {Promise<Object[]>}
          */
@@ -51,4 +51,4 @@ class AppServices {
     }
 }
 
-module.exports = AppServices;
+module.exports = ForAllServices;
