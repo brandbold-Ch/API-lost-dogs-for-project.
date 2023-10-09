@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 
 useTreblle(app, {
     apiKey:'aljulEbaflLbDgaMrGFE4Wc5BhTTQe0f',
-    projectId: '54TZa6O4k6tYy0vJ'
+    projectId: 'jokOQEuJGMpsP6yZ'
 });
 
 /* ----------------------- Operations CRUD for the users ---------------------------------- */
