@@ -5,9 +5,9 @@
  * @module authSchema
  */
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const bcrypt = require('bcrypt')
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
 
 /**
  * Scheme to store a user's credentials.
@@ -44,7 +44,7 @@ const authSchema = new Schema({
         ref: 'User',
         required: true
     }
-})
+});
 
 /**
  * Mongodb middleware to encrypt the password before saving it to the database.
@@ -62,12 +62,12 @@ authSchema.pre('save', async function (next) {
     } catch (error) {
         next(error);
     }
-})
+});
 
 /**
  * Mongoose model for user credentials.
  * @type {mongoose.Model<AuthSchema>}
  */
 
-const Auth = mongoose.model('auth', authSchema)
+const Auth = mongoose.model('auth', authSchema);
 module.exports = Auth;

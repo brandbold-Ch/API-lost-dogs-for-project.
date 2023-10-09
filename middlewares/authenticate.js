@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 const isAuthenticate = async (req, res, next) => {
     try {
         const token = req.headers.authorization;
 
-        if (token !== undefined) {
+        if (token) {
             req.user = jwt.verify(token.substring(7), 'my-secret-key');
             next();
         } else {
@@ -14,6 +14,6 @@ const isAuthenticate = async (req, res, next) => {
     } catch (error) {
         res.status(401).json({'message': error.message});
     }
-}
+};
 
 module.exports = isAuthenticate;

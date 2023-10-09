@@ -4,8 +4,8 @@
  * @file This module is the configuration to mongodb
  */
 
-const mongoose = require('mongoose')
-const { db } = require('./config')
+const mongoose = require('mongoose');
+const { credentials: db } = require('./config');
 
 /**
  * Here the connection with mongodb is established
@@ -17,6 +17,6 @@ const connection = mongoose.connect(`mongodb://${db.host}:${db.port}/${db.databa
         console.log("Successful connection")
     }).catch(() => {
         console.log("Connection error")
-    })
+    });
 
-module.exports = connection
+module.exports = connection;

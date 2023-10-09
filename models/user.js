@@ -5,7 +5,6 @@
  * @module authSchema
  */
 
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const dogSchema = require('./dogs');
@@ -40,8 +39,27 @@ const userSchema = new Schema({
         maxLength: 10,
         minLength: 10
     },
-    lost_dogs: [dogSchema]
-})
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    my_networks: {
+        type: Array,
+        required: false,
+        default: [
+            {platform: 'instagram', user: ''},
+            {platform: 'facebook', user: ''},
+            {platform: 'twitter', user: ''},
+            {platform: 'linkedin', user: ''},
+            {platform: 'tiktok', user: ''},
+            {platform: 'threads', user: ''},
+            {platform: 'whatsapp', user: ''}
+        ]
+    },
+    my_lost_dogs: [dogSchema],
+    the_lost_dogs: [dogSchema]
+});
 
 /**
  * Mongoose model for the user model.

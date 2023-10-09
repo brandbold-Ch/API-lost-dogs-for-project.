@@ -14,41 +14,105 @@ const User = require('../models/user');
 
 class ForAllServices {
 
-    constructor() {}
+    constructor() {};
 
-    /**
-     * Get information about owners of lost dogs.
-     * @async
-     * @function
-     * @returns {Promise<Array>} A Promise that will be resolved to a list of objects representing lost dog owner information.
-     */
+    async getUserAndDog(id, dog_id, isOwner){
+        let user; let dog;
+        if (isOwner === 'true') {
+            user = await User.findOne({_id: id}, {the_lost_dogs: 0, _id:0, my_lost_dogs: 0, __v: 0});
+            dog = await User.findOne(
+                {_id: id},
+                {my_lost_dogs: {$elemMatch: {_id: dog_id}}}
+            );
 
-    async getAllLostDogs(){
-        /**
-         * Perform an aggregation operation to obtain information about lost dog owners.
-         * @memberof ForAllServices
-         * @inner
-         * @type {Promise<Object[]>}
-         */
-
-        return User.aggregate([{
-            /**
-             * Project specific fields for output.
-             * @type {Object}
-             * @property {number} _id - The _id field is excluded from the output.
-             * @property {string} owner - The 'name' field is renamed to 'owner'.
-             * @property {number} cellphone - The 'cellphone' field is included in the output.
-             * @property {number} lost_dogs - The 'lost_dogs' field is included in the output.
-             */
-
-            $project: {
-                _id: 0,
-                owner: "$name",
-                cellphone: 1,
-                lost_dogs: 1
+            if (dog['my_lost_dogs'][0]){
+                return [user, dog['my_lost_dogs'][0]];
+            } else {
+                return []
             }
-        }]);
-    }
+        }
+
+        else if (isOwner === 'false') {
+            user = await User.findOne({_id: id}, {the_lost_dogs: 0, _id:0, my_lost_dogs: 0, __v: 0});
+            dog = await User.findOne(
+                {_id: id},
+                {the_lost_dogs: {$elemMatch: {_id: dog_id}}}
+            );
+
+            if (dog['the_lost_dogs'][0]){
+                return [user, dog['the_lost_dogs'][0]];
+            } else {
+                return []
+            }
+        } else {
+            return {'message': 'You must specify the user, dog and if it is the owner in false or true'};
+        }
+
+    };
+
+    async getAllLostDogs(isOwner){
+
+        if (isOwner === 'true') {
+            return User.aggregate([
+                {
+                    $unwind: "$my_lost_dogs"
+                },
+                {
+                    $replaceRoot: { newRoot: "$my_lost_dogs" }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        dog_name: 1,
+                        gender: 1,
+                        last_seen: 1,
+                        description: 1,
+                        image: 1,
+                        size: 1,
+                        breed: 1,
+                        date: 1,
+                        lost_date: 1,
+                        found: 1,
+                        owner: 1,
+                        tags: 1
+                    }
+                }
+            ]);
+        } else if (isOwner === 'false') {
+            return User.aggregate([
+                {
+                    $unwind: "$the_lost_dogs"
+                },
+                {
+                    $addFields: {
+                        "the_lost_dogs.owner": "$_id"
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: "$the_lost_dogs" }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        dog_name: 1,
+                        gender: 1,
+                        last_seen: 1,
+                        description: 1,
+                        image: 1,
+                        size: 1,
+                        breed: 1,
+                        date: 1,
+                        lost_date: 1,
+                        found: 1,
+                        owner: 1,
+                        tags: 1
+                    }
+                }
+            ]);
+        } else {
+            return {'message': 'Illegal query, must be true or false'};
+        }
+    };
 }
 
 module.exports = ForAllServices;

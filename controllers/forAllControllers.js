@@ -4,7 +4,7 @@
  * @file This module is for creating application services.
  */
 
-const forAllServices = require('../services/forAllServices')
+const forAllServices = require('../services/forAllServices');
 const service = new forAllServices();
 
 /**
@@ -14,6 +14,10 @@ const service = new forAllServices();
  * @returns {Promise<Array>}
  * */
 
-exports.getAllLostDogs = async () => {
-    return await service.getAllLostDogs()
-}
+exports.getAllLostDogs = async (isOwner) => {
+    return await service.getAllLostDogs(isOwner);
+};
+
+exports.getUserAndDog = async (id, dog_id, isOwner) => {
+    return await service.getUserAndDog(id, dog_id, isOwner);
+};

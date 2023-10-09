@@ -1,5 +1,7 @@
-const { checkUserExists, checkPostExists } = require('./middlewares/entityManager')
-const isAuthenticate = require('./middlewares/authenticate')
+const { checkUserExists } = require('./middlewares/entityManager');
+const { checkMyPostExists, checkOtherPostExists } = require('./middlewares/entityManager');
+const { generalEndpoint} = require('./middlewares/entityManager');
+const isAuthenticate = require('./middlewares/authenticate');
 const userControllers = require('./controllers/userControllers');
 const dogsControllers = require('./controllers/dogsControllers');
 const appControllers = require('./controllers/forAllControllers');
@@ -19,7 +21,7 @@ app.use(morgan('dev'));
 
 app.post('/api/users/login', async (req, res) => {
     try {
-        const key = await authControllers.login(req.body)
+        const key = await authControllers.login(req.body);
 
         if (req.body.email && req.body.password) {
 
@@ -36,151 +38,247 @@ app.post('/api/users/login', async (req, res) => {
                     res.status(200).json(key[1]);
                     break;
             }
-
         } else {
             res.status(404).json({'message': 'Invalid credentials'});
         }
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.get('/api/users', async (req, res) => {
     try {
-        res.status(200).json(await userControllers.getUsers())
+        res.status(200).json(await userControllers.getUsers());
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.get('/api/users/:id', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const data = await userControllers.getUser(req.params.id)
-        res.status(200).json(data[0])
+        const data = await userControllers.getUser(req.params.id);
+        res.status(200).json(data);
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.get('/api/users/:id/credentials', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const pass = await authControllers.getCredentials(req.params.id)
-        res.status(200).json(pass[0])
+        const pass = await authControllers.getCredentials(req.params.id);
+        res.status(200).json(pass);
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.delete('/api/users/:id/delete', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        await userControllers.delUser(req.params.id)
-        res.status(200).json({'message': 'Deleted user'})
+        await userControllers.delUser(req.params.id);
+        res.status(200).json({'message': 'Deleted user'});
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.put('/api/users/:id/update', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        await userControllers.updateUser(req.params.id, req.body)
-        res.status(200).json({'message': 'Update user'})
+        await userControllers.updateUser(req.params.id, req.body);
+        res.status(200).json({'message': 'Update user'});
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
+
+app.put('/api/users/:id/networks/update', isAuthenticate, checkUserExists, async (req, res) => {
+    try {
+        await userControllers.updateNetwork(req.params.id, req.query.social, req.body);
+        res.status(200).json({'message': 'Updated social media'});
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
 
 app.put('/api/users/:id/credentials/update', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        await authControllers.updateCredentials(req.params.id, req.body)
-        res.status(200).json({'message': 'Updated credentials'})
+        await authControllers.updateCredentials(req.params.id, req.body);
+        res.status(200).json({'message': 'Updated credentials'});
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.post('/api/users/new', async (req, res) => {
     try {
-        await userControllers.setUser(req.body)
-        res.status(201).json({'message': 'Added user'})
+        await userControllers.setUser(req.body);
+        res.status(201).json({'message': 'Added user'});
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 
 /* ----------------------- Operations CRUD for the lost dogs ------------------------*/
 
 app.post('/api/users/:id/posts/new', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        await dogsControllers.insertLostDog(req.params.id, req.body)
-        res.status(201).json({'message': 'Added post'})
+        await dogsControllers.insertLostDog(req.params.id, req.body);
+        res.status(201).json({'message': 'Added post'});
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
 app.get('/api/users/:id/posts', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const posts = await dogsControllers.getPosts(req.params.id)
-        res.status(200).json(posts[0].lost_dogs)
+        const posts = await dogsControllers.getPosts(req.params.id, req.query.owner);
+        res.status(200).json(posts);
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
-app.get('/api/users/:id/posts/filter', isAuthenticate, checkUserExists, checkPostExists, async (req, res) => {
+app.get('/api/users/:id/posts/mine/filter', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
     try {
-        const post = await dogsControllers.getPost(req.params.id, req.query.dog)
-        res.status(200).json(post[0].lost_dogs[0])
+        if (req.query.dog) {
+            res.status(200).json(await dogsControllers.getMyPostByName(req.params.id, req.query.dog));
+        }else {
+            res.status(200).json(await dogsControllers.getMyPostById(req.params.id, req.query.id));
+        }
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
-app.delete('/api/users/:id/posts/delete', isAuthenticate, checkUserExists, checkPostExists, async (req, res) => {
+app.get('/api/users/:id/posts/other/filter', isAuthenticate, checkUserExists, checkOtherPostExists, async (req, res) => {
     try {
-        await dogsControllers.delPost(req.params.id, req.query.dog)
-        res.status(200).json({'message': 'Deleted post'})
+        if (req.query.dog) {
+            res.status(200).json(await dogsControllers.getOtherPostByName(req.params.id, req.query.dog));
+        }else {
+            res.status(200).json(await dogsControllers.getOtherPostById(req.params.id, req.query.id));
+        }
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
-app.put('/api/users/:id/posts/update', isAuthenticate, checkUserExists, checkPostExists, async (req, res) => {
+app.delete('/api/users/:id/posts/mine/delete', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
     try {
-        await dogsControllers.updatePost(req.params.id, req.query.dog, req.body)
-        res.status(200).json({'message': 'Updated post'})
+        await dogsControllers.delMyPost(req.params.id, req.query.id);
+        res.status(200).json({'message': 'Deleted post'});
 
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
 
+app.delete('/api/users/:id/posts/other/delete', isAuthenticate, checkUserExists, checkOtherPostExists, async (req, res) => {
+    try {
+        await dogsControllers.delOtherPost(req.params.id, req.query.id);
+        res.status(200).json({'message': 'Deleted post'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.put('/api/users/:id/posts/mine/update', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
+    try {
+        await dogsControllers.updateMyPost(req.params.id, req.query.id, req.body);
+        res.status(200).json({'message': 'Updated post'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.put('/api/users/:id/posts/other/update', isAuthenticate, checkUserExists, checkOtherPostExists, async (req, res) => {
+    try {
+        await dogsControllers.updateOtherPost(req.params.id, req.query.id, req.body);
+        res.status(200).json({'message': 'Updated post'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.post('/api/users/:id/posts/mine/tags/new', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
+    try {
+        await dogsControllers.insertTagsMyPost(req.params.id, req.query.id, req.body);
+        res.status(200).json({'message': 'Added tag'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.post('/api/users/:id/posts/other/tags/new', isAuthenticate, checkUserExists, checkOtherPostExists, async (req, res) => {
+    try {
+        await dogsControllers.insertTagsOtherPost(req.params.id, req.query.id, req.body);
+        res.status(200).json({'message': 'Added tag'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.delete('/api/users/:id/posts/mine/tags/delete', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
+    try {
+        console.log(req.url)
+        await dogsControllers.delTagsMyPost(req.params.id, req.query.id, req.query.key, req.query.value);
+        res.status(200).json({'message': 'Deleted tag'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
+app.delete('/api/users/:id/posts/other/tags/delete', isAuthenticate, checkUserExists, checkOtherPostExists, async (req, res) => {
+    try {
+        await dogsControllers.delTagsOtherPost(req.params.id, req.query.id, req.query.key, req.query.value);
+        res.status(200).json({'message': 'Deleted tag'});
+
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
 
 /* ----------------------- Operations without authentication ------------------------*/
 
 app.get('/', (req, res) => {
-    res.status(200).json({'message': `Welcome ${req.ip.substring(7)} to API to lost dogs`});
-})
+    res.status(200).json({'message': 'Welcome API to lost dogs'});
+});
 
-app.get('/dogs/lost', async (req, res) => {
+app.get('/api/dogs/lost', generalEndpoint, async (req, res) => {
     try {
-        res.status(200).json(await appControllers.getAllLostDogs())
+        res.status(200).json(await appControllers.getAllLostDogs(req.query.owner));
     } catch (error) {
-        res.status(500).json({'message': error.message})
+        res.status(500).json({'message': error.message});
     }
-})
+});
+
+app.get('/api/dogs/lost/board', generalEndpoint, async (req, res) => {
+    try {
+        res.status(200).json(
+            await appControllers.getUserAndDog(
+                req.query.user, req.query.dog, req.query.owner
+            )
+        );
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
 
 app.listen(5000, () => {
-    console.log("Listening")
-})
+    console.log("Listening");
+});

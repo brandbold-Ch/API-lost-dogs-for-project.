@@ -4,9 +4,9 @@
  * @file This module is for creating auth services.
  */
 
-const authService = require('../services/authServices')
+const authService = require('../services/authServices');
 const service = new authService();
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 /**
  * Get user credentials (email and password)
@@ -17,8 +17,8 @@ const bcrypt = require('bcrypt')
  * */
 
 exports.getCredentials = async (id) => {
-    return await service.getCredentials(id)
-}
+    return await service.getCredentials(id);
+};
 
 /**
  * Update partial credentials (email or password)
@@ -30,27 +30,27 @@ exports.getCredentials = async (id) => {
  * */
 
 exports.updateCredentials = async (id, data) => {
-    await service.updateCredentials(id, data)
-}
+    await service.updateCredentials(id, data);
+};
 
 exports.login = async (auth) => {
     const {email, password} = auth;
-    const user = await service.getEmail(email)
+    const user = await service.getEmail(email);
 
-    if (user.length > 0) {
-        const match = bcrypt.compareSync(password, user[0].password)
+    if (user) {
+        const match = bcrypt.compareSync(password, user['password']);
 
         if (match) {
             return [200, await service.generateTokenUser({
-                email: user[0].email,
-                user: user[0].user
-            })]
+                email: user['email'],
+                user: user['user']
+            })];
 
         } else {
-            return [401, {'message': 'Incorrect password'}]
+            return [401, {'message': 'Incorrect password'}];
         }
 
     } else {
-        return [404, {'message': 'Not found user'}]
+        return [404, {'message': 'Not found user'}];
     }
-}
+};

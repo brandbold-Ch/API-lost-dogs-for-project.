@@ -7,6 +7,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const { cloudinary } = require('../configurations/config');
 
 /**
  * Scheme for storing information about a dog.
@@ -23,15 +24,19 @@ const Schema = mongoose.Schema;
  */
 
 const dogSchema = new Schema({
-
     dog_name: {
         type: String,
-        required: true,
+        required: false,
+        default: 'Sin nombre'
     },
     gender: {
         type: String,
         enum: ['Macho', 'Hembra'],
         required: true
+    },
+    age: {
+        type: String,
+        required: false
     },
     last_seen: {
         type: String,
@@ -41,6 +46,11 @@ const dogSchema = new Schema({
         type: String,
         required: true
     },
+    image: {
+        type: Object,
+        required: false,
+        default: ""
+    },
     size: {
         type: String,
         enum: ['Pequeño', 'Mediano', 'Grande'],
@@ -49,6 +59,10 @@ const dogSchema = new Schema({
     breed: {
         type: String,
         required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now()
     },
     lost_date: {
         type: Date,
@@ -60,11 +74,16 @@ const dogSchema = new Schema({
         required: true,
         default: false
     },
+    owner: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
     tags: {
         type: Array,
         required: false,
         default: []
     }
-})
+});
 
 module.exports = dogSchema;

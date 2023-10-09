@@ -4,7 +4,7 @@
  * @file This module is for creating user services.
  */
 
-const userService = require('../services/userServices')
+const userService = require('../services/userServices');
 const service = new userService();
 
 /**
@@ -15,8 +15,8 @@ const service = new userService();
  * */
 
 exports.getUsers = async () => {
-    return await service.getAll()
-}
+    return await service.getAll();
+};
 
 /**
  * Create new user
@@ -27,8 +27,8 @@ exports.getUsers = async () => {
  * */
 
 exports.setUser = async (data) => {
-    await service.create(data)
-}
+    await service.create(data);
+};
 
 /**
  * Get user
@@ -40,7 +40,7 @@ exports.setUser = async (data) => {
 
 exports.getUser = async (id) => {
     return await service.getUser(id);
-}
+};
 
 /**
  * Delete user
@@ -51,8 +51,8 @@ exports.getUser = async (id) => {
  * */
 
 exports.delUser = async (id) => {
-    await service.delUser(id)
-}
+    await service.delUser(id);
+};
 
 /**
  * Update partial user
@@ -64,5 +64,9 @@ exports.delUser = async (id) => {
  * */
 
 exports.updateUser = async (id, data) => {
-    await service.updateUser(id, data)
-}
+    await service.updateUser(id, data);
+};
+
+exports.updateNetwork = async (id, network, data)  => {
+    await service.updateNetwork(id, network, data);
+};

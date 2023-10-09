@@ -1,9 +1,10 @@
 const Auth = require('../models/auth');
+const User = require('../models/user');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
 class AuthServices {
-    constructor() {}
+    constructor() {};
 
     /**
      * Gets a user's credentials by their ID.
@@ -14,8 +15,8 @@ class AuthServices {
      */
 
     async getCredentials(id){
-        return Auth.find({user: id}, {user: 0, _id: 0, __v:0})
-    }
+        return Auth.findOne({user: id}, {user: 0, _id: 0, __v:0});
+    };
 
     /**
      * Gets a user's email.
@@ -26,8 +27,8 @@ class AuthServices {
      */
 
     async getEmail(email) {
-        return Auth.find({email: email})
-    }
+        return Auth.findOne({email: email});
+    };
 
     /**
      * Updates a user's credentials by their ID.
@@ -41,18 +42,19 @@ class AuthServices {
      */
 
     async updateCredentials(id, data) {
-        let { email, password } = data
-        password = await bcrypt.hash(password, 10)
+        let { email, password } = data;
+        password = await bcrypt.hash(password, 10);
+        await User.updateOne({_id: id}, {$set: {email: email}});
         await Auth.updateOne(
             {user: id},
             {$set: {email: email, password: password}},
             {runValidators: true}
-        )
-    }
+        );
+    };
 
     async generateTokenUser(payload) {
-         return jwt.sign(payload, 'my-secret-key', {expiresIn: '1m'})
-    }
+         return jwt.sign(payload, 'my-secret-key', {expiresIn: '2h'});
+    };
 }
 
 module.exports = AuthServices;
