@@ -58,6 +58,11 @@ class ForAllServices {
                     $unwind: "$my_lost_dogs"
                 },
                 {
+                    $addFields: {
+                        "the_lost_dogs.owner": "$_id"
+                    }
+                },
+                {
                     $replaceRoot: { newRoot: "$my_lost_dogs" }
                 },
                 {
@@ -65,6 +70,7 @@ class ForAllServices {
                         _id: 0,
                         dog_name: 1,
                         gender: 1,
+                        age: 1,
                         last_seen: 1,
                         description: 1,
                         image: 1,
@@ -96,6 +102,7 @@ class ForAllServices {
                         _id: 1,
                         dog_name: 1,
                         gender: 1,
+                        age: 1,
                         last_seen: 1,
                         description: 1,
                         image: 1,
