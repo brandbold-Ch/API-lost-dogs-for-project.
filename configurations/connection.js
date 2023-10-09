@@ -12,7 +12,7 @@ const { credentials: db } = require('./config');
  * @returns {Promise<void>}
  * */
 
-const connection = mongoose.connect(`mongodb://${db.host}:${db.port}/${db.database}`)
+const connection = mongoose.connect("mongodb+srv://223031:EWwe05ZQcQgV9AuR@cluster0.glnagiz.mongodb.net/?retryWrites=true&w=majority")
     .then(() => {
         console.log("Successful connection")
     }).catch(() => {
