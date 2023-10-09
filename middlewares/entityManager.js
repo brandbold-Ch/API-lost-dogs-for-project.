@@ -44,7 +44,6 @@ const checkMyPostExists = async (req, res, next) => {
         res.status(500).json({'message': error.message})
     }
 };
-
 const checkOtherPostExists = async (req, res, next) => {
     try {
         if (req.query.dog) {
@@ -74,14 +73,27 @@ const checkOtherPostExists = async (req, res, next) => {
 
 const generalEndpoint = async (req, res, next) => {
     try {
-        if (req.query.owner) {
-            next();
+
+        if (req.url.substring(0, 19) === '/api/dogs/lost/board') {
+
+            if (req.query.owner && req.query.dog ) {
+                next();
+            } else {
+                res.status(404).json({'message': 'Parameters: owner=true or false; dog=id'})
+            }
+
         }
-        else if (req.query.dog) {
-            next();
+        else if (req.url.substring(0, 14) === '/api/dogs/lost') {
+
+            if (req.query.owner) {
+                next();
+            }else {
+                res.status(404).json({'message': 'You must set the owner parameter to false or true'})
+            }
+
         }
         else {
-            res.status(404).json({'message': 'Parameters: owner=true or false; dog=id'})
+            next();
         }
 
     } catch (error) {

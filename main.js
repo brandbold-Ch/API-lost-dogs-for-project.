@@ -1,5 +1,5 @@
-const { checkUserExists } = require('./middlewares/entityManager');
 const { checkMyPostExists, checkOtherPostExists } = require('./middlewares/entityManager');
+const { checkUserExists } = require('./middlewares/entityManager');
 const { generalEndpoint} = require('./middlewares/entityManager');
 const isAuthenticate = require('./middlewares/authenticate');
 const userControllers = require('./controllers/userControllers');
@@ -7,14 +7,21 @@ const dogsControllers = require('./controllers/dogsControllers');
 const appControllers = require('./controllers/forAllControllers');
 const authControllers = require('./controllers/authControllers');
 const connection = require('./configurations/connection');
+const { useTreblle } = require('treblle');
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const dotenv = require('dotenv').config()
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
+
+useTreblle(app, {
+    apiKey:'aljulEbaflLbDgaMrGFE4Wc5BhTTQe0f',
+    projectId: '54TZa6O4k6tYy0vJ'
+});
 
 /* ----------------------- Operations CRUD for the users ---------------------------------- */
 
@@ -57,8 +64,7 @@ app.get('/api/users', async (req, res) => {
 
 app.get('/api/users/:id', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const data = await userControllers.getUser(req.params.id);
-        res.status(200).json(data);
+        res.status(200).json(await userControllers.getUser(req.params.id));
 
     } catch (error) {
         res.status(500).json({'message': error.message});
@@ -67,8 +73,7 @@ app.get('/api/users/:id', isAuthenticate, checkUserExists, async (req, res) => {
 
 app.get('/api/users/:id/credentials', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const pass = await authControllers.getCredentials(req.params.id);
-        res.status(200).json(pass);
+        res.status(200).json(await authControllers.getCredentials(req.params.id));
 
     } catch (error) {
         res.status(500).json({'message': error.message});
@@ -138,8 +143,7 @@ app.post('/api/users/:id/posts/new', isAuthenticate, checkUserExists, async (req
 
 app.get('/api/users/:id/posts', isAuthenticate, checkUserExists, async (req, res) => {
     try {
-        const posts = await dogsControllers.getPosts(req.params.id, req.query.owner);
-        res.status(200).json(posts);
+        res.status(200).json(await dogsControllers.getPosts(req.params.id, req.query.owner));
 
     } catch (error) {
         res.status(500).json({'message': error.message});
@@ -234,7 +238,6 @@ app.post('/api/users/:id/posts/other/tags/new', isAuthenticate, checkUserExists,
 
 app.delete('/api/users/:id/posts/mine/tags/delete', isAuthenticate, checkUserExists, checkMyPostExists, async (req, res) => {
     try {
-        console.log(req.url)
         await dogsControllers.delTagsMyPost(req.params.id, req.query.id, req.query.key, req.query.value);
         res.status(200).json({'message': 'Deleted tag'});
 
@@ -261,6 +264,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/dogs/lost', generalEndpoint, async (req, res) => {
     try {
+        console.log(process.env.port)
         res.status(200).json(await appControllers.getAllLostDogs(req.query.owner));
     } catch (error) {
         res.status(500).json({'message': error.message});
