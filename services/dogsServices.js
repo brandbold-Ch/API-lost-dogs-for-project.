@@ -182,6 +182,7 @@ class DogsServices {
 
     async updateMyPost(id, dog_id, dog_data) {
         const dog = await this.getMyPostById(id, dog_id)
+        dog_data.tags = dog.tags;
 
         if (typeof dog.image === "object" && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
@@ -194,7 +195,6 @@ class DogsServices {
         } 
         else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
-            dog_data.tags = dog.tags;
             
         } else {
             const url = await cloudinary.uploader.upload(dog_data.image);
@@ -213,6 +213,7 @@ class DogsServices {
 
     async updateOtherPost(id, dog_id, dog_data) {
         const dog = await this.getOtherPostById(id, dog_id)
+        dog_data.tags = dog.tags;
 
         if (typeof dog.image === "object" && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
@@ -224,7 +225,6 @@ class DogsServices {
             
         } else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
-            dog_data.tags = dog.tags;
             
         } else {
             const url = await cloudinary.uploader.upload(dog_data.image);
