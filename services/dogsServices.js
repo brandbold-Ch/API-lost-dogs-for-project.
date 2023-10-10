@@ -183,11 +183,14 @@ class DogsServices {
     async updateMyPost(id, dog_id, dog_data) {
         const dog = await this.getMyPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {} || dog.image.substring(11, 21) === "cloudinary") {
+        if (typeof dog.image === typeof {}) {
             await cloudinary.uploader.destroy(dog.image.id);
-        }
-
-        if (dog_data.image) {
+            
+        } 
+        else if (dog.image.substring(11, 21) === "cloudinary") {
+            dog_data.image = dog.image;
+            
+        } else {
             await cloudinary.uploader.upload(dog_data.image).then((url) => {
                 dog_data.image = {
                     'url': url.url,
@@ -207,11 +210,13 @@ class DogsServices {
     async updateOtherPost(id, dog_id, dog_data) {
         const dog = await this.getOtherPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {} || dog.image.substring(11, 21) === "cloudinary") {
+        if (typeof dog.image === typeof {}) {
             await cloudinary.uploader.destroy(dog.image.id);
-        }
-
-        if (dog_data.image) {
+            
+        } else if (dog.image.substring(11, 21) === "cloudinary") {
+            dog_data.image = dog.image;
+            
+        } else {
             await cloudinary.uploader.upload(dog_data.image).then((url) => {
                 dog_data.image = {
                     'url': url.url,
@@ -225,7 +230,6 @@ class DogsServices {
             {$set: {"the_lost_dogs.$": dog_data}},
             {runValidators: true}
         );
-
     };
 
     async insertTagsMyPost(id, dog_id, data) {
