@@ -183,11 +183,18 @@ class DogsServices {
     async updateMyPost(id, dog_id, dog_data) {
         const dog = await this.getMyPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {}) {
+        if (typeof dog.image === typeof {} && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
             
+            await cloudinary.uploader.upload(dog_data.image).then((url) => {
+                dog_data.image = {
+                    'url': url.url,
+                    'id': url.public_id
+                };
+            });
+        
         } 
-        else if (dog.image.substring(11, 21) === "cloudinary") {
+        else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
             
         } else {
@@ -204,16 +211,22 @@ class DogsServices {
             {$set: {"my_lost_dogs.$": dog_data}},
             {runValidators: true}
         );
-
     };
 
     async updateOtherPost(id, dog_id, dog_data) {
         const dog = await this.getOtherPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {}) {
+        if (typeof dog.image === typeof {} && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
             
-        } else if (dog.image.substring(11, 21) === "cloudinary") {
+            await cloudinary.uploader.upload(dog_data.image).then((url) => {
+                dog_data.image = {
+                    'url': url.url,
+                    'id': url.public_id
+                };
+            });
+            
+        } else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
             
         } else {
