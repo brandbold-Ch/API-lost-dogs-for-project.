@@ -194,6 +194,7 @@ class DogsServices {
         } 
         else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
+            dog_data.tags = dog.tags;
             
         } else {
             const url = await cloudinary.uploader.upload(dog_data.image);
@@ -223,6 +224,7 @@ class DogsServices {
             
         } else if (dog_data.image.substring(11, 21) === "cloudinary") {
             dog_data.image = dog.image;
+            dog_data.tags = dog.tags;
             
         } else {
             const url = await cloudinary.uploader.upload(dog_data.image);
