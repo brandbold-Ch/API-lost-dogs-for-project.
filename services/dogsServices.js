@@ -183,7 +183,7 @@ class DogsServices {
     async updateMyPost(id, dog_id, dog_data) {
         const dog = await this.getMyPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {} && dog_data.image.substring(11, 21) !== "cloudinary") {
+        if (typeof dog.image === "object" && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
             
             await cloudinary.uploader.upload(dog_data.image).then((url) => {
@@ -216,7 +216,7 @@ class DogsServices {
     async updateOtherPost(id, dog_id, dog_data) {
         const dog = await this.getOtherPostById(id, dog_id)
 
-        if (typeof dog.image === typeof {} && dog_data.image.substring(11, 21) !== "cloudinary") {
+        if (typeof dog.image === "object" && dog_data.image.substring(11, 21) !== "cloudinary") {
             await cloudinary.uploader.destroy(dog.image.id);
             
             await cloudinary.uploader.upload(dog_data.image).then((url) => {
