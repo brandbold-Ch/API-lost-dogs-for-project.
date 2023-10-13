@@ -6,13 +6,15 @@
 
 const mongoose = require('mongoose');
 const { credentials: db } = require('./config');
+require('dotenv').config();
+
 
 /**
  * Here the connection with mongodb is established
  * @returns {Promise<void>}
  * */
 
-const connection = mongoose.connect("mongodb+srv://223031:EWwe05ZQcQgV9AuR@cluster0.glnagiz.mongodb.net/?retryWrites=true&w=majority")
+const connection = mongoose.connect(process.env.URL_DATABASE)
     .then(() => {
         console.log("Successful connection")
     }).catch(() => {

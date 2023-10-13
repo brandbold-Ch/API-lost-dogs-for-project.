@@ -67,6 +67,16 @@ exports.updateUser = async (id, data) => {
     await service.updateUser(id, data);
 };
 
+/**
+ * Update user network information.
+ * @async
+ * @function
+ * @param {string} id - ID user.
+ * @param {string} network - Network to update.
+ * @param {Object} data - Body request data.
+ * @returns {Promise<void>} - A promise that resolves when the user's network information is updated.
+ */
+
 exports.updateNetwork = async (id, network, data)  => {
     await service.updateNetwork(id, network, data);
 };

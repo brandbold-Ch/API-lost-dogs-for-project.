@@ -1,7 +1,16 @@
+/**
+ * @author Brandon Jared Molina Vazquez
+ * @date 02/10/2023
+ * @file This module is to handle user authentication.
+ * @module authSchema
+ */
+
+
 const Auth = require('../models/auth');
 const User = require('../models/user');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 class AuthServices {
     constructor() {};
@@ -52,8 +61,20 @@ class AuthServices {
         );
     };
 
+    /**
+     * Generates a JSON Web Token (JWT) for a user based on the provided payload.
+     *
+     * @async
+     * @function
+     * @param {Object} payload - The data to be included in the JWT payload.
+     * @param {string} payload.email - The user's email.
+     * @param {string} payload.user - The user identifier.
+     * @returns {Promise<string>} A Promise that resolves to the generated JWT.
+     * @throws {Error} If there's an issue during token generation.
+     */
+
     async generateTokenUser(payload) {
-         return jwt.sign(payload, 'my-secret-key', {expiresIn: '2h'});
+         return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '3h'});
     };
 }
 

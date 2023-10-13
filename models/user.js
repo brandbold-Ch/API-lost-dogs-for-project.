@@ -7,15 +7,18 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dogSchema = require('./dogs');
+const petsSchema = require('./pets');
 
 /**
- * Scheme to store information about a user.
+ * Schema to store information about a user.
  * @typedef {Object} UserSchema
  * @property {string} name - Name of the user.
  * @property {string} lastname - Last name of the user.
  * @property {string} cellphone - User's phone number.
- * @property {Array} lost_dogs - Array that stores lost dogs associated with the user.
+ * @property {string} email - User's email address.
+ * @property {Array} my_networks - Array that stores user's social media networks.
+ * @property {Array} my_lost_dogs - Array that stores lost dogs associated with the user.
+ * @property {Array} the_lost_dogs - Array that stores lost dogs associated with other users.
  */
 
 /**
@@ -57,8 +60,8 @@ const userSchema = new Schema({
             {platform: 'whatsapp', user: ''}
         ]
     },
-    my_lost_dogs: [dogSchema],
-    the_lost_dogs: [dogSchema]
+    my_lost_pets: [petsSchema],
+    the_lost_pets: [petsSchema]
 });
 
 /**

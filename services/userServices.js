@@ -97,6 +97,16 @@ class UserServices {
         );
     };
 
+    /**
+     * Updates a user's network information by their ID and network platform.
+     * @async
+     * @function
+     * @param {string} id - User ID.
+     * @param {string} network - Platform of the network to update.
+     * @param {Object} data - New network data.
+     * @returns {Promise<void>} A Promise that will be resolved once the network update is complete.
+     */
+
     async updateNetwork(id, network, data){
         await User.updateOne(
             {_id: id, "my_networks.platform": network},

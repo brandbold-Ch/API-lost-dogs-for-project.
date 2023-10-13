@@ -16,110 +16,150 @@ class ForAllServices {
 
     constructor() {};
 
-    async getUserAndDog(id, dog_id, isOwner){
-        let user; let dog;
+    /**
+     * Get information about a user and a specific dog based on ownership.
+     * @async
+     * @function
+     * @param {string} id - User identifier.
+     * @param {string} pet_id - ID of the pet.
+     * @param {boolean} isOwner - Indicates if the user is the owner.
+     * @returns {Promise<Array||Object>} A Promise that resolves to an array containing information about the user and the specific pet.
+     */
+
+    async getUserAndPet(id, pet_id, isOwner){
+        let user; let pet; let array
+
         if (isOwner === 'true') {
-            user = await User.findOne({_id: id}, {the_lost_dogs: 0, _id:0, my_lost_dogs: 0, __v: 0});
-            dog = await User.findOne(
-                {_id: id},
-                {my_lost_dogs: {$elemMatch: {_id: dog_id}}}
-            );
+            array = "my_lost_pets";
 
-            if (dog['my_lost_dogs'][0]){
-                return [user, dog['my_lost_dogs'][0]];
-            } else {
-                return []
-            }
         }
-
         else if (isOwner === 'false') {
-            user = await User.findOne({_id: id}, {the_lost_dogs: 0, _id:0, my_lost_dogs: 0, __v: 0});
-            dog = await User.findOne(
-                {_id: id},
-                {the_lost_dogs: {$elemMatch: {_id: dog_id}}}
-            );
+            array = "the_lost_pets"
 
-            if (dog['the_lost_dogs'][0]){
-                return [user, dog['the_lost_dogs'][0]];
-            } else {
-                return []
-            }
-        } else {
-            return {'message': 'You must specify the user, dog and if it is the owner in false or true'};
+        }else {
+            return {'message': 'You must specify the user, pet and if it is the owner in false or true'};
         }
 
+        user = await User.findOne({_id: id}, {the_lost_pets: 0, _id:0, my_lost_pets: 0, __v: 0});
+        pet = await User.findOne(
+            {_id: id},
+            {[`${array}`]: {$elemMatch: {_id: pet_id}}}
+        );
+
+        if (pet[array][0]){
+            return [user, pet[array][0]];
+        } else {
+            return []
+        }
     };
 
-    async getAllLostDogs(isOwner){
+    /**
+     * Get information about all lost dogs based on ownership.
+     * @async
+     * @function
+     * @param {boolean} isOwner - Indicates if the user is the owner.
+     * @returns {Promise<Array||Object>} A Promise that resolves to an array containing information about lost dogs.
+     */
 
-        if (isOwner === 'true') {
-            return User.aggregate([
-                {
-                    $unwind: "$my_lost_dogs"
-                },
-                {
-                    $addFields: {
-                        "the_lost_dogs.owner": "$_id"
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: "$my_lost_dogs" }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        dog_name: 1,
-                        gender: 1,
-                        age: 1,
-                        last_seen: 1,
-                        description: 1,
-                        image: 1,
-                        size: 1,
-                        breed: 1,
-                        date: 1,
-                        lost_date: 1,
-                        found: 1,
-                        owner: 1,
-                        tags: 1
-                    }
-                }
-            ]);
-        } else if (isOwner === 'false') {
-            return User.aggregate([
-                {
-                    $unwind: "$the_lost_dogs"
-                },
-                {
-                    $addFields: {
-                        "the_lost_dogs.owner": "$_id"
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: "$the_lost_dogs" }
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        dog_name: 1,
-                        gender: 1,
-                        age: 1,
-                        last_seen: 1,
-                        description: 1,
-                        image: 1,
-                        size: 1,
-                        breed: 1,
-                        date: 1,
-                        lost_date: 1,
-                        found: 1,
-                        owner: 1,
-                        tags: 1
-                    }
-                }
-            ]);
+    async getAllLostPets(isOwner){
+        let array;
+
+        if (isOwner === 'true'){
+            array = "my_lost_pets";
+
+        }
+        else if (isOwner === 'false') {
+            array = "the_lost_pets";
+
         } else {
             return {'message': 'Illegal query, must be true or false'};
         }
+
+        return User.aggregate([
+            {
+                $unwind: `$${array}`
+            },
+            {
+                $addFields: {
+                    [`${array}.owner`]: "$_id"
+                }
+            },
+            {
+                $replaceRoot: { newRoot: `$${array}`}
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    gender: 1,
+                    age: 1,
+                    last_seen: 1,
+                    description: 1,
+                    image: 1,
+                    size: 1,
+                    breed: 1,
+                    update: 1,
+                    date: 1,
+                    lost_date: 1,
+                    found: 1,
+                    owner: 1,
+                    tags: 1
+                }
+            }
+        ]);
     };
+
+    /**
+     * Get information about pets of a specific species based on ownership.
+     * @async
+     * @function
+     * @param {boolean} isOwner - Indicates if the user is the owner.
+     * @param {string} pet_specie - The species of the pet.
+     * @returns {Promise<Array||Object>} A Promise that resolves to an array containing information about pets of the specified species.
+     */
+
+    async getSpecies(isOwner, pet_specie){
+        let array;
+
+        if (isOwner === 'true') {
+            array = "my_lost_pets";
+
+        }
+        else if (isOwner === 'false') {
+            array = "the_lost_pets";
+
+        } else {
+            return {'message': 'You must set the owner parameter to false or true and type the specie'};
+        }
+
+        return User.aggregate([
+            {
+                $project: {
+                    [`${array}`]: {
+                        $filter: {
+                            input: `$${array}`,
+                            as: "pet",
+                            cond: {$eq: ["$$pet.specie", pet_specie]}
+                        }
+                    },
+                    _id: 1
+                }
+            },
+            {
+                $unwind: `$${array}`
+            },
+            {
+                $addFields: {
+                    [`${array}.user`]: "$_id"
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: `$${array}`
+                }
+            }
+        ]);
+    }
 }
 
 module.exports = ForAllServices;
