@@ -38,7 +38,7 @@ const petSchema = new Schema({
     },
     gender: {
         type: String,
-        enum: ['macho', 'hembra'],
+        enum: ['Macho', 'Hembra'],
         required: true
     },
     age: {
@@ -60,7 +60,7 @@ const petSchema = new Schema({
     },
     size: {
         type: String,
-        enum: ['pequeño', 'mediano', 'grande'],
+        enum: ['Chico', 'Mediano', 'Grande', 'No aplica'],
         required: true
     },
     breed: {

@@ -516,7 +516,7 @@ app.delete('/api/users/:id/posts/other/tags/delete', isAuthenticate, checkUserEx
  */
 
 app.get('/', (req, res) => {
-    res.status(200).json({'message': 'Welcome API to lost dogs'});
+    res.status(200).json({'message': 'Welcome API to lost pets'});
 });
 
 /**
@@ -559,6 +559,17 @@ app.get('/api/pets/lost/board', checkUserExists, generalEndpoint, async (req, re
     }
 });
 
+/**
+ * Get lost pets by species endpoint.
+ *
+ * @function
+ * @name getLostPetsBySpecies
+ * @memberof PublicOperations
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {void}
+ */
+
 app.get('/api/pets/lost/specie', async (req, res) => {
     try {
         res.status(200).json(await appControllers.getSpecies(req.query.owner, req.query.type));
@@ -576,5 +587,5 @@ app.get('/api/pets/lost/specie', async (req, res) => {
  */
 
 app.listen(parseInt(process.env.PORT, 10), () => {
-    console.log("Listening");
+    console.log("Listening requests");
 });

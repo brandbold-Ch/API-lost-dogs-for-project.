@@ -63,7 +63,7 @@ class UserServices {
     async getUser(id){
          return User.findOne(
              {_id: id},
-             {__v:0, _id: 0, my_lost_dogs: 0, the_lost_dogs: 0}
+             {__v:0, _id: 0, my_lost_pets: 0, the_lost_pets: 0}
          );
     };
 

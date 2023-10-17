@@ -52,8 +52,7 @@ exports.login = async (auth) => {
 
         if (match) {
             return [202, await service.generateTokenUser({
-                email: user['email'],
-                user: user['user']
+                id: user['user']
             })];
 
         } else {

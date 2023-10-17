@@ -5,7 +5,6 @@
  * @module authSchema
  */
 
-
 const Auth = require('../models/auth');
 const User = require('../models/user');
 const bcrypt = require("bcrypt");
@@ -66,7 +65,7 @@ class AuthServices {
      *
      * @async
      * @function
-     * @param {Object} payload - The data to be included in the JWT payload.
+     * @param {{id}} payload - The data to be included in the JWT payload.
      * @param {string} payload.email - The user's email.
      * @param {string} payload.user - The user identifier.
      * @returns {Promise<string>} A Promise that resolves to the generated JWT.

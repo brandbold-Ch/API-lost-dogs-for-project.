@@ -17,8 +17,8 @@ const petsSchema = require('./pets');
  * @property {string} cellphone - User's phone number.
  * @property {string} email - User's email address.
  * @property {Array} my_networks - Array that stores user's social media networks.
- * @property {Array} my_lost_dogs - Array that stores lost dogs associated with the user.
- * @property {Array} the_lost_dogs - Array that stores lost dogs associated with other users.
+ * @property {Array} my_lost_dogs - Array that stores lost pets associated with the user.
+ * @property {Array} the_lost_pets - Array that stores lost pets associated with other users.
  */
 
 /**
