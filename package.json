@@ -1,7 +1,7 @@
 {
-  "name": "api_dogs",
-  "version": "1.0.0",
-  "description": "API for dogs",
+  "name": "api_pets",
+  "version": "1.5.1",
+  "description": "API for pets",
   "engines": {
     "node": "16"
   },
