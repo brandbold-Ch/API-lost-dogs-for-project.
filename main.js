@@ -30,18 +30,11 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors({
-    origin: (origin, callback) => {
-        const origins = ['*'];
-
-        if (origins.includes(origin)) {
-            return callback(null, true);
-        }
-        if (!origin){
-            return callback(null, true);
-        }
-
-        return callback(new Error('Not allowed by CORS'));
-    }
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204,
+    allowedHeaders: 'Content-Type,Authorization',
 }));
 app.use(morgan('dev'));
 
