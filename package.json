@@ -7,13 +7,13 @@
   },
   "main": "main.js",
   "scripts": {
-    "npm start": "node main.js"
+    "start": "node main.js"
   },
+  "start": "node main.js",
   "keywords": [
     "heroku"
   ],
   "author": "Brandon Jared Molina Vazquez",
-
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
