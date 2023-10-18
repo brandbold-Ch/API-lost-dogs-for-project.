@@ -31,6 +31,9 @@ const corsOptions = {
 app.use(express.json());
 app.options('*', cors(corsOptions))
 app.use(cors(corsOptions));
+app.header('Access-Control-Allow-Origin', '*');
+app.header('Access-Control-Allow-Credentials', true);
+app.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
 app.use(morgan('dev'));
 
 useTreblle(app, {
