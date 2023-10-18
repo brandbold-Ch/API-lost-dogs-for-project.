@@ -28,9 +28,21 @@ const corsOptions = {
     allowedHeaders: 'Content-Type,Authorization',
 };
 
-app.options('*', cors(corsOptions))
-app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cors({
+    origin: (origin, callback) => {
+        const origins = ['*'];
+
+        if (origins.includes(origin)) {
+            return callback(null, true);
+        }
+        if (!origin){
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    }
+}));
 app.use(morgan('dev'));
 
 useTreblle(app, {
