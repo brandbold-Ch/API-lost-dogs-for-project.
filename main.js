@@ -20,14 +20,6 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 
-const corsOptions = {
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-    optionsSuccessStatus: 204,
-    allowedHeaders: 'Content-Type,Authorization',
-};
-
 app.use(express.json());
 app.use(cors({
     origin: '*',
@@ -36,6 +28,7 @@ app.use(cors({
     optionsSuccessStatus: 204,
     allowedHeaders: 'Content-Type,Authorization',
 }));
+app.options('*', cors());
 app.use(morgan('dev'));
 
 useTreblle(app, {

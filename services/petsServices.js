@@ -28,7 +28,21 @@ class PetsServices {
 
     async insertLostPet(id, pet_data) {
         if (pet_data.image) {
-            await cloudinary.uploader.upload(pet_data.image).then((url) => {
+            let image;
+
+            if (typeof pet_data.image === 'string'){
+                image = pet_data.image;
+            }
+            else if (pet_data.image instanceof File) {
+                const reader = new FileReader();
+                reader.readAsDataURL(pet_data.image);
+
+                reader.onload = () => {
+                    image = reader.result;
+                }
+            }
+
+            await cloudinary.uploader.upload(image).then((url) => {
                 pet_data.image = {
                     'url': url.url,
                     'id': url.public_id
