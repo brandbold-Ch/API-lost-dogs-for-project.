@@ -36,12 +36,16 @@ class PetsServices {
             else if (pet_data.image instanceof File) {
                 const reader = new FileReader();
                 reader.readAsDataURL(pet_data.image);
+                console.log(pet_data.image);
 
-                reader.onload = () => {
-                    image = reader.result;
-                }
+                image = await new Promise((resolve) => {
+                    reader.onload = () => {
+                        resolve(reader.result);
+                    };
+                });
             }
 
+            console.log(image);
             await cloudinary.uploader.upload(image).then((url) => {
                 pet_data.image = {
                     'url': url.url,
