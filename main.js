@@ -543,6 +543,14 @@ app.get('/api/pets/lost', generalEndpoint, async (req, res) => {
     }
 });
 
+app.get('/api/pets/all', async (req, res) => {
+    try {
+        res.status(200).json(await appControllers.getAllPets());
+    } catch (error) {
+        res.status(500).json({'message': error.message});
+    }
+});
+
 /**
  * Get user and dog information endpoint.
  * @function

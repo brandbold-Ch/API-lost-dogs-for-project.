@@ -109,6 +109,75 @@ class ForAllServices {
         ]);
     };
 
+    async getAllPets() {
+        const array1 = await User.aggregate([
+            {
+                $unwind: "$my_lost_pets",
+            },
+            {
+                $addFields: {
+                    "my_lost_pets.owner": "$_id"
+                }
+            },
+            {
+                $replaceRoot: { newRoot: "$my_lost_pets"}
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    gender: 1,
+                    age: 1,
+                    last_seen: 1,
+                    description: 1,
+                    image: 1,
+                    size: 1,
+                    breed: 1,
+                    update: 1,
+                    date: 1,
+                    lost_date: 1,
+                    found: 1,
+                    owner: 1,
+                    tags: 1
+                }
+            }
+        ]);
+
+        const array2 = await User.aggregate([
+            {
+                $unwind: "$the_lost_pets",
+            },
+            {
+                $addFields: {
+                    "the_lost_pets.owner": "$_id"
+                }
+            },
+            {
+                $replaceRoot: { newRoot: "$the_lost_pets"}
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    gender: 1,
+                    age: 1,
+                    last_seen: 1,
+                    description: 1,
+                    image: 1,
+                    size: 1,
+                    breed: 1,
+                    update: 1,
+                    date: 1,
+                    lost_date: 1,
+                    found: 1,
+                    owner: 1,
+                    tags: 1
+                }
+            }
+        ]);
+        return array1.concat(array2);
+    }
+
     /**
      * Get information about pets of a specific species based on ownership.
      * @async

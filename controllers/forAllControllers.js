@@ -18,6 +18,10 @@ exports.getAllLostPets = async (isOwner) => {
     return await service.getAllLostPets(isOwner);
 };
 
+exports.getAllPets = async () => {
+    return await service.getAllPets();
+}
+
 /**
  * Get user and pet information.
  * @async
