@@ -51,9 +51,13 @@ exports.login = async (auth) => {
         const match = bcrypt.compareSync(password, user['password']);
 
         if (match) {
-            return [202, await service.generateTokenUser({
-                id: user['user']
-            })];
+            return [
+                202,
+                {
+                    token: await service.generateTokenUser({context: user['user']}),
+                    id: user['user']
+                }
+            ];
 
         } else {
             return [401, {'message': 'Incorrect password'}];

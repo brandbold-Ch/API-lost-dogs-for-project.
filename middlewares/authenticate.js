@@ -25,7 +25,7 @@ const isAuthenticate = async (req, res, next) => {
             const key = jwt.verify(token.substring(7), process.env.SECRET_KEY);
 
             //It is verified that the token id corresponds to the current id
-            if (req.params.id === key.id){
+            if (req.params.id === key.context){
                 req.user = token;
                 next();
 

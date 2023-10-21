@@ -14,7 +14,7 @@ require('dotenv').config();
  * @returns {Promise<void>}
  * */
 
-const connection = mongoose.connect(process.env.URL_DATABASE)
+const connection = mongoose.connect(`mongodb://${db.host}:${db.port}/${db.database}`)
     .then(() => {
         console.log("Successful connection")
     }).catch(() => {

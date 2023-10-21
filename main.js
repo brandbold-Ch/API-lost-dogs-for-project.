@@ -60,7 +60,7 @@ app.post('/api/users/login', async (req, res) => {
 
             switch (key[0]) {
                 case 202:
-                    res.status(202).send(key[1]);
+                    res.status(202).json(key[1]);
                     break;
 
                 case 401:
@@ -76,7 +76,7 @@ app.post('/api/users/login', async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({'message': error.message});
+        res.status(400).json({'message': error.message});
     }
 });
 
@@ -238,7 +238,7 @@ app.post('/api/users/new', async (req, res) => {
         await userControllers.setUser(req.body);
         res.status(201).json({'message': 'Added user'});
     } catch (error) {
-        res.status(500).json({'message': error.message});
+        res.status(400).json({'message': error.message});
     }
 });
 
