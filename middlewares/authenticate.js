@@ -25,22 +25,22 @@ const isAuthenticate = async (req, res, next) => {
             const key = jwt.verify(token.substring(7), process.env.SECRET_KEY);
 
             //It is verified that the token id corresponds to the current id
-            if (req.params.id === key.context){
+            if (req.params.id === key.context) {
                 req.user = token;
                 next();
 
             } else {
-                res.status(401).json({'message': 'It\'s not your token'});
+                res.status(401).json({message: 'It\'s not your token 🤡'});
             }
 
         } else {
             // If no token is provided, return a 401 Unauthorized response
-            res.status(401).json({'message': 'Not received token'});
+            res.status(401).json({message: 'Not received token 🙄'});
         }
 
     } catch (error) {
         // If there's an error during token verification, return a 401 Unauthorized response
-        res.status(401).json({'message': error.message});
+        res.status(401).json({message: error.message});
     }
 };
 

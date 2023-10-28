@@ -37,17 +37,17 @@ const userSchema = new Schema({
     },
     cellphone: {
         type: String,
-        required: true,
-        unique: true,
+        required: false,
+        default: null,
         maxLength: 10,
         minLength: 10
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
-    my_networks: {
+    social_media: {
         type: Array,
         required: false,
         default: [
@@ -60,8 +60,7 @@ const userSchema = new Schema({
             {platform: 'whatsapp', user: ''}
         ]
     },
-    my_lost_pets: [petsSchema],
-    the_lost_pets: [petsSchema]
+    lost_pets: [petsSchema],
 });
 
 /**
@@ -69,5 +68,5 @@ const userSchema = new Schema({
  * @type {mongoose.Model<UserSchema>}
  */
 
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;

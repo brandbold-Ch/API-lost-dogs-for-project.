@@ -68,6 +68,6 @@ authSchema.pre('save', async function (next) {
  * Mongoose model for user credentials.
  * @type {mongoose.Model<AuthSchema>}
  */
-
-const Auth = mongoose.model('auth', authSchema);
+authSchema.index({user: 1}, {unique: true});
+const Auth = mongoose.model('Auth', authSchema);
 module.exports = Auth;

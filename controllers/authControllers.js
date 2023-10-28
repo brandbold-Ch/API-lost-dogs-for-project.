@@ -4,66 +4,62 @@
  * @file This module is for creating auth services.
  */
 
-const authService = require('../services/authServices');
-const service = new authService();
+const { auths } = require('../singlenton/uniqueInstances')
 const bcrypt = require('bcrypt');
 
-/**
- * Get user credentials (email and password)
- * @async
- * @function
- * @param {string} id - ID user
- * @returns {Promise<Object>}
- * */
+exports.getCredentials =  async (req, res) => {
+    try {
+        res.status(200).json(await auths.getCredentials(req.params.id));
 
-exports.getCredentials = async (id) => {
-    return await service.getCredentials(id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Update partial credentials (email or password)
- * @async
- * @function
- * @param {string} id - ID user
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- * */
+exports.updateCredentials = async (req, res) => {
+    try {
+        await auths.updateCredentials(req.params.id, req.body);
+        res.status(202).json({
+            message: 'Updated credentials ✅',
+            data: req.body
+        });
 
-exports.updateCredentials = async (id, data) => {
-    await service.updateCredentials(id, data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Login user with email and password
- * @async
- * @function
- * @param {Object} auth - Object containing email and password
- * @param {string} auth.email - User's email
- * @param {string} auth.password - User's password
- * @returns {Promise<Array>} - A promise that resolves to an array containing status code and response data.
- * */
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    const user = await auths.getEmail(email);
 
-exports.login = async (auth) => {
-    const {email, password} = auth;
-    const user = await service.getEmail(email);
+    if (email && password) {
+        const verifyEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-    if (user) {
-        const match = bcrypt.compareSync(password, user['password']);
+        if (verifyEmail){
 
-        if (match) {
-            return [
-                202,
-                {
-                    token: await service.generateTokenUser({context: user['user']}),
-                    id: user['user']
+            if (user) {
+                const match = bcrypt.compareSync(password, user['password']);
+
+                if (match) {
+                    res.status(202).json({
+                        token: await auths.generateTokenUser({context: user['user']}),
+                        id: user['user']
+                    });
+
+                } else {
+                    res.status(401).json({message: 'Incorrect password 🤬'});
                 }
-            ];
+
+            } else {
+                res.status(404).json({message: 'Not found user 🚫'});
+            }
 
         } else {
-            return [401, {'message': 'Incorrect password'}];
+            res.status(400).json({message: 'Invalid email field 💢'});
         }
 
     } else {
-        return [404, {'message': 'Not found user'}];
+        res.status(400).json({message: 'You did not send the credentials 🙄'});
     }
 };

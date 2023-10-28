@@ -52,7 +52,11 @@ class AuthServices {
     async updateCredentials(id, data) {
         let { email, password } = data;
         password = await bcrypt.hash(password, 10);
-        await User.updateOne({_id: id}, {$set: {email: email}});
+        await User.updateOne(
+            {_id: id},
+            {$set: {email: email}},
+            {runValidators: true}
+        );
         await Auth.updateOne(
             {user: id},
             {$set: {email: email, password: password}},

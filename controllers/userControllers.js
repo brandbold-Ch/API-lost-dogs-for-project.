@@ -4,79 +4,68 @@
  * @file This module is for creating user services.
  */
 
-const userService = require('../services/userServices');
-const service = new userService();
+const { users } = require('../singlenton/uniqueInstances')
 
-/**
- * Get all users
- * @async
- * @function
- * @returns {Promise<Array>}
- * */
+exports.getUsers = async (req, res) => {
+    try {
+        res.status(200).json(await users.getAll());
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
-exports.getUsers = async () => {
-    return await service.getAll();
+exports.setUser = async (req, res) => {
+    try {
+        await users.create(req.body);
+        res.status(201).json({
+            message: 'Added user ✅',
+            data: req.body
+        });
+    } catch (error) {
+        res.status(400).json({message: error.message});
+    }
 };
 
-/**
- * Create new user
- * @async
- * @function
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- * */
+exports.getUser = async (req, res) => {
+    try {
+        res.status(200).json(await users.getUser(req.params.id));
 
-exports.setUser = async (data) => {
-    await service.create(data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get user
- * @async
- * @function
- * @param {string} id - ID user
- * @returns {Promise<void>}
- * */
+exports.delUser = async (req, res) => {
+    try {
+        await users.delUser(req.params.id);
+        res.status(204).end();
 
-exports.getUser = async (id) => {
-    return await service.getUser(id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Delete user
- * @async
- * @function
- * @param {string} data - ID user
- * @returns {Promise<void>}
- * */
+exports.updateUser = async (req, res) => {
+    try {
+        await users.updateUser(req.params.id, req.body);
+        res.status(202).json({
+            message: 'Update user ✅',
+            data: req.body
+        });
 
-exports.delUser = async (id) => {
-    await service.delUser(id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Update partial user
- * @async
- * @function
- * @param {string} id - ID user
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- * */
-
-exports.updateUser = async (id, data) => {
-    await service.updateUser(id, data);
-};
-
-/**
- * Update user network information.
- * @async
- * @function
- * @param {string} id - ID user.
- * @param {string} network - Network to update.
- * @param {Object} data - Body request data.
- * @returns {Promise<void>} - A promise that resolves when the user's network information is updated.
- */
-
-exports.updateNetwork = async (id, network, data)  => {
-    await service.updateNetwork(id, network, data);
+exports.updateSocialMedia = async (req, res) => {
+    try {
+        await users.updateSocialMedia(req.params.id, req.query.social, req.body);
+        res.status(202).json({
+            message: 'Updated social media ✅',
+            data: req.body
+        });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };

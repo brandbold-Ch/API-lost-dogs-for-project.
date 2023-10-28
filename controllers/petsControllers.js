@@ -4,223 +4,161 @@
  * @file This module is for creating pets services.
  */
 
-const petsService = require('../services/petsServices');
-const service = new petsService();
+const { pets } = require('../singlenton/uniqueInstances');
 
+exports.insertLostPet = async (req, res) => {
+    try {
+        await pets.insertLostPet(req.params.id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+        res.status(201).json({
+            message: 'Added post ✅',
+            data: req.body
+        });
 
-/**
- * Insert lost pets in array of user
- * @async
- * @function
- * @param {string} id - ID user
- * @param {Object} dog_data - Body request data
- * @returns {Promise<void>}
- * */
-
-exports.insertLostPet = async (id, dog_data) => {
-    await service.insertLostPet(id, dog_data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get all lost pet from user array
- * @async
- * @function
- * @param {string} id - ID user
- * @param {boolean} isOwner
- * @returns {Promise<Array>}
- * */
+exports.getPosts = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getPosts(req.params.id));
 
-exports.getPosts = async (id, isOwner) => {
-    return await service.getPosts(id, isOwner);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get lost pet from user array
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} dog_name - Pet name identifier
- * @returns {Promise<Array>}
- * */
+exports.getFilterPostGender = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostGender(req.params.id, req.query.value));
 
-exports.getMyPostByName = async (id, pet_name) => {
-    return await service.getMyPostByName(id, pet_name);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get lost pet from other users' arrays by name.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_name - Pet name identifier
- * @returns {Promise<Array>}
- */
+exports.getFilterPostBreed = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostBreed(req.params.id, req.query.value));
 
-exports.getOtherPostByName = async (id, pet_name) => {
-    return await service.getOtherPostByName(id, pet_name);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get lost pet from the user array by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @returns {Promise<Array>}
- */
+exports.getFilterPostSize = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostSize(req.params.id, req.query.value));
 
-exports.getMyPostById = async (id, pet_id) => {
-    return await service.getMyPostById(id, pet_id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get lost pet from other users' arrays by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @returns {Promise<Array>}
- */
+exports.getFilterPostOwner = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostOwner(req.params.id, req.query.value));
 
-exports.getOtherPostById = async (id, pet_id) => {
-    return await service.getOtherPostById(id, pet_id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
+exports.getFilterPostFound = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostFound(req.params.id, req.query.value));
 
-/**
- * Get middleware for lost pets from the user array by name.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_name - Pet name identifier
- * @returns {Promise<Array>}
- */
-
-exports.getMiddlewareMyPost = async (id, pet_name) => {
-    return await service.getMiddlewareMyPost(id, pet_name);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Get middleware for lost pets from other users' arrays by name.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_name - Pet name identifier
- * @returns {Promise<Array>}
- */
+exports.getFilterPostSpecie = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getFilterPostSpecie(req.params.id, req.query.value));
 
-exports.getMiddlewareOtherPost = async (id, pet_name) => {
-    return await service.getMiddlewareOtherPost(id, pet_name);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Remove lost pet from user array
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet name identifier
- * @returns {Promise<void>}
- * */
+exports.getPost = async (req, res) => {
+    try {
+        res.status(200).json(await pets.getPet(req.params.id, req.params.pet_id));
 
-exports.delMyPost = async (id, pet_id) => {
-    await service.delMyPost(id, pet_id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Remove lost pet from other users' arrays by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @returns {Promise<void>}
- */
+exports.updatePost = async (req, res) => {
+    try {
+        await pets.updatePost(req.params.id, req.params.pet_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+        res.status(200).json(
+            {
+                message: 'Updated post ✅',
+                data: JSON.parse(JSON.stringify(req.body))
+            }
+        );
 
-exports.delOtherPost = async (id, pet_id) => {
-    await service.delOtherPost(id, pet_id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Update partial lost pet from user array
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_name - Pet name identifier
- * @param {Object} pet_data - Body request data
- * @returns {Promise<void>}
- * */
+exports.delPost = async (req, res) => {
+    try {
+        await pets.delPost(req.params.id, req.params.pet_id);
+        res.status(204).end();
 
-exports.updateMyPost = async (id, pet_id, pet_data) => {
-    await service.updateMyPost(id, pet_id, pet_data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Update partial lost pet from other users' arrays by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @param {Object} pet_data - Body request data
- * @returns {Promise<void>}
- */
-
-exports.updateOtherPost = async (id, pet_id, pet_data) => {
-    await service.updateOtherPost(id, pet_id, pet_data);
+exports.addGallery = async (req, res) => {
+    try {
+        console.log(req.files)
+        await pets.addGallery(req.params.id, req.params.pet_id, req.files);
+        res.status(201).json({
+            message: 'Added images ✅',
+            data: `${req.files.length} Buffered images`
+        });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Insert tags for lost pet in the user array by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- */
+exports.delPartialGallery = async (req, res) => {
+    try {
+        console.log(req.query.image);
+        await pets.deleteImage(req.query.image);
+        res.status(204).end();
 
-exports.insertTagsMyPost = async (id, pet_id, data) => {
-    await service.insertTagsMyPost(id, pet_id, data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.insertTagsPost = async (req, res) => {
+    try {
+        await pets.insertTagsPost(req.params.id, req.params.pet_id , JSON.parse(JSON.stringify(req.body)));
+        res.status(201).json({
+            message: 'Added tag ✅',
+            data: JSON.parse(JSON.stringify(req.body))
+        });
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };
 
-/**
- * Insert tags for lost pet in other users' arrays by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @param {Object} data - Body request data
- * @returns {Promise<void>}
- */
+exports.delTagsPost = async (req, res) => {
+    try {
+        await pets.delTagsPost(req.params.id, req.params.pet_id, req.query.key, req.query.value);
+        res.status(204).end();
 
-exports.insertTagsOtherPost = async (id, pet_id, data) => {
-    await service.insertTagsOtherPost(id, pet_id, data);
-};
-
-/**
- * Remove tags for lost pet from the user array by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @param {string} key - Tag key
- * @param {string} tag_value - Tag value
- * @returns {Promise<void>}
- */
-
-exports.delTagsMyPost = async (id, pet_id, key, tag_value) => {
-    await service.delTagsMyPost(id, pet_id, key, tag_value)
-};
-
-/**
- * Remove tags for lost pet from other users' arrays by ID.
- * @async
- * @function
- * @param {string} id - ID user
- * @param {string} pet_id - Pet ID identifier
- * @param {string} key - Tag key
- * @param {string} tag_value - Tag value
- * @returns {Promise<void>}
- */
-
-exports.delTagsOtherPost = async (id, pet_id, key, tag_value) => {
-    await service.delTagsOtherPost(id, pet_id, key, tag_value)
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
 };

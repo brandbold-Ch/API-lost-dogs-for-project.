@@ -27,6 +27,9 @@ const cloudinary = require('cloudinary').v2;
 
 // Configuration for database credentials and Cloudinary
 /** @type {DatabaseCredentials} */
+
+require('dotenv').config();
+
 const credentials = {
     host: '127.0.0.1',
     user: '',
@@ -37,9 +40,9 @@ const credentials = {
 
 
 cloudinary.config({
-    cloud_name: 'dq8syevxm',
-    api_key: '631793189673192',
-    api_secret: 'I6lEB9jlisDabtU2TnMgx9kPkwI'
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_CLOUD_KEY,
+    api_secret: process.env.API_SECRET_CLOUD
 });
 
 

@@ -27,74 +27,96 @@ const Schema = mongoose.Schema;
  */
 
 const petSchema = new Schema({
+
     name: {
         type: String,
         required: false,
         default: 'Sin nombre'
     },
-    specie: {
-        type: String,
-        required: true
+    details: {
+        specie: {
+            type: String,
+            required: true
+        },
+        gender: {
+            type: String,
+            enum: ['Macho', 'Hembra'],
+            required: true
+        },
+        age: {
+            type: String,
+            required: false,
+            default: ""
+        },
+        description: {
+            type: String,
+            required: true,
+        },
+        size: {
+            type: String,
+            enum: ['Chico', 'Mediano', 'Grande', 'No aplica'],
+            required: true
+        },
+        breed: {
+            type: String,
+            required: true
+        },
     },
-    gender: {
-        type: String,
-        enum: ['Macho', 'Hembra'],
-        required: true
+    publication: {
+        update: {
+            type: Date,
+            required: false,
+            default: null
+        },
+        published: {
+            type: Date,
+            default: Date.now()
+        },
+        lost_date: {
+            type: Date,
+            required: true
+        },
+        last_seen_site: {
+            type: String,
+            required: true,
+        }
     },
-    age: {
-        type: String,
-        required: false
+    status: {
+        found: {
+            type: Boolean,
+            enum: [true, false],
+            required: false,
+            default: false
+        },
+        owner: {
+            type: Boolean,
+            required: true,
+            default: true
+        },
     },
-    last_seen: {
-        type: String,
-        required: true
+    identify: {
+        image: {
+            type: Object,
+            required: true,
+            default: null
+        },
+        gallery: {
+            type: Array,
+            required: false,
+            default: []
+        },
     },
-    description: {
-        type: String,
-        required: true
-    },
-    image: {
-        type: Object,
-        required: true,
-        default: ""
-    },
-    size: {
-        type: String,
-        enum: ['Chico', 'Mediano', 'Grande', 'No aplica'],
-        required: true
-    },
-    breed: {
-        type: String,
-        required: true
-    },
-    update: {
-        type: Date,
-        required: false,
-        default: null
-    },
-    date: {
-        type: Date,
-        default: Date.now()
-    },
-    lost_date: {
-        type: Date,
-        required: true
-    },
-    found: {
-        type: Boolean,
-        enum: [true, false],
-        required: true,
-        default: false
-    },
-    owner: {
-        type: Boolean,
-        required: true,
-        default: true
-    },
-    tags: {
-        type: Array,
-        required: false,
-        default: []
+    feedback: {
+        comments: {
+            type: Array,
+            required: false,
+            default: []
+        },
+        tags: {
+            type: Array,
+            required: false,
+            default: []
+        }
     }
 });
 

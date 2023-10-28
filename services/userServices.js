@@ -14,31 +14,17 @@ const Auth = require('../models/auth');
  */
 
 class UserServices {
+
     constructor() {};
 
-    /**
-     * Create a new user and their authentication information.
-     * @async
-     * @function
-     * @param {Object} data - User data and authentication credentials.
-     * @param {string} data.email - User's email.
-     * @param {string} data.password - User password.
-     * @param {string} data.name - Name of the user.
-     * @param {string} data.lastname - Last name of the user.
-     * @param {string} data.cellphone - User's phone number.
-     * @returns {Promise<void>} A Promise that will be resolved once the creation of the user and credentials is complete.
-     */
-
     async create(data){
-        const { email, password } = data;
-        const { name, lastname, cellphone } = data;
+        const { name, lastname, cellphone, email, password} = data;
 
-        // Create a new user and their authentication credentials.
         const user = new User({name, lastname, email, cellphone});
         const auth = new Auth({email, password, user: user._id});
 
-        await auth.save();
         await user.save();
+        await auth.save();
     };
 
     /**
@@ -61,10 +47,10 @@ class UserServices {
      */
 
     async getUser(id){
-         return User.findOne(
-             {_id: id},
-             {__v:0, _id: 0, my_lost_pets: 0, the_lost_pets: 0}
-         );
+        return User.findOne(
+            {_id: id},
+            {__v:0, _id: 0, lost_pets: 0}
+        );
     };
 
     /**
@@ -107,11 +93,10 @@ class UserServices {
      * @returns {Promise<void>} A Promise that will be resolved once the network update is complete.
      */
 
-    async updateNetwork(id, network, data){
+    async updateSocialMedia(id, network, data){
         await User.updateOne(
-            {_id: id, "my_networks.platform": network},
-            {$set: {"my_networks.$": data}},
-            {runValidators: true}
+            {_id: id, "social_media.platform": network},
+            {$set: {"social_media.$": data}},
         );
     };
 }
