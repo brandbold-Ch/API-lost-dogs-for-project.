@@ -30,9 +30,9 @@ const checkUserExists = async (req, res, next) => {
 
 const checkPostExists = async (req, res, next) => {
     try {
-        const pet = await pets.getPet(req.params.id || req.query.user, req.params.pet_id || req.query.pet);
+        const pet = await pets.getPost(req.params.id || req.query.user, req.params.pet_id || req.query.pet);
 
-        if (pet['lost_pets'].length) {
+        if (pet) {
             next();
         } else {
             res.status(404).json({message: 'Not found post 🚫'});

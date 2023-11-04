@@ -17,15 +17,33 @@ class GuestsServices {
     constructor() {};
 
     async getUserAndPet(id, pet_id){
-        let user; let pet;
 
-        user = await User.findOne({_id: id}, {lost_pets: 0, _id:0, __v: 0});
-        pet = await User.findOne(
-            {_id: id},
-            {lost_pets: {$elemMatch: {_id: pet_id}}}
+        const user = await User.findOne(
+            {
+                _id: id
+            },
+            {
+                lost_pets: 0,
+                _id:0,
+                __v: 0
+            }
         );
 
-        if (pet['lost_pets'][0]){
+        const pet = await User.findOne(
+            {
+                _id: id
+            },
+            {
+                _id: 0,
+                lost_pets: {
+                    $elemMatch: {
+                        _id: pet_id
+                    }
+                }
+            }
+        );
+
+        if (pet){
             return [user, pet['lost_pets'][0]];
         } else {
             return [];
@@ -50,7 +68,9 @@ class GuestsServices {
                 }
             },
             {
-                $replaceRoot: { newRoot: '$lost_pets'}
+                $replaceRoot: {
+                    newRoot: '$lost_pets'
+                }
             },
             {
                 $project: {
@@ -65,13 +85,6 @@ class GuestsServices {
                 }
             },
         ]);
-    };
-
-    async insertComment(id, pet_id, comment) {
-        await User.updateOne(
-            {_id: id, "lost_pets._id": pet_id},
-            {$push: {"lost_pets.$.feedback.comments": comment}}
-        );
     };
 
     async getFilterPostGender(gender) {

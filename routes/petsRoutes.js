@@ -17,11 +17,11 @@ petsRoute.get('/:id/filter/owner', checkUserExists, isAuthenticate, checkQueryPa
 petsRoute.get('/:id/filter/found', checkUserExists, isAuthenticate,checkQueryParameters, petsControllers.getFilterPostFound);
 petsRoute.get('/:id/filter/specie', checkUserExists, isAuthenticate,checkQueryParameters, petsControllers.getFilterPostSpecie);
 petsRoute.get('/:id/pets/:pet_id', checkUserExists, checkPostExists, isAuthenticate, petsControllers.getPost);
-petsRoute.get('/:id/pets/:pet_id', checkUserExists, checkPostExists, isAuthenticate, petsControllers.getPost);
 petsRoute.delete('/:id/pets/:pet_id', checkUserExists, checkPostExists, isAuthenticate, petsControllers.delPost);
 petsRoute.post('/:id/pets/tags/new/:pet_id', checkUserExists, checkPostExists, isAuthenticate, express.urlencoded({ extended: true }), petsControllers.insertTagsPost);
 petsRoute.delete('/:id/pets/tags/:pet_id', checkUserExists, checkPostExists, isAuthenticate, petsControllers.delTagsPost);
 petsRoute.post('/:id/pets/gallery/:pet_id', checkUserExists, checkPostExists, isAuthenticate, processFormData, petsControllers.addGallery);
 petsRoute.delete('/:id/pets/gallery/:pet_id', checkUserExists, checkPostExists, isAuthenticate, petsControllers.delPartialGallery);
+petsRoute.post('/:id/pets/comment/new/:pet_id', express.text(), checkUserExists, checkPostExists, isAuthenticate, petsControllers.insertComment);
 
 module.exports = petsRoute;

@@ -22,19 +22,6 @@ exports.getUserAndPet = async (req, res) => {
     }
 };
 
-exports.insertComment = async (req, res) => {
-    try {
-        console.log(req.body)
-        await guests.insertComment(req.query.user, req.query.pet, req.body);
-        res.status(201).json({
-            message: 'Added comment ✅',
-            data: req.body
-        });
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
 exports.getFilterPostGender = async (req, res) => {
     try {
         res.status(200).json(await guests.getFilterPostGender(req.query.value));

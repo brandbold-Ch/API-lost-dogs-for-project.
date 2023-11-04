@@ -23,7 +23,16 @@ class AuthServices {
      */
 
     async getCredentials(id){
-        return Auth.findOne({user: id}, {user: 0, _id: 0, __v:0});
+        return Auth.findOne(
+            {
+                user: id
+            },
+            {
+                user: 0,
+                _id: 0,
+                __v:0
+            }
+        );
     };
 
     /**
@@ -35,7 +44,11 @@ class AuthServices {
      */
 
     async getEmail(email) {
-        return Auth.findOne({email: email});
+        return Auth.findOne(
+            {
+                email: email
+            }
+        );
     };
 
     /**
@@ -53,14 +66,30 @@ class AuthServices {
         let { email, password } = data;
         password = await bcrypt.hash(password, 10);
         await User.updateOne(
-            {_id: id},
-            {$set: {email: email}},
-            {runValidators: true}
+            {
+                _id: id
+            },
+            {
+                $set: {
+                    email: email
+                }
+            },
+            {
+                runValidators: true
+            }
         );
         await Auth.updateOne(
-            {user: id},
-            {$set: {email: email, password: password}},
-            {runValidators: true}
+            {
+                user: id
+            },
+            {
+                $set: {
+                    email: email, password: password
+                }
+            },
+            {
+                runValidators: true
+            }
         );
     };
 

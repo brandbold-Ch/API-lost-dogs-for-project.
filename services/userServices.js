@@ -48,8 +48,14 @@ class UserServices {
 
     async getUser(id){
         return User.findOne(
-            {_id: id},
-            {__v:0, _id: 0, lost_pets: 0}
+            {
+                _id: id
+            },
+            {
+                __v:0,
+                _id: 0,
+                lost_pets: 0
+            }
         );
     };
 
@@ -62,8 +68,16 @@ class UserServices {
      */
 
     async delUser(id){
-        await Auth.deleteOne({user: id});
-        await User.deleteOne({_id: id});
+        await Auth.deleteOne(
+            {
+                user: id
+            }
+        );
+        await User.deleteOne(
+            {
+                _id: id
+            }
+        );
     };
 
     /**
@@ -77,9 +91,15 @@ class UserServices {
 
     async updateUser(id, data){
         await User.updateOne(
-            {_id: id},
-            {$set: data},
-            {runValidators: true}
+            {
+                _id: id
+            },
+            {
+                $set: data
+            },
+            {
+                runValidators: true
+            }
         );
     };
 
@@ -95,8 +115,15 @@ class UserServices {
 
     async updateSocialMedia(id, network, data){
         await User.updateOne(
-            {_id: id, "social_media.platform": network},
-            {$set: {"social_media.$": data}},
+            {
+                _id: id,
+                "social_media.platform": network
+            },
+            {
+                $set: {
+                    "social_media.$": data
+                }
+            },
         );
     };
 }

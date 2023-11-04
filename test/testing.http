@@ -1,0 +1,4 @@
+http://127.0.0.1:5000/api/v1/guests/publications
+###
+
+http://127.0.0.1:5000/api/v1/guests/publications/search?user=653d2b75d0de9404039c66b4&pet=653d3d4749b89481ab29b80e

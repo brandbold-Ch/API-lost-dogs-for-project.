@@ -9,10 +9,12 @@ const { pets } = require('../singlenton/uniqueInstances');
 exports.insertLostPet = async (req, res) => {
     try {
         await pets.insertLostPet(req.params.id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
-        res.status(201).json({
-            message: 'Added post ✅',
-            data: req.body
-        });
+        res.status(201).json(
+            {
+                message: 'Added post ✅',
+                data: req.body
+            }
+        );
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -84,7 +86,7 @@ exports.getFilterPostSpecie = async (req, res) => {
 
 exports.getPost = async (req, res) => {
     try {
-        res.status(200).json(await pets.getPet(req.params.id, req.params.pet_id));
+        res.status(200).json(await pets.getPost(req.params.id, req.params.pet_id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -102,6 +104,7 @@ exports.updatePost = async (req, res) => {
         );
 
     } catch (error) {
+        console.log('Error puto')
         res.status(500).json({message: error.message});
     }
 };
@@ -120,10 +123,12 @@ exports.addGallery = async (req, res) => {
     try {
         console.log(req.files)
         await pets.addGallery(req.params.id, req.params.pet_id, req.files);
-        res.status(201).json({
-            message: 'Added images ✅',
-            data: `${req.files.length} Buffered images`
-        });
+        res.status(201).json(
+            {
+                message: 'Added images ✅',
+                data: `${req.files.length} buffered images`
+            }
+        );
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -132,7 +137,7 @@ exports.addGallery = async (req, res) => {
 exports.delPartialGallery = async (req, res) => {
     try {
         console.log(req.query.image);
-        await pets.deleteImage(req.query.image);
+        await pets.delPartialGallery(req.params.id, req.params.pet_id, req.query.image);
         res.status(204).end();
 
     } catch (error) {
@@ -143,10 +148,12 @@ exports.delPartialGallery = async (req, res) => {
 exports.insertTagsPost = async (req, res) => {
     try {
         await pets.insertTagsPost(req.params.id, req.params.pet_id , JSON.parse(JSON.stringify(req.body)));
-        res.status(201).json({
-            message: 'Added tag ✅',
-            data: JSON.parse(JSON.stringify(req.body))
-        });
+        res.status(201).json(
+            {
+                message: 'Added tag ✅',
+                data: JSON.parse(JSON.stringify(req.body))
+            }
+        );
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -158,6 +165,20 @@ exports.delTagsPost = async (req, res) => {
         await pets.delTagsPost(req.params.id, req.params.pet_id, req.query.key, req.query.value);
         res.status(204).end();
 
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+exports.insertComment = async (req, res) => {
+    try {
+        await pets.insertComment(req.params.id, req.params.pet_id, req.body);
+        res.status(201).json(
+            {
+                message: 'Added comment ✅',
+                data: req.body
+            }
+        );
     } catch (error) {
         res.status(500).json({message: error.message});
     }

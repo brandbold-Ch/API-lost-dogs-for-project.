@@ -38,16 +38,37 @@ class PetsServices {
          await cloudinary.uploader.destroy(id);
      };
 
+     async delPartialGallery(id, pet_id, img_id) {
+        await this.deleteImage(img_id);
+        await User.updateOne(
+            {
+                _id: id,
+                "lost_pets._id": pet_id
+            },
+            {
+                $pull: {
+                    "lost_pets.$.identify.gallery": {
+                        id: img_id
+                    }
+                }
+            }
+        );
+     }
+
     async posts(id) {
         return User.aggregate([
             {
-                $match: { _id: new ObjectId(id) }
+                $match: {
+                    _id: new ObjectId(id)
+                }
             },
             {
                 $unwind: '$lost_pets'
             },
             {
-                $replaceRoot: { newRoot: '$lost_pets' }
+                $replaceRoot: {
+                    newRoot: '$lost_pets'
+                }
             },
             {
                 $project: {
@@ -56,25 +77,27 @@ class PetsServices {
                     details: 1,
                     publication: 1,
                     status: 1,
-                    identify: 1,
-                    feedback: 1
+                    'identify.image': 1,
                 }
             }
         ]);
     }
 
-    async getPet(id, pet_id) {
-        return User.findOne(
-            {_id: id},
-            {lost_pets: {$elemMatch: {_id: pet_id}}}
+    async getPost(id, pet_id) {
+        const pet = await User.findOne(
+            {
+                _id: id
+            },
+            {
+                lost_pets: {
+                    $elemMatch: {
+                        _id: pet_id
+                    }
+                }
+            }
         );
-    };
 
-    async getGallery(id, pet_id) {
-        return User.findOne(
-            {_id: id},
-            {"lost_pets": {$elemMatch: {"identify.gallery": 1}}}
-        );
+        return pet['lost_pets'][0];
     };
 
     async insertLostPet(id, pet_data) {
@@ -104,9 +127,17 @@ class PetsServices {
         }
 
         await User.updateOne(
-            {_id: id},
-            {$push: {lost_pets: data}},
-            {runValidators: true}
+            {
+                _id: id
+            },
+            {
+                $push: {
+                    lost_pets: data
+                }
+            },
+            {
+                runValidators: true
+            }
         );
     };
 
@@ -145,22 +176,35 @@ class PetsServices {
     };
 
     async delPost(id, pet_id) {
-        const pet = await this.getPet(id, pet_id);
+        const pet = await this.getPost(id, pet_id);
 
-        if (pet['lost_pets'][0].identify.image !== null) {
-            await this.deleteImage(pet['lost_pets'][0].identify.image.id);
+        if (pet.identify.image !== null) {
+            await this.deleteImage(pet.identify.image.id);
+        }
+
+        if (pet.identify.gallery.length) {
+            for (const key of pet) {
+                await this.deleteImage(key.id)
+            }
         }
 
         await User.updateOne(
-            {_id: id},
-            {$pull: {lost_pets: {_id: pet_id}}}
+            {
+                _id: id
+            },
+            {
+                $pull: {
+                    lost_pets: {
+                        _id: pet_id
+                    }
+                }
+            }
         );
     };
 
 
     async updatePost(id, pet_id, pet_data) {
-        const pet = await this.getPet(id, pet_id);
-        const context = pet['lost_pets'][0];
+        const context = await this.getPost(id, pet_id);
 
         const body = pet_data[0];
         const file = pet_data[1];
@@ -202,8 +246,16 @@ class PetsServices {
         }
 
         await User.updateOne(
-            {_id: id, "lost_pets._id": pet_id},
-            {$set: {"lost_pets.$": data}},
+            {
+                _id: id,
+                "lost_pets._id": pet_id
+            },
+            {
+                $set: {
+                    "lost_pets.$": data
+                }
+            },
+            {runValidators: true}
         );
     };
 
@@ -213,23 +265,80 @@ class PetsServices {
             console.log(key);
             let image = await this.uploadImage(key.buffer);
             await User.updateOne(
-                {_id: id, "lost_pets._id": pet_id},
-                {$push: {"lost_pets.$.identify.gallery": image}}
+                {
+                    _id: id,
+                    "lost_pets._id": pet_id
+                },
+                {
+                    $push: {
+                        "lost_pets.$.identify.gallery": image
+                    }
+                }
             );
         });
     };
 
     async insertTagsPost(id, pet_id, data) {
         await User.updateOne(
-            {_id: id, "lost_pets._id": pet_id},
-            {$push: {"lost_pets.$.feedback.tags": data}}
+            {
+                _id: id,
+                "lost_pets._id": pet_id
+            },
+            {
+                $push: {
+                    "lost_pets.$.feedback.tags": data
+                }
+            }
         );
     };
 
     async delTagsPost(id, pet_id, key, value) {
         await User.updateOne(
-            {_id: id, "lost_pets._id": pet_id},
-            {$pull: {"lost_pets.$.feedback.tags": {[key]: value}}}
+            {
+                _id: id,
+                "lost_pets._id": pet_id
+            },
+            {
+                $pull: {
+                    "lost_pets.$.feedback.tags": {
+                        [key]: value
+                    }
+                }
+            }
+        );
+    };
+
+    async insertComment(id, pet_id, data) {
+        const user = await User.findOne(
+            {
+                _id: id
+            },
+            {
+                lastname: 0,
+                cellphone: 0,
+                __v: 0,
+                _id: 1,
+                lost_pets: 0,
+                social_media: 0
+            }
+        );
+
+        const comment = {
+            title: data,
+            timestamp: Date.now(),
+            user: user
+        };
+
+        await User.updateOne(
+            {
+                _id: id,
+                "lost_pets._id": pet_id
+            },
+            {
+                $push: {
+                    "lost_pets.$.feedback.comments": comment
+                }
+            }
         );
     };
 }
