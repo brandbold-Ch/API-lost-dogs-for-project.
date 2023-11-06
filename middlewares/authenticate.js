@@ -20,17 +20,36 @@ const isAuthenticate = async (req, res, next) => {
         // Extract the token from the Authorization header
         const token = req.headers.authorization;
 
+        const roles = {
+            USER: [
+                '/api/v1/users',
+                '/api/v1/posts',
+                '/api/v1/auth'
+            ],
+            COLLABORATOR: [
+
+            ],
+            ADMINISTRATOR: [
+
+            ]
+        };
+
         if (token) {
             // Verify the token and attach user information to the request object
             const key = jwt.verify(token.substring(7), process.env.SECRET_KEY);
 
-            //It is verified that the token id corresponds to the current id
-            if (req.params.id === key.context) {
-                req.user = token;
-                next();
+            if (key.role) {
+
+                if (roles[key.role].includes(req.baseUrl)) {
+                    req.id = key.user;
+                    next();
+
+                } else {
+                    res.status(401).json({message: 'You don´t have access to this route 🚫'});
+                }
 
             } else {
-                res.status(401).json({message: 'It\'s not your token 🤡'});
+                res.status(401).json({message: 'For me you don´t exist 😒'});
             }
 
         } else {

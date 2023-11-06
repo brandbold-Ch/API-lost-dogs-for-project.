@@ -16,13 +16,14 @@ const { users, pets } = require('../singlenton/uniqueInstances');
 
 const checkUserExists = async (req, res, next) => {
     try {
-        const user = await users.getUser(req.params.id || req.query.user);
+        const user = await users.getUser(req.id || req.query.user);
 
         if (user) {
             next();
         } else {
             res.status(404).json({message: 'Not found user 🚫'});
         }
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -30,7 +31,7 @@ const checkUserExists = async (req, res, next) => {
 
 const checkPostExists = async (req, res, next) => {
     try {
-        const pet = await pets.getPost(req.params.id || req.query.user, req.params.pet_id || req.query.pet);
+        const pet = await pets.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
 
         if (pet) {
             next();
@@ -54,7 +55,7 @@ const checkQueryParameters = async (req, res, next) => {
             found: ['true', 'false'],
             id: [],
             breed: [],
-            specie: []
+            specie: ['Perro', 'Gato', 'Ave']
         }
 
         if (link && choices[value].includes(link) || choices[value].length === 0) {

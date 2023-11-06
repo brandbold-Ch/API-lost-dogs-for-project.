@@ -55,7 +55,7 @@ class PetsServices {
         );
      }
 
-    async posts(id) {
+    async postsAll(id) {
         return User.aggregate([
             {
                 $match: {
@@ -78,6 +78,7 @@ class PetsServices {
                     publication: 1,
                     status: 1,
                     'identify.image': 1,
+                    feedback: 1
                 }
             }
         ]);
@@ -124,7 +125,7 @@ class PetsServices {
             identify: {
                 image: await this.uploadImage(file.buffer)
             }
-        }
+        };
 
         await User.updateOne(
             {
@@ -142,36 +143,36 @@ class PetsServices {
     };
 
     async getPosts(id) {
-        return await this.posts(id);
+        return await this.postsAll(id);
     };
 
     async getFilterPostGender(id, gender) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.details.gender === gender);
     };
 
     async getFilterPostBreed(id, breed) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.details.breed === breed);
     };
 
     async getFilterPostSize(id, size) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.details.size === size);
     };
 
     async getFilterPostOwner(id, owner) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.status.owner === JSON.parse(owner));
     };
 
     async getFilterPostFound(id, found) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.status.found === JSON.parse(found));
     };
 
     async getFilterPostSpecie(id, specie) {
-        const array = await this.posts(id);
+        const array = await this.postsAll(id);
         return array.filter(key => key.details.specie === specie);
     };
 
@@ -308,7 +309,7 @@ class PetsServices {
         );
     };
 
-    async insertComment(id, pet_id, data) {
+    async insertComment(id, user_id, pet_id, data) {
         const user = await User.findOne(
             {
                 _id: id
@@ -331,7 +332,7 @@ class PetsServices {
 
         await User.updateOne(
             {
-                _id: id,
+                _id: user_id,
                 "lost_pets._id": pet_id
             },
             {

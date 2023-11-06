@@ -21,7 +21,7 @@ class UserServices {
         const { name, lastname, cellphone, email, password} = data;
 
         const user = new User({name, lastname, email, cellphone});
-        const auth = new Auth({email, password, user: user._id});
+        const auth = new Auth({email, password, user: user._id, role: 'USER'});
 
         await user.save();
         await auth.save();

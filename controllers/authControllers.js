@@ -4,12 +4,12 @@
  * @file This module is for creating auth services.
  */
 
-const { auths } = require('../singlenton/uniqueInstances')
+const { auths } = require('../singlenton/uniqueInstances');
 const bcrypt = require('bcrypt');
 
 exports.getCredentials =  async (req, res) => {
     try {
-        res.status(200).json(await auths.getCredentials(req.params.id));
+        res.status(200).json(await auths.getCredentials(req.id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -18,7 +18,7 @@ exports.getCredentials =  async (req, res) => {
 
 exports.updateCredentials = async (req, res) => {
     try {
-        await auths.updateCredentials(req.params.id, req.body);
+        await auths.updateCredentials(req.id, req.body);
         res.status(202).json({
             message: 'Updated credentials ✅',
             data: req.body
@@ -31,19 +31,23 @@ exports.updateCredentials = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-    const user = await auths.getEmail(email);
 
     if (email && password) {
         const verifyEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
         if (verifyEmail){
+            const user = await auths.getEmail(email);
 
             if (user) {
                 const match = bcrypt.compareSync(password, user['password']);
 
                 if (match) {
+
                     res.status(202).json({
-                        token: await auths.generateTokenUser({context: user['user']}),
+                        token: await auths.generateTokenUser({
+                            user: user['user'],
+                            role: user['role']
+                        }),
                         id: user['user']
                     });
 

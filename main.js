@@ -25,12 +25,12 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',
 }));
 app.use(morgan('dev'));
-/*
+
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
- */
+
 app.get('/', (req, res) => {
     res.status(200).json({'message': `Welcome API to lost pets: ${req.ip.substring(7)}`});
 });

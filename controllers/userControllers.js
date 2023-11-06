@@ -28,7 +28,7 @@ exports.setUser = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     try {
-        res.status(200).json(await users.getUser(req.params.id));
+        res.status(200).json(await users.getUser(req.id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -37,7 +37,7 @@ exports.getUser = async (req, res) => {
 
 exports.delUser = async (req, res) => {
     try {
-        await users.delUser(req.params.id);
+        await users.delUser(req.id);
         res.status(204).end();
 
     } catch (error) {
@@ -47,7 +47,7 @@ exports.delUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        await users.updateUser(req.params.id, req.body);
+        await users.updateUser(req.id, req.body);
         res.status(202).json({
             message: 'Update user ✅',
             data: req.body
@@ -60,11 +60,12 @@ exports.updateUser = async (req, res) => {
 
 exports.updateSocialMedia = async (req, res) => {
     try {
-        await users.updateSocialMedia(req.params.id, req.query.social, req.body);
+        await users.updateSocialMedia(req.id, req.query.social, req.body);
         res.status(202).json({
             message: 'Updated social media ✅',
             data: req.body
         });
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }

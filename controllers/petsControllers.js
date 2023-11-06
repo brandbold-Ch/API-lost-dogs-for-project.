@@ -8,7 +8,7 @@ const { pets } = require('../singlenton/uniqueInstances');
 
 exports.insertLostPet = async (req, res) => {
     try {
-        await pets.insertLostPet(req.params.id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+        await pets.insertLostPet(req.id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
         res.status(201).json(
             {
                 message: 'Added post ✅',
@@ -23,7 +23,7 @@ exports.insertLostPet = async (req, res) => {
 
 exports.getPosts = async (req, res) => {
     try {
-        res.status(200).json(await pets.getPosts(req.params.id));
+        res.status(200).json(await pets.getPosts(req.id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -32,7 +32,7 @@ exports.getPosts = async (req, res) => {
 
 exports.getFilterPostGender = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostGender(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostGender(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -41,7 +41,7 @@ exports.getFilterPostGender = async (req, res) => {
 
 exports.getFilterPostBreed = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostBreed(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostBreed(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -50,7 +50,7 @@ exports.getFilterPostBreed = async (req, res) => {
 
 exports.getFilterPostSize = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostSize(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostSize(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -59,7 +59,7 @@ exports.getFilterPostSize = async (req, res) => {
 
 exports.getFilterPostOwner = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostOwner(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostOwner(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -68,7 +68,7 @@ exports.getFilterPostOwner = async (req, res) => {
 
 exports.getFilterPostFound = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostFound(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostFound(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -77,7 +77,7 @@ exports.getFilterPostFound = async (req, res) => {
 
 exports.getFilterPostSpecie = async (req, res) => {
     try {
-        res.status(200).json(await pets.getFilterPostSpecie(req.params.id, req.query.value));
+        res.status(200).json(await pets.getFilterPostSpecie(req.id, req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -86,7 +86,7 @@ exports.getFilterPostSpecie = async (req, res) => {
 
 exports.getPost = async (req, res) => {
     try {
-        res.status(200).json(await pets.getPost(req.params.id, req.params.pet_id));
+        res.status(200).json(await pets.getPost(req.id, req.params.pet_id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -95,7 +95,7 @@ exports.getPost = async (req, res) => {
 
 exports.updatePost = async (req, res) => {
     try {
-        await pets.updatePost(req.params.id, req.params.pet_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+        await pets.updatePost(req.id, req.params.pet_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
         res.status(200).json(
             {
                 message: 'Updated post ✅',
@@ -104,14 +104,13 @@ exports.updatePost = async (req, res) => {
         );
 
     } catch (error) {
-        console.log('Error puto')
         res.status(500).json({message: error.message});
     }
 };
 
 exports.delPost = async (req, res) => {
     try {
-        await pets.delPost(req.params.id, req.params.pet_id);
+        await pets.delPost(req.id, req.params.pet_id);
         res.status(204).end();
 
     } catch (error) {
@@ -122,7 +121,7 @@ exports.delPost = async (req, res) => {
 exports.addGallery = async (req, res) => {
     try {
         console.log(req.files)
-        await pets.addGallery(req.params.id, req.params.pet_id, req.files);
+        await pets.addGallery(req.id, req.params.pet_id, req.files);
         res.status(201).json(
             {
                 message: 'Added images ✅',
@@ -137,7 +136,7 @@ exports.addGallery = async (req, res) => {
 exports.delPartialGallery = async (req, res) => {
     try {
         console.log(req.query.image);
-        await pets.delPartialGallery(req.params.id, req.params.pet_id, req.query.image);
+        await pets.delPartialGallery(req.id, req.params.pet_id, req.query.image);
         res.status(204).end();
 
     } catch (error) {
@@ -147,7 +146,7 @@ exports.delPartialGallery = async (req, res) => {
 
 exports.insertTagsPost = async (req, res) => {
     try {
-        await pets.insertTagsPost(req.params.id, req.params.pet_id , JSON.parse(JSON.stringify(req.body)));
+        await pets.insertTagsPost(req.id, req.params.pet_id , JSON.parse(JSON.stringify(req.body)));
         res.status(201).json(
             {
                 message: 'Added tag ✅',
@@ -162,7 +161,7 @@ exports.insertTagsPost = async (req, res) => {
 
 exports.delTagsPost = async (req, res) => {
     try {
-        await pets.delTagsPost(req.params.id, req.params.pet_id, req.query.key, req.query.value);
+        await pets.delTagsPost(req.id, req.params.pet_id, req.query.key, req.query.value);
         res.status(204).end();
 
     } catch (error) {
@@ -172,7 +171,7 @@ exports.delTagsPost = async (req, res) => {
 
 exports.insertComment = async (req, res) => {
     try {
-        await pets.insertComment(req.params.id, req.params.pet_id, req.body);
+        await pets.insertComment(req.id, req.query.user, req.query.pet, req.body);
         res.status(201).json(
             {
                 message: 'Added comment ✅',
