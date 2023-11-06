@@ -326,7 +326,7 @@ class PetsServices {
 
         const comment = {
             title: data,
-            timestamp: Date.now(),
+            timestamp: new Date(Date.now()),
             user: user
         };
 
