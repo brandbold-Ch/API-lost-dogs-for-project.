@@ -5,7 +5,7 @@
  * functionality to authenticated users
  */
 
-const User = require('../models/user');
+const { User } = require('../models/user');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const { cloudinary } = require('../configurations/config');

@@ -6,6 +6,7 @@
 
 const { auths } = require('../singlenton/uniqueInstances');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.getCredentials =  async (req, res) => {
     try {
@@ -30,40 +31,53 @@ exports.updateCredentials = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (email && password) {
-        const verifyEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+        if (email && password) {
+            const verifyEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-        if (verifyEmail){
-            const user = await auths.getEmail(email);
+            if (verifyEmail){
+                const user = await auths.getEmail(email);
 
-            if (user) {
-                const match = bcrypt.compareSync(password, user['password']);
+                if (user) {
+                    const match = bcrypt.compareSync(password, user['password']);
 
-                if (match) {
+                    if (match) {
 
-                    res.status(202).json({
-                        token: await auths.generateTokenUser({
-                            user: user['user'],
-                            role: user['role']
-                        }),
-                        id: user['user']
-                    });
+                        res.status(202).json({
+                            token: await auths.generateTokenUser({
+                                user: user['user'],
+                                role: user['role']
+                            })
+                        });
+
+                    } else {
+                        res.status(401).json({message: 'Incorrect password 🤬'});
+                    }
 
                 } else {
-                    res.status(401).json({message: 'Incorrect password 🤬'});
+                    res.status(404).json({message: 'Not found user 🚫'});
                 }
 
             } else {
-                res.status(404).json({message: 'Not found user 🚫'});
+                res.status(400).json({message: 'Invalid email field 💢'});
             }
 
         } else {
-            res.status(400).json({message: 'Invalid email field 💢'});
+            res.status(400).json({message: 'You did not send the credentials 🙄'});
         }
 
-    } else {
-        res.status(400).json({message: 'You did not send the credentials 🙄'});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+exports.statusToken = async (req, res) => {
+    try {
+        res.status(200).json(await auths.detailToken(req.body.token));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
     }
 };

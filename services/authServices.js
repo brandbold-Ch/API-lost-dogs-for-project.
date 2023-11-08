@@ -6,7 +6,7 @@
  */
 
 const Auth = require('../models/auth');
-const User = require('../models/user');
+const { User } = require('../models/user');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -48,6 +48,9 @@ class AuthServices {
         return Auth.findOne(
             {
                 email: email
+            },
+            {
+                __v: 0
             }
         );
     };
@@ -85,7 +88,8 @@ class AuthServices {
             },
             {
                 $set: {
-                    email: email, password: password
+                    email: email,
+                    password: password
                 }
             },
             {
@@ -107,7 +111,29 @@ class AuthServices {
      */
 
     async generateTokenUser(payload) {
-         return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '3h'});
+        return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '3h'});
+    };
+
+    async detailToken(token) {
+        try {
+            const data = jwt.verify(token, process.env.SECRET_KEY);
+            return  {
+                start: data.iat,
+                end: data.exp,
+                expired: false
+            }
+
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return {
+                    start: null,
+                    end: null,
+                    expired: true
+                };
+            } else {
+                return error;
+            }
+        }
     };
 }
 

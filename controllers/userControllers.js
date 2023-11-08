@@ -22,7 +22,7 @@ exports.setUser = async (req, res) => {
             data: req.body
         });
     } catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(500).json({message: error.message});
     }
 };
 

@@ -10,6 +10,7 @@ const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRotes');
 const petsRouter = require('./routes/petsRoutes');
 const guestsRouter = require('./routes/guestsRoutes');
+const adminRouter = require('./routes/adminRoutes');
 const morgan = require('morgan');
 const cors = require('cors');
 require('dotenv').config();
@@ -38,6 +39,7 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/posts', petsRouter);
 app.use('/api/v1/guests', guestsRouter);
+app.use('/api/v1/admin', adminRouter);
 app.use((req, res) => {
     res.status(404).json({'message': 'This route not available'});
 });

@@ -5,7 +5,7 @@
  * functionality to authenticated users
  */
 
-const User = require('../models/user');
+const { User } = require('../models/user');
 const Auth = require('../models/auth');
 
 /**

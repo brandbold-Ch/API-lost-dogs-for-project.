@@ -5,7 +5,7 @@
  * functionality to unauthenticated users
  */
 
-const User = require('../models/user');
+const { User } = require('../models/user');
 
 /**
  * Class that provides services related to the application.

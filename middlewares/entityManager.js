@@ -68,8 +68,24 @@ const checkQueryParameters = async (req, res, next) => {
     }
 };
 
+const checkTrust = async (req, res, next) => {
+    try {
+        console.log(req.body)
+
+        if (req.body.token === process.env.TRUSTED_PERMISSIONS) {
+            next();
+        } else {
+            res.status(403).json({message: 'Can\'t create an administrator account 💩'});
+        }
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 module.exports = {
     checkUserExists,
     checkPostExists,
-    checkQueryParameters
+    checkQueryParameters,
+    checkTrust
 };
