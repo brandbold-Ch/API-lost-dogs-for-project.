@@ -105,7 +105,7 @@ class PetsServices {
         const body = pet_data[0];
         const file = pet_data[1];
 
-        let data = {
+        let template = {
             name: body.name,
             details: {
                 specie: body.specie,
@@ -133,7 +133,7 @@ class PetsServices {
             },
             {
                 $push: {
-                    lost_pets: data
+                    lost_pets: template
                 }
             },
             {
@@ -179,7 +179,7 @@ class PetsServices {
     async delPost(id, pet_id) {
         const pet = await this.getPost(id, pet_id);
 
-        if (pet.identify.image !== null) {
+        if (pet.identify.image) {
             await this.deleteImage(pet.identify.image.id);
         }
 
@@ -210,7 +210,7 @@ class PetsServices {
         const body = pet_data[0];
         const file = pet_data[1];
 
-        let data = {
+        let template = {
             name: body.name,
             details: {
                 specie: body.specie,
@@ -243,7 +243,7 @@ class PetsServices {
 
         if (file !== undefined) {
             await this.deleteImage(context.identify.image.id);
-            data.identify.image = await this.uploadImage(file.buffer);
+            template.identify.image = await this.uploadImage(file.buffer);
         }
 
         await User.updateOne(
@@ -253,7 +253,7 @@ class PetsServices {
             },
             {
                 $set: {
-                    "lost_pets.$": data
+                    "lost_pets.$": template
                 }
             },
             {runValidators: true}

@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const { users, pets } = require('../singlenton/uniqueInstances');
+const { pets, auths } = require('../singlenton/uniqueInstances');
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -16,9 +16,9 @@ const { users, pets } = require('../singlenton/uniqueInstances');
 
 const checkUserExists = async (req, res, next) => {
     try {
-        const user = await users.getUser(req.id || req.query.user);
+        const entity = await auths.getUser(req.query.user || req.id);
 
-        if (user) {
+        if (entity) {
             next();
         } else {
             res.status(404).json({message: 'Not found user 🚫'});
@@ -38,6 +38,7 @@ const checkPostExists = async (req, res, next) => {
         } else {
             res.status(404).json({message: 'Not found post 🚫'});
         }
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -63,6 +64,7 @@ const checkQueryParameters = async (req, res, next) => {
         } else {
             res.status(400).json({message: `The parameters must be 👉 ${choices[value]} 👈`});
         }
+
     } catch (error) {
         res.status(404).json({message: error.message});
     }
@@ -70,7 +72,6 @@ const checkQueryParameters = async (req, res, next) => {
 
 const checkTrust = async (req, res, next) => {
     try {
-        console.log(req.body)
 
         if (req.body.token === process.env.TRUSTED_PERMISSIONS) {
             next();

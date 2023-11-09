@@ -55,6 +55,21 @@ class AuthServices {
         );
     };
 
+    async getUser(user) {
+        return Auth.findOne(
+            {
+                user: user
+            },
+            {
+                _id: 0,
+                email: 0,
+                password: 0,
+                role: 0,
+                __v: 0
+            }
+        );
+    };
+
     /**
      * Updates a user's credentials by their ID.
      * @async

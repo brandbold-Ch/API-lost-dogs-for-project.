@@ -1,6 +1,5 @@
 const Admin = require('../models/administrator');
 const Auth = require("../models/auth");
-const {User} = require("../models/user");
 
 class AdminServices {
     constructor() {};
@@ -35,6 +34,30 @@ class AdminServices {
             {
                 __v:0,
                 _id: 0
+            }
+        );
+    }
+
+    async updateAdmin(id, data){
+        const template = {
+            name: data.name,
+            lastname: data.lastname,
+            cellphone: data.cellphone,
+            details: {
+                birthdate: data.birthdate,
+                age: data.age,
+                address: data.address
+            }
+        }
+        await Admin.updateOne(
+            {
+                _id: id
+            },
+            {
+                $set: template
+            },
+            {
+                runValidators: true
             }
         );
     }

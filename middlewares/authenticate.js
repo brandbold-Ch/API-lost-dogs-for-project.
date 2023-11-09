@@ -30,7 +30,7 @@ const isAuthenticate = async (req, res, next) => {
 
             ],
             ADMINISTRATOR: [
-
+                '/api/v1/admin'
             ]
         };
 
