@@ -38,7 +38,7 @@ class AdminServices {
         );
     }
 
-    async updateAdmin(id, data){
+    async updateAdmin(id, data) {
         const template = {
             name: data.name,
             lastname: data.lastname,

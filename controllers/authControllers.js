@@ -45,11 +45,18 @@ exports.login = async (req, res) => {
 
                     if (match) {
 
+                        const token = await auths.generateTokenUser({
+                            user: user['user'],
+                            role: user['role']
+                        });
+                        const decompile = jwt.verify(token, process.env.SECRET_KEY);
+
                         res.status(202).json({
-                            token: await auths.generateTokenUser({
-                                user: user['user'],
-                                role: user['role']
-                            })
+                            token: token,
+                            details: {
+                                start: decompile.iat,
+                                end: decompile.exp
+                            }
                         });
 
                     } else {
