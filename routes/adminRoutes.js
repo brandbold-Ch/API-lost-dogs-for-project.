@@ -10,7 +10,7 @@ adminRoute.post('/new', express.urlencoded({ extended: true }), checkTrust, admi
 adminRoute.get('/', isAuthenticate, checkUserExists, adminControllers.getAdmin);
 adminRoute.put('/', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), adminControllers.updateAdmin);
 adminRoute.delete('/', isAuthenticate, checkUserExists, adminControllers.delAdmin);
-adminRoute.get('/requests', adminControllers.getRequests);
+adminRoute.get('/requests', isAuthenticate, checkUserExists, adminControllers.getRequests);
 adminRoute.post('/requests/activate/:id', isAuthenticate, checkUserExists, checkRequestExists, adminControllers.activateRequest);
 adminRoute.post('/requests/deactivate/:id', isAuthenticate, checkUserExists, checkRequestExists, adminControllers.deactivateRequest);
 adminRoute.post('/requests/reject/:id', isAuthenticate, checkUserExists, checkRequestExists, adminControllers.rejectRequest);
