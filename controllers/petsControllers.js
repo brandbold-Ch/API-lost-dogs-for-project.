@@ -120,7 +120,6 @@ exports.delPost = async (req, res) => {
 
 exports.addGallery = async (req, res) => {
     try {
-        console.log(req.files)
         await pets.addGallery(req.id, req.params.pet_id, req.files);
         res.status(201).json(
             {
@@ -171,7 +170,7 @@ exports.delTagsPost = async (req, res) => {
 
 exports.insertComment = async (req, res) => {
     try {
-        await pets.insertComment(req.id, req.query.user, req.query.pet, req.body);
+        await pets.insertComment(req.id, req.query.pet, req.body);
         res.status(201).json(
             {
                 message: 'Added comment ✅',

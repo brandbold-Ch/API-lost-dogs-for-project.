@@ -9,6 +9,7 @@ const { guests } = require('../singlenton/uniqueInstances');
 exports.getLostPets = async (req, res) => {
     try {
         res.status(200).json(await guests.getAllLostPets());
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -16,7 +17,7 @@ exports.getLostPets = async (req, res) => {
 
 exports.getUserAndPet = async (req, res) => {
     try {
-        res.status(200).json(await guests.getUserAndPet(req.query.user, req.query.pet));
+        res.status(200).json(await guests.getUserAndPet(req.query.pet));
     } catch (error) {
         res.status(500).json({message: error.message});
     }

@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const { pets, auths } = require('../singlenton/uniqueInstances');
+const { pets, auths, admin } = require('../singlenton/uniqueInstances');
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -31,9 +31,16 @@ const checkUserExists = async (req, res, next) => {
 
 const checkPostExists = async (req, res, next) => {
     try {
-        const pet = await pets.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
+        let entity = null;
 
-        if (pet) {
+        if (req.baseUrl === '/api/v1/posts' && req.path !== '/comment/new')
+            entity = await pets.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
+        else {
+            entity = await pets.getGeneralPost(req.params.pet_id || req.query.pet);
+        }
+
+
+        if (entity) {
             next();
         } else {
             res.status(404).json({message: 'Not found post 🚫'});
@@ -84,9 +91,71 @@ const checkTrust = async (req, res, next) => {
     }
 };
 
+const isActive = async (req, res, next) => {
+    try {
+        const request = await admin.getRequestForMiddlewareIsActive(req.id);
+
+        if (request['status'] === 'pendiente') {
+            res.status(403).json({message: 'You are in a waiting process, ' +
+                    'the administrator must activate your account ⏳'});
+        }
+        else if (request['status'] === 'rechazado') {
+            res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
+        }
+        else if (request['status'] === 'activo') {
+            next();
+        }
+        else {
+            res.status(403).json({message: 'Your account is deactivated 📴'});
+        }
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+const checkRequestExists = async (req, res, next) => {
+    try {
+        const request = await admin.getRequestForMiddlewareCheck(req.params.id);
+
+        if (request) {
+            next();
+        } else {
+            res.status(404).json({message: 'Not found request 🚫'});
+        }
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+const checkQueryStatus = async (req, res , next) => {
+    try {
+
+        const choices = [
+            'pendiente',
+            'activo',
+            'inactivo',
+            'rechazado'
+        ];
+
+        if (choices.includes(req.query.status)) {
+            next();
+        } else {
+            res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
+        }
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
 module.exports = {
     checkUserExists,
     checkPostExists,
     checkQueryParameters,
-    checkTrust
+    checkTrust,
+    isActive,
+    checkRequestExists,
+    checkQueryStatus
 };

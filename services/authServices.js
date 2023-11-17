@@ -6,7 +6,6 @@
  */
 
 const Auth = require('../models/auth');
-const { User } = require('../models/user');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -24,15 +23,8 @@ class AuthServices {
 
     async getCredentials(id){
         return Auth.findOne(
-            {
-                user: id
-            },
-            {
-                user: 0,
-                _id: 0,
-                __v:0,
-                role: 0
-            }
+            { user: id },
+            { user: 0, _id: 0, __v:0, role: 0 }
         );
     };
 
@@ -46,27 +38,15 @@ class AuthServices {
 
     async getEmail(email) {
         return Auth.findOne(
-            {
-                email: email
-            },
-            {
-                __v: 0
-            }
+            { email: email },
+            { __v: 0 }
         );
     };
 
     async getUser(user) {
         return Auth.findOne(
-            {
-                user: user
-            },
-            {
-                _id: 0,
-                email: 0,
-                password: 0,
-                role: 0,
-                __v: 0
-            }
+            { user: user },
+            { _id: 0, email: 0, password: 0, role: 0, __v: 0 }
         );
     };
 
@@ -82,34 +62,19 @@ class AuthServices {
      */
 
     async updateCredentials(id, data) {
-        let { email, password } = data;
-        password = await bcrypt.hash(password, 10);
-        await User.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: {
-                    email: email
-                }
-            },
-            {
-                runValidators: true
-            }
-        );
+        let { email, new_password, old_password } = data;
+        const user = await Auth.findOne({ user: id});
+
+        if (bcrypt.compareSync(old_password, user.password)){
+            new_password = await bcrypt.hash(new_password, 10);
+        } else {
+            throw Error('Incorrect password 🤬');
+        }
+
         await Auth.updateOne(
-            {
-                user: id
-            },
-            {
-                $set: {
-                    email: email,
-                    password: password
-                }
-            },
-            {
-                runValidators: true
-            }
+            { user: id },
+            { $set: { email: email, password: new_password }},
+            { runValidators: true }
         );
     };
 
@@ -126,7 +91,7 @@ class AuthServices {
      */
 
     async generateTokenUser(payload) {
-        return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '3h'});
+        return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: process.env.EXPIRE});
     };
 
     async detailToken(token) {

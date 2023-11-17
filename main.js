@@ -11,6 +11,7 @@ const authRouter = require('./routes/authRotes');
 const petsRouter = require('./routes/petsRoutes');
 const guestsRouter = require('./routes/guestsRoutes');
 const adminRouter = require('./routes/adminRoutes');
+const collabRouter = require('./routes/collabRoutes');
 const morgan = require('morgan');
 const cors = require('cors');
 require('dotenv').config();
@@ -27,10 +28,12 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 
+/*
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
+ */
 
 app.get('/', (req, res) => {
     res.status(200).json({'message': `Welcome API to lost pets: ${req.ip.substring(7)}`});
@@ -39,7 +42,8 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/posts', petsRouter);
 app.use('/api/v1/guests', guestsRouter);
-app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/admins', adminRouter);
+app.use('/api/v1/collabs', collabRouter);
 app.use((req, res) => {
     res.status(404).json({'message': 'This route not available'});
 });

@@ -41,11 +41,6 @@ const userSchema = new Schema({
         default: null,
         maxLength: 10,
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
     social_media: {
         type: Array,
         required: false,
@@ -58,8 +53,7 @@ const userSchema = new Schema({
             {platform: 'threads', user: ''},
             {platform: 'whatsapp', user: ''}
         ]
-    },
-    lost_pets: [petsSchema],
+    }
 });
 
 /**

@@ -22,7 +22,7 @@ exports.updateCredentials = async (req, res) => {
         await auths.updateCredentials(req.id, req.body);
         res.status(202).json({
             message: 'Updated credentials ✅',
-            data: req.body
+            data: req.body.email
         });
 
     } catch (error) {

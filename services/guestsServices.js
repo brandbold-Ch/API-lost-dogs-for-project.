@@ -5,7 +5,7 @@
  * functionality to unauthenticated users
  */
 
-const { User } = require('../models/user');
+const Pet = require('../models/pets');
 
 /**
  * Class that provides services related to the application.
@@ -16,38 +16,10 @@ class GuestsServices {
 
     constructor() {};
 
-    async getUserAndPet(id, pet_id){
-
-        const user = await User.findOne(
-            {
-                _id: id
-            },
-            {
-                lost_pets: 0,
-                _id:0,
-                __v: 0
-            }
-        );
-
-        const pet = await User.findOne(
-            {
-                _id: id
-            },
-            {
-                _id: 0,
-                lost_pets: {
-                    $elemMatch: {
-                        _id: pet_id
-                    }
-                }
-            }
-        );
-
-        if (pet){
-            return [user, pet['lost_pets'][0]];
-        } else {
-            return [];
-        }
+    async getUserAndPet(pet_id){
+        return Pet.findById(pet_id,
+            {_id: 0, __v: 0}
+        ).populate('user', { __v: 0 });
     };
 
     /**
@@ -58,33 +30,7 @@ class GuestsServices {
      */
 
     async getAllLostPets(){
-        return User.aggregate([
-            {
-                $unwind: '$lost_pets'
-            },
-            {
-                $addFields: {
-                    'lost_pets.user': "$_id"
-                }
-            },
-            {
-                $replaceRoot: {
-                    newRoot: '$lost_pets'
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    user: 1,
-                    name: 1,
-                    details: 1,
-                    publication: 1,
-                    status: 1,
-                    'identify.image': 1,
-                    feedback: 1
-                }
-            },
-        ]);
+        return Pet.find({}, { "identify.gallery": 0, user: 0, __v: 0 });
     };
 
     async getFilterPostGender(gender) {

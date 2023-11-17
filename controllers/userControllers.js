@@ -21,6 +21,7 @@ exports.setUser = async (req, res) => {
             message: 'Added user ✅',
             data: req.body
         });
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -49,7 +50,7 @@ exports.updateUser = async (req, res) => {
     try {
         await users.updateUser(req.id, req.body);
         res.status(202).json({
-            message: 'Update user ✅',
+            message: 'Updated user ✅',
             data: req.body
         });
 
@@ -60,7 +61,7 @@ exports.updateUser = async (req, res) => {
 
 exports.updateSocialMedia = async (req, res) => {
     try {
-        await users.updateSocialMedia(req.id, req.query.social, req.body);
+        await users.updateSocialMedia(req.id, req.query.social, req.body.user);
         res.status(202).json({
             message: 'Updated social media ✅',
             data: req.body

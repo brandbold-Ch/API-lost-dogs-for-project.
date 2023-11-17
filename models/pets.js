@@ -27,7 +27,7 @@ const Schema = mongoose.Schema;
  */
 
 const petSchema = new Schema({
-
+    
     name: {
         type: String,
         required: false,
@@ -36,12 +36,12 @@ const petSchema = new Schema({
     details: {
         specie: {
             type: String,
-            required: true
+            required: false
         },
         gender: {
             type: String,
             enum: ['Macho', 'Hembra'],
-            required: true
+            required: false
         },
         age: {
             type: String,
@@ -50,16 +50,16 @@ const petSchema = new Schema({
         },
         description: {
             type: String,
-            required: true,
+            required: false,
         },
         size: {
             type: String,
             enum: ['Chico', 'Mediano', 'Grande', 'No aplica'],
-            required: true
+            required: false
         },
         breed: {
             type: String,
-            required: true
+            required: false
         },
     },
     publication: {
@@ -74,11 +74,12 @@ const petSchema = new Schema({
         },
         lost_date: {
             type: Date,
-            required: true
+            required: false
         },
-        last_seen_site: {
-            type: String,
-            required: true,
+        coordinates: {
+            type: Array,
+            required: false,
+            default: []
         }
     },
     status: {
@@ -90,14 +91,14 @@ const petSchema = new Schema({
         },
         owner: {
             type: Boolean,
-            required: true,
+            required: false,
             default: true
         },
     },
     identify: {
         image: {
             type: Object,
-            required: true,
+            required: false,
             default: null
         },
         gallery: {
@@ -117,7 +118,14 @@ const petSchema = new Schema({
             required: false,
             default: []
         }
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
-});
+}, {__v: 0});
 
-module.exports = petSchema;
+petSchema.index({user: 1}, {unique: true});
+const Pet = mongoose.model('Pet', petSchema);
+module.exports = Pet;

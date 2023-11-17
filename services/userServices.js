@@ -6,7 +6,9 @@
  */
 
 const { User } = require('../models/user');
+const Pet = require('../models/pets');
 const Auth = require('../models/auth');
+const { cloudinary } = require('../configurations/config');
 
 /**
  * Class that provides CRUD services related to users.
@@ -18,13 +20,13 @@ class UserServices {
     constructor() {};
 
     async create(data){
-        const { name, lastname, cellphone, email, password} = data;
+        const { name, lastname, cellphone, email, password } = data;
 
-        const user = new User({name, lastname, email, cellphone});
+        const user = new User({name, lastname, cellphone});
         const auth = new Auth({email, password, user: user._id, role: 'USER'});
 
-        await user.save();
         await auth.save();
+        await user.save();
     };
 
     /**
@@ -46,17 +48,11 @@ class UserServices {
      * @returns {Promise<Array>} A Promise that will be resolved to the user's information.
      */
 
-    async getUser(id){
-        return User.findOne(
-            {
-                _id: id
-            },
-            {
-                __v:0,
-                _id: 0,
-                lost_pets: 0
-            }
-        );
+    async getUser(id) {
+        return User.findById(id, {
+            __v:0,
+            _id: 0,
+        })
     };
 
     /**
@@ -67,17 +63,32 @@ class UserServices {
      * @returns {Promise <void>} A Promise that will be resolved once the removal of the user and its credentials is complete.
      */
 
-    async delUser(id){
-        await Auth.deleteOne(
-            {
-                user: id
-            }
-        );
-        await User.deleteOne(
-            {
-                _id: id
-            }
-        );
+    async delUser(id) {
+        await Promise.all([
+            Auth.findOneAndDelete({ user: id }),
+            User.findByIdAndDelete({ _id: id }),
+        ]);
+
+        const array = await Pet.find({ user: id });
+
+        if (array.length) {
+            await Promise.all(
+                array.map(async pet => {
+                    if (pet.identify.image) {
+                        await cloudinary.uploader.destroy(pet.identify.image.id);
+                    }
+
+                    if (pet.identify.gallery.length) {
+                        await Promise.all(
+                            pet.identify.gallery.map(async image => {
+                                await cloudinary.uploader.destroy(image.id);
+                            })
+                        );
+                    }
+                    await Pet.deleteOne({ _id: pet._id });
+                })
+            );
+        }
     };
 
     /**
@@ -90,16 +101,10 @@ class UserServices {
      */
 
     async updateUser(id, data){
-        await User.updateOne(
-            {
-                _id: id
-            },
-            {
-                $set: data
-            },
-            {
-                runValidators: true
-            }
+        await User.findByIdAndUpdate(
+            id,
+            { $set: data },
+            { runValidators: true }
         );
     };
 
@@ -115,15 +120,8 @@ class UserServices {
 
     async updateSocialMedia(id, network, data){
         await User.updateOne(
-            {
-                _id: id,
-                "social_media.platform": network
-            },
-            {
-                $set: {
-                    "social_media.$": data
-                }
-            },
+            { _id: id, "social_media.platform": network },
+            { $set: { "social_media.$.user": data }},
         );
     };
 }

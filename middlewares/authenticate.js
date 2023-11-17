@@ -27,10 +27,12 @@ const isAuthenticate = async (req, res, next) => {
                 '/api/v1/auth'
             ],
             COLLABORATOR: [
-
+                '/api/v1/collabs',
+                '/api/v1/auth'
             ],
             ADMINISTRATOR: [
-                '/api/v1/admin'
+                '/api/v1/admins',
+                '/api/v1/auth'
             ]
         };
 
