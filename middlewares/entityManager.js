@@ -131,7 +131,6 @@ const checkRequestExists = async (req, res, next) => {
 
 const checkQueryStatus = async (req, res , next) => {
     try {
-
         const choices = [
             'pendiente',
             'activo',
