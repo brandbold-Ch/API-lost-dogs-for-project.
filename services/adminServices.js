@@ -6,7 +6,7 @@ class AdminServices {
     constructor() {};
 
     async create(data) {
-        const { name, lastname, cellphone, email, password } = data;
+        const { name, lastname, email, password } = data;
 
         const admin = new Admin({ name, lastname });
         const auth = new Auth({email, password, user: admin['_id'], role: 'ADMINISTRATOR'});

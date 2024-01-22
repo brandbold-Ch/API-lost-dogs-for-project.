@@ -8,6 +8,7 @@ const { auths } = require('../singlenton/uniqueInstances');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
 exports.getCredentials =  async (req, res) => {
     try {
         res.status(200).json(await auths.getCredentials(req.id));
@@ -30,55 +31,81 @@ exports.updateCredentials = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+const validateRequest = (body) => {
+    return new Promise((resolve, reject) => {
 
-        if (email && password) {
-            const verifyEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+        if (body.email && body.password) {
+            resolve(body);
+        } else {
+            reject([400, {message: 'You did not send the credentials 🙄'}]);
+        }
+    });
+}
 
-            if (verifyEmail){
-                const user = await auths.getEmail(email);
+const validateEmail = (body) => {
+    return new Promise((resolve, reject) => {
 
-                if (user) {
-                    const match = bcrypt.compareSync(password, user['password']);
+        const parseEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(body.email);
 
-                    if (match) {
+        if (parseEmail) {
+            resolve(body);
+        } else {
+            reject([400, {message: 'Invalid email field 💢'}]);
+        }
+    })
+}
 
-                        const token = await auths.generateTokenUser({
-                            user: user['user'],
-                            role: user['role']
-                        });
-                        const decompile = jwt.verify(token, process.env.SECRET_KEY);
+const validateUser = (body) => {
+    return new Promise(async (resolve, reject) => {
 
-                        res.status(202).json({
-                            token: token,
-                            details: {
-                                start: decompile.iat,
-                                end: decompile.exp
-                            }
-                        });
+        const user = await auths.getEmail(body.email);
 
-                    } else {
-                        res.status(401).json({message: 'Incorrect password 🤬'});
-                    }
+        if (user) {
+            resolve([body, user]);
+        } else {
+            reject([404, {message: 'Not found user 🚫'}]);
+        }
+    })
+}
 
-                } else {
-                    res.status(404).json({message: 'Not found user 🚫'});
+const validatePassword = (data) => {
+    return new Promise(async (resolve, reject) => {
+
+        const match = bcrypt.compareSync(data[0].password, data[1].password);
+
+        if (match) {
+
+            const token = await auths.generateTokenUser({
+                user: data[1].user,
+                role: data[1].role
+            });
+            const decompile = jwt.verify(token, process.env.SECRET_KEY);
+
+            resolve({
+                token: token,
+                details: {
+                    start: decompile.iat,
+                    end: decompile.exp
                 }
-
-            } else {
-                res.status(400).json({message: 'Invalid email field 💢'});
-            }
+            });
 
         } else {
-            res.status(400).json({message: 'You did not send the credentials 🙄'});
+            reject([401, {message: 'Incorrect password 🤬'}]);
         }
+    })
+}
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+exports.login = async (req, res) => {
+    validateRequest(req.body)
+        .then(body => validateEmail(body))
+        .then(email => validateUser(email))
+        .then(async data => {
+            res.status(200).json(await validatePassword(data));
+        })
+        .catch(err => {
+            res.status(err[0]).json(err[1]);
+        })
+}
 
 exports.statusToken = async (req, res) => {
     try {
