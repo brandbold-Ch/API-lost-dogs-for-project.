@@ -4,7 +4,7 @@ const isAuthenticate = require('../middlewares/authenticate');
 const express = require('express');
 const collabRouter = express.Router();
 
-collabRouter.post('/new', express.urlencoded({ extended: true }), collabControllers.setCollab);
+collabRouter.post('/', express.urlencoded({ extended: true }), collabControllers.setCollab);
 collabRouter.get('/', isAuthenticate, checkUserExists, isActive, collabControllers.getCollab);
 
 module.exports = collabRouter;

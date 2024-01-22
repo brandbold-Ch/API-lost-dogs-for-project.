@@ -7,7 +7,7 @@ const petsRoute = express.Router();
 const processFormData = require('../middlewares/formData');
 const isAuthenticate = require('../middlewares/authenticate');
 
-petsRoute.post('/new', isAuthenticate, checkUserExists, processFormData, petsControllers.insertLostPet);
+petsRoute.post('/', isAuthenticate, checkUserExists, processFormData, petsControllers.insertLostPet);
 petsRoute.put('/:pet_id', isAuthenticate, checkUserExists, checkPostExists, processFormData, petsControllers.updatePost);
 petsRoute.get('/all', isAuthenticate, checkUserExists, petsControllers.getPosts);
 petsRoute.get('/filter/gender', isAuthenticate, checkUserExists, checkQueryParameters, petsControllers.getFilterPostGender);
