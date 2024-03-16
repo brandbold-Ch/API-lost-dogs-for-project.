@@ -1,8 +1,8 @@
-const { admin } = require('../singlenton/uniqueInstances');
+const { admins } = require('../singlenton/instances');
 
 exports.setAdmin = async (req, res) => {
     try {
-        await admin.create(req.body);
+        await admins.createAdmin(req.body);
         res.status(201).json({
             message: 'Added admin ✅',
             data: req.body
@@ -15,7 +15,7 @@ exports.setAdmin = async (req, res) => {
 
 exports.getAdmin = async (req, res) => {
     try {
-        res.status(200).json(await admin.getAdmin(req.id));
+        res.status(200).json(await admins.getAdmin(req.id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -24,7 +24,7 @@ exports.getAdmin = async (req, res) => {
 
 exports.updateAdmin = async (req, res) => {
     try {
-        await admin.updateAdmin(req.id, req.body);
+        await admins.updateAdmin(req.id, req.body);
         res.status(202).json({
             message: 'Updated admin ✅',
             data: req.body
@@ -37,7 +37,7 @@ exports.updateAdmin = async (req, res) => {
 
 exports.delAdmin = async (req, res) => {
     try {
-        await admin.delAdmin(req.id);
+        await admins.deleteAdmin(req.id);
         res.status(204).end();
 
     } catch (error) {
@@ -47,37 +47,33 @@ exports.delAdmin = async (req, res) => {
 
 exports.getRequests = async (req, res) => {
     try {
-        res.status(200).json(await admin.getRequests());
+        res.status(200).json(await admins.getRequests());
 
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 }
 
-exports.activateRequest = async (req, res) => {
+exports.actionRequest = async (req, res) => {
     try {
-        await admin.activateRequest(req.params.id)
-        res.status(200).json({message: 'Activate request ✅'});
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
+        switch (req.query.action) {
 
-exports.deactivateRequest = async (req, res) => {
-    try {
-        await admin.deactivateRequest(req.params.id)
-        res.status(200).json({message: 'Deactivate request ✅'});
+            case "activate":
+                await admins.activateRequest(req.params.id);
+                res.status(200).json({message: 'Activate request ✅'});
+                break;
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
+            case "deactivate":
+                await admins.deactivateRequest(req.params.id);
+                res.status(200).json({message: 'Deactivate request ✅'});
+                break;
 
-exports.rejectRequest = async (req, res) => {
-    try {
-        await admin.rejectRequest(req.params.id)
-        res.status(200).json({message: 'Reject request ✅'});
+            case "reject":
+                await admins.rejectRequest(req.params.id)
+                res.status(200).json({message: 'Reject request ✅'});
+                break;
+        }
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -86,7 +82,73 @@ exports.rejectRequest = async (req, res) => {
 
 exports.filterRequests = async (req, res) => {
     try {
-        res.status(200).json(await admin.filterRequests(req.query.status));
+        res.status(200).json(await admins.filterRequests(req.query.status));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.deleteRequest = async (req, res) => {
+    try {
+        await admins.deleteRequest(req.params.id)
+        res.status(204).end();
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.getCollabs = async (req, res) => {
+    try {
+        res.status(200).json(await admins.getCollabs());
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.getCollab = async (req, res) => {
+    try {
+        res.status(200).json(await admins.getCollab(req.params.collab_id));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.deleteCollab = async (req, res) => {
+    try {
+        await admins.deleteCollab(req.params.collab_id)
+        res.status(204).end();
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.getUsers = async (req, res) => {
+    try {
+        res.status(200).json(await admins.getUsers());
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.getUser = async (req, res) => {
+    try {
+        res.status(200).json(await admins.getUser(req.params.user_id));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.deleteUser = async (req, res) => {
+    try {
+        await admins.deleteUser(req.params.user_id)
+        res.status(204).end();
 
     } catch (error) {
         res.status(500).json({message: error.message});

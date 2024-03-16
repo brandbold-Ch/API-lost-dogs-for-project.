@@ -5,10 +5,12 @@ const express = require('express');
 const usersRoute = express.Router();
 
 usersRoute.get('/', isAuthenticate, checkUserExists, userControllers.getUser);
-usersRoute.delete('/', isAuthenticate, checkUserExists, userControllers.delUser);
+usersRoute.delete('/', isAuthenticate, checkUserExists, userControllers.deleteUser);
 usersRoute.put('/', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), userControllers.updateUser);
 usersRoute.post('/', express.urlencoded({ extended: true }), userControllers.setUser);
-usersRoute.put('/networks', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), userControllers.updateSocialMedia);
+usersRoute.post('/socials', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), userControllers.addSocialMedia);
+usersRoute.delete('/socials', isAuthenticate, checkUserExists, userControllers.deleteSocialMedia);
+usersRoute.put('/socials', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), userControllers.updateSocialMedia);
 usersRoute.get('/test', userControllers.getUsers);
 
 module.exports = usersRoute;

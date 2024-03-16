@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const requestsSchema = new Schema({
-    date: {
+    timestamp: {
         type: Date,
         required: true,
         default: Date.now()
@@ -10,19 +10,25 @@ const requestsSchema = new Schema({
     role: {
         type: String,
         required: true,
-        enum: ['COLLABORATOR']
+        enum: ["COLLABORATOR"]
     },
     status: {
         type: String,
-        enum: ['pendiente', 'activo', 'inactivo', 'rechazado'],
-        default: 'pendiente'
+        enum: [
+            "pending",
+            "active",
+            "disabled",
+            "rejected"
+        ],
+        default: "pending"
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Collab',
+        ref: "Collab",
         required: true,
     }
+}, {
+    versionKey: false
 });
 
-const Request = mongoose.model('Request', requestsSchema);
-module.exports = Request;
+module.exports = mongoose.model("Request", requestsSchema);

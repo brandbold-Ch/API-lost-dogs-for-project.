@@ -5,9 +5,8 @@
  * @module authSchema
  */
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const petsSchema = require('./pets');
 
 /**
  * Schema to store information about a user.
@@ -44,16 +43,10 @@ const userSchema = new Schema({
     social_media: {
         type: Array,
         required: false,
-        default: [
-            {platform: 'instagram', user: ''},
-            {platform: 'facebook', user: ''},
-            {platform: 'twitter', user: ''},
-            {platform: 'linkedin', user: ''},
-            {platform: 'tiktok', user: ''},
-            {platform: 'threads', user: ''},
-            {platform: 'whatsapp', user: ''}
-        ]
+        default: []
     }
+}, {
+    versionKey: false
 });
 
 /**
@@ -61,8 +54,4 @@ const userSchema = new Schema({
  * @type {mongoose.Model<UserSchema>}
  */
 
-const User = mongoose.model('User', userSchema);
-module.exports = {
-    User,
-    userSchema
-};
+module.exports = mongoose.model("User", userSchema);

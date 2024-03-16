@@ -15,8 +15,6 @@ require('dotenv').config();
  * @returns {void}
  */
 
-
-
 const isAuthenticate = async (req, res, next) => {
     try {
         // Extract the token from the Authorization header
@@ -24,17 +22,18 @@ const isAuthenticate = async (req, res, next) => {
 
         const roles = {
             USER: [
-                '/api/v1/users',
-                '/api/v1/posts',
-                '/api/v1/auth'
+                '/api/v2/users',
+                '/api/v2/posts',
+                '/api/v2/auth'
             ],
             COLLABORATOR: [
-                '/api/v1/collabs',
-                '/api/v1/auth'
+                '/api/v2/collabs',
+                '/api/v2/auth',
+                '/api/v2/bulletins'
             ],
             ADMINISTRATOR: [
-                '/api/v1/admins',
-                '/api/v1/auth'
+                '/api/v2/admins',
+                '/api/v2/auth'
             ]
         };
 

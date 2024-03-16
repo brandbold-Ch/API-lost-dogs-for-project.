@@ -4,7 +4,7 @@
  * @file This module is for creating auth services.
  */
 
-const { auths } = require('../singlenton/uniqueInstances');
+const { auths } = require('../singlenton/instances');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -33,7 +33,6 @@ exports.updateCredentials = async (req, res) => {
 
 const validateRequest = (body) => {
     return new Promise((resolve, reject) => {
-
         if (body.email && body.password) {
             resolve(body);
         } else {
@@ -65,7 +64,7 @@ const validateUser = (body) => {
         } else {
             reject([404, {message: 'Not found user 🚫'}]);
         }
-    })
+    });
 }
 
 const validatePassword = (data) => {

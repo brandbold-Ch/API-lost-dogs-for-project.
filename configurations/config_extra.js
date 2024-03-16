@@ -28,7 +28,7 @@ const cloudinary = require('cloudinary').v2;
 // Configuration for database credentials and Cloudinary
 /** @type {DatabaseCredentials} */
 
-require('dotenv').config();
+require("dotenv").config();
 
 const credentials = {
     host: '127.0.0.1',

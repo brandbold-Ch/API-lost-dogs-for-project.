@@ -10,6 +10,7 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+
 class AuthServices {
     constructor() {};
 
@@ -24,7 +25,7 @@ class AuthServices {
     async getCredentials(id){
         return Auth.findOne(
             { user: id },
-            { user: 0, _id: 0, __v:0, role: 0 }
+            { user: 0, _id: 0, role: 0 }
         );
     };
 
@@ -37,16 +38,13 @@ class AuthServices {
      */
 
     async getEmail(email) {
-        return Auth.findOne(
-            { email: email },
-            { __v: 0 }
-        );
+        return Auth.findOne({ email: email });
     };
 
     async getUser(user) {
         return Auth.findOne(
             { user: user },
-            { _id: 0, email: 0, password: 0, role: 0, __v: 0 }
+            { _id: 0, email: 0, password: 0, role: 0 }
         );
     };
 

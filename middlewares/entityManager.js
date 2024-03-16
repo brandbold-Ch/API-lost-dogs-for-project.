@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const { pets, auths, admin } = require('../singlenton/uniqueInstances');
+const { posts, auths, admins } = require('../singlenton/instances');
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -31,14 +31,13 @@ const checkUserExists = async (req, res, next) => {
 
 const checkPostExists = async (req, res, next) => {
     try {
-        let entity = null;
+        let entity;
 
-        if (req.baseUrl === '/api/v1/posts' && req.path !== '/comment/new')
-            entity = await pets.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
-        else {
-            entity = await pets.getGeneralPost(req.params.pet_id || req.query.pet);
+        if (req.baseUrl === '/api/v2/posts' && req.path !== '/comment/') {
+            entity = await posts.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
+        } else {
+            entity = await posts.getGeneralPost(req.params.pet_id || req.query.pet);
         }
-
 
         if (entity) {
             next();
@@ -93,16 +92,16 @@ const checkTrust = async (req, res, next) => {
 
 const isActive = async (req, res, next) => {
     try {
-        const request = await admin.getRequestForMiddlewareIsActive(req.id);
+        const request = await admins.getRequestForMiddlewareIsActive(req.id);
 
-        if (request['status'] === 'pendiente') {
+        if (request['status'] === 'pending') {
             res.status(403).json({message: 'You are in a waiting process, ' +
                     'the administrator must activate your account ⏳'});
         }
-        else if (request['status'] === 'rechazado') {
+        else if (request['status'] === 'rejected') {
             res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
         }
-        else if (request['status'] === 'activo') {
+        else if (request['status'] === 'active') {
             next();
         }
         else {
@@ -116,7 +115,7 @@ const isActive = async (req, res, next) => {
 
 const checkRequestExists = async (req, res, next) => {
     try {
-        const request = await admin.getRequestForMiddlewareCheck(req.params.id);
+        const request = await admins.getRequestForMiddlewareCheck(req.params.id);
 
         if (request) {
             next();
@@ -129,13 +128,32 @@ const checkRequestExists = async (req, res, next) => {
     }
 }
 
+const checkQueryAction = async (req, res, next) => {
+    try {
+        const choices = [
+            "activate",
+            "deactivate",
+            "reject"
+        ];
+
+        if (choices.includes(req.query.action)) {
+            next();
+        } else {
+            res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
+        }
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
 const checkQueryStatus = async (req, res , next) => {
     try {
         const choices = [
-            'pendiente',
-            'activo',
-            'inactivo',
-            'rechazado'
+            'pending',
+            'active',
+            'disabled',
+            'rejected'
         ];
 
         if (choices.includes(req.query.status)) {
@@ -156,5 +174,6 @@ module.exports = {
     checkTrust,
     isActive,
     checkRequestExists,
-    checkQueryStatus
+    checkQueryStatus,
+    checkQueryAction
 };

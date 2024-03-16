@@ -1,4 +1,4 @@
-const guestsControllers = require('../controllers/guestsControllers');
+const guestsControllers = require('../controllers/guestControllers');
 const { checkUserExists } = require('../middlewares/entityManager');
 const { checkPostExists } = require('../middlewares/entityManager');
 const { checkQueryParameters } = require('../middlewares/entityManager');
@@ -13,5 +13,7 @@ guestsRoute.get('/publications/filter/size', checkQueryParameters, guestsControl
 guestsRoute.get('/publications/filter/breed', guestsControllers.getFilterPostBreed);
 guestsRoute.get('/publications/filter/found', checkQueryParameters, guestsControllers.getFilterPostFound);
 guestsRoute.get('/publications/filter/owner', checkQueryParameters, guestsControllers.getFilterPostOwner);
+guestsRoute.get('/publications/filter/date', guestsControllers.getFilterPostLostDate);
+guestsRoute.get('/publications/filter/year', guestsControllers.getFilterPostYear);
 
 module.exports = guestsRoute;

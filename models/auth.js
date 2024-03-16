@@ -5,9 +5,9 @@
  * @module authSchema
  */
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 /**
  * Scheme to store a user's credentials.
@@ -32,7 +32,7 @@ const authSchema = new Schema({
             validator: function (email) {
                 return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
             },
-            message: 'Invalid email field'
+            message: "Invalid email field"
         }
     },
     password: {
@@ -41,7 +41,7 @@ const authSchema = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
         required: true
     },
     role: {
@@ -49,6 +49,8 @@ const authSchema = new Schema({
         required: false,
         default: null,
     },
+}, {
+    versionKey: false
 });
 
 /**
@@ -59,7 +61,7 @@ const authSchema = new Schema({
  * @throws {error} - Error in case there is a problem encrypting the password.
  */
 
-authSchema.pre('save', async function (next) {
+authSchema.pre("save", async function (next) {
     try {
         this.password = await bcrypt.hash(this.password, 10);
         next();
@@ -74,5 +76,4 @@ authSchema.pre('save', async function (next) {
  * @type {mongoose.Model<AuthSchema>}
  */
 authSchema.index({user: 1}, {unique: true});
-const Auth = mongoose.model('Auth', authSchema);
-module.exports = Auth;
+module.exports = mongoose.model("Auth", authSchema);

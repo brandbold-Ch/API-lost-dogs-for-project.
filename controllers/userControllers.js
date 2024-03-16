@@ -4,21 +4,14 @@
  * @file This module is for creating user services.
  */
 
-const { users } = require('../singlenton/uniqueInstances')
+const { users } = require("../singlenton/instances")
 
-exports.getUsers = async (req, res) => {
-    try {
-        res.status(200).json(await users.getAll());
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
 
 exports.setUser = async (req, res) => {
     try {
-        await users.create(req.body);
+        await users.createUser(req.body);
         res.status(201).json({
-            message: 'Added user ✅',
+            message: "Added user ✅",
             data: req.body
         });
 
@@ -26,6 +19,14 @@ exports.setUser = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+exports.getUsers = async (req, res) => {
+    try {
+        res.status(200).json(await users.getUsers());
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 exports.getUser = async (req, res) => {
     try {
@@ -36,9 +37,9 @@ exports.getUser = async (req, res) => {
     }
 };
 
-exports.delUser = async (req, res) => {
+exports.deleteUser = async (req, res) => {
     try {
-        await users.delUser(req.id);
+        await users.deleteUser(req.id);
         res.status(204).end();
 
     } catch (error) {
@@ -59,9 +60,9 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-exports.updateSocialMedia = async (req, res) => {
+exports.addSocialMedia = async (req, res) => {
     try {
-        await users.updateSocialMedia(req.id, req.query.social, req.body.user);
+        await users.addSocialMedia(req.id, req.body);
         res.status(202).json({
             message: 'Updated social media ✅',
             data: req.body
@@ -71,3 +72,24 @@ exports.updateSocialMedia = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+exports.deleteSocialMedia = async (req, res) => {
+    try {
+        await users.deleteSocialMedia(req.id, req.query.key, req.query.value);
+        res.status(204).end();
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.updateSocialMedia = async (req, res) => {
+    try {
+        await users.updateSocialMedia(req.id, req.body);
+        res.status(202).json({
+            message: 'Updated social media ✅',
+            data: req.body
+        });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}

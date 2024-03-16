@@ -4,7 +4,7 @@
  * @file This module is for creating application services.
  */
 
-const { guests } = require('../singlenton/uniqueInstances');
+const { guests } = require('../singlenton/instances');
 
 exports.getLostPets = async (req, res) => {
     try {
@@ -85,3 +85,22 @@ exports.getFilterPostById = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+exports.getFilterPostLostDate = async (req, res) => {
+    try {
+        res.status(200).json(await guests.getFilterPostLostDate(req.query.fetch));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+exports.getFilterPostYear = async (req, res) => {
+    try {
+        res.status(200).json(await guests.getFilterPostYear(req.query.year));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+

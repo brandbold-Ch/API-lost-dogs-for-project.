@@ -5,7 +5,7 @@
  * @module DogSchema
  */
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 /**
@@ -26,40 +26,45 @@ const Schema = mongoose.Schema;
  * @property {Array<string>} tags - Tags associated with the dog.
  */
 
-const petSchema = new Schema({
+const postSchema = new Schema({
     
     name: {
         type: String,
         required: false,
-        default: 'Sin nombre'
+        default: "Sin nombre"
     },
     details: {
         specie: {
             type: String,
-            required: false
+            required: false,
+            default: null
         },
         gender: {
             type: String,
-            enum: ['Macho', 'Hembra'],
-            required: false
+            enum: ["Macho", "Hembra"],
+            required: false,
+            default: null
         },
         age: {
             type: String,
             required: false,
-            default: ""
+            default: null
         },
         description: {
             type: String,
             required: false,
+            default: null
         },
         size: {
             type: String,
-            enum: ['Chico', 'Mediano', 'Grande', 'No aplica'],
-            required: false
+            enum: ["Chico", "Mediano", "Grande", "No aplica"],
+            required: false,
+            default: null
         },
         breed: {
             type: String,
-            required: false
+            required: false,
+            default: null
         },
     },
     publication: {
@@ -74,12 +79,13 @@ const petSchema = new Schema({
         },
         lost_date: {
             type: Date,
-            required: false
+            required: false,
+            default: null
         },
         coordinates: {
-            type: Array,
+            type: Object,
             required: false,
-            default: []
+            default: null
         }
     },
     status: {
@@ -112,20 +118,16 @@ const petSchema = new Schema({
             type: Array,
             required: false,
             default: []
-        },
-        tags: {
-            type: Array,
-            required: false,
-            default: []
         }
     },
     user: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'User'
+        ref: "User"
     }
-}, {__v: 0});
+}, {
+    versionKey: false
+});
 
-petSchema.index({user: 1}, {unique: true});
-const Pet = mongoose.model('Pet', petSchema);
-module.exports = Pet;
+postSchema.index({ user: 1 });
+module.exports = mongoose.model("Post", postSchema);

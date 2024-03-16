@@ -5,21 +5,19 @@
  * functionality to unauthenticated users
  */
 
-const Pet = require('../models/pets');
+const Post = require('../models/post');
 
 /**
  * Class that provides services related to the application.
  * @class
  */
 
-class GuestsServices {
+class GuestServices {
 
     constructor() {};
 
     async getUserAndPet(pet_id){
-        return Pet.findById(pet_id,
-            {_id: 0, __v: 0}
-        ).populate('user', { __v: 0 });
+        return Post.findById(pet_id, { _id: 0 }).populate('user');
     };
 
     /**
@@ -30,7 +28,7 @@ class GuestsServices {
      */
 
     async getAllLostPets(){
-        return Pet.find({}, { "identify.gallery": 0, user: 0, __v: 0 });
+        return Post.find({}, { "identify.gallery": 0, user: 0 });
     };
 
     async getFilterPostGender(gender) {
@@ -67,6 +65,23 @@ class GuestsServices {
         const array = await this.getAllLostPets();
         return array.filter(key => key.details.specie === specie);
     };
+
+    async getFilterPostLostDate(lost_date) {
+        const array = await this.getAllLostPets();
+
+        return array.filter(key => {
+            const date = key.publication.lost_date
+            return date.toISOString() === lost_date.substring(0, 23)+"Z";
+        });
+    }
+
+    async getFilterPostYear(year) {
+        const array = await this.getAllLostPets();
+        return array.filter(key => {
+            const date = key.publication.lost_date
+            return date.getFullYear() === parseInt(year);
+        });
+    }
 }
 
-module.exports = GuestsServices;
+module.exports = GuestServices;

@@ -5,11 +5,12 @@
  * functionality to authenticated users
  */
 
-const { User } = require('../models/user');
-const Pet = require('../models/pets');
-const Auth = require('../models/auth');
-const { cloudinary } = require('../configurations/config');
-
+const User = require("../models/user");
+const Post = require("../models/post");
+const Auth = require("../models/auth");
+const { cloudinary } = require("../configurations/config_extra");
+const conn = require("../configurations/connection");
+const mongoose = require("mongoose")
 /**
  * Class that provides CRUD services related to users.
  * @class
@@ -19,14 +20,41 @@ class UserServices {
 
     constructor() {};
 
-    async create(data){
+    /////////////////////////////////////////////////
+
+    async deleteImages(gallery) {
+        if (gallery.length) {
+            await cloudinary.api.delete_resources(
+                gallery,
+                { type: 'upload', resource_type: 'image' }
+            );
+        }
+    }
+    /////////////////////////////////////////////////
+
+    async createUser(data){
         const { name, lastname, cellphone, email, password } = data;
+        const session = await conn.startSession();
 
-        const user = new User({name, lastname, cellphone});
-        const auth = new Auth({email, password, user: user._id, role: 'USER'});
+        await session.withTransaction(async () => {
+            const user = await User.create([
+                {
+                    name: name,
+                    lastname: lastname,
+                    cellphone: cellphone
+                }
+            ], { session });
 
-        await auth.save();
-        await user.save();
+            await Auth.create([
+                {
+                    email: email,
+                    password: password,
+                    user: user[0]["_id"],
+                    role: "USER"
+                }
+            ], { session });
+        });
+        await session.endSession();
     };
 
     /**
@@ -36,7 +64,7 @@ class UserServices {
      * @returns {Promise<Array>} A Promise that will resolve to the list of users.
      */
 
-    async getAll(){
+    async getUsers(){
         return User.find({});
     };
 
@@ -49,10 +77,7 @@ class UserServices {
      */
 
     async getUser(id) {
-        return User.findById(id, {
-            __v:0,
-            _id: 0,
-        })
+        return User.findById(id, {_id: 0})
     };
 
     /**
@@ -63,32 +88,59 @@ class UserServices {
      * @returns {Promise <void>} A Promise that will be resolved once the removal of the user and its credentials is complete.
      */
 
-    async delUser(id) {
-        await Promise.all([
-            Auth.findOneAndDelete({ user: id }),
-            User.findByIdAndDelete({ _id: id }),
+    async deleteUser(id) {
+        const session = await conn.startSession();
+
+        const array_urls = await Post.aggregate([
+            {
+                $match: { user: new mongoose.Types.ObjectId(id) }
+            },
+            {
+                $project: {
+                    "galleryIds": "$identify.gallery.id",
+                    "imageId": "$identify.image.id"
+                }
+            },
+            {
+                $project: {
+                    "allIds": {
+                        $concatArrays: ["$galleryIds", ["$imageId"]]
+                    }
+                }
+            },
+            {
+                $unwind: "$allIds"
+            },
+            {
+                $group: {
+                    _id: null,
+                    "allIds": { $addToSet: "$allIds" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "allIds": 1
+                }
+            }
         ]);
 
-        const array = await Pet.find({ user: id });
-
-        if (array.length) {
-            await Promise.all(
-                array.map(async pet => {
-                    if (pet.identify.image) {
-                        await cloudinary.uploader.destroy(pet.identify.image.id);
-                    }
-
-                    if (pet.identify.gallery.length) {
-                        await Promise.all(
-                            pet.identify.gallery.map(async image => {
-                                await cloudinary.uploader.destroy(image.id);
-                            })
-                        );
-                    }
-                    await Pet.deleteOne({ _id: pet._id });
-                })
-            );
-        }
+        await session.withTransaction(async () => {
+            await Promise.all([
+                Auth.findOneAndDelete({ user: id }, {session}),
+                User.findByIdAndDelete(id, {session}),
+                Post.deleteMany({ user: id }, {session}),
+            ]);
+        })
+            .then(async () => {
+                if (array_urls.length) {
+                    await this.deleteImages(array_urls[0]["allIds"]);
+                }
+            })
+            .catch((err) => {
+                throw Error(err.message);
+            })
+        await session.endSession();
     };
 
     /**
@@ -101,8 +153,7 @@ class UserServices {
      */
 
     async updateUser(id, data){
-        await User.findByIdAndUpdate(
-            id,
+        await User.findByIdAndUpdate(id,
             { $set: data },
             { runValidators: true }
         );
@@ -113,17 +164,41 @@ class UserServices {
      * @async
      * @function
      * @param {string} id - User ID.
-     * @param {string} network - Platform of the network to update.
-     * @param {Object} data - New network data.
+     * @param {Array} data - Platform of the network to update.
      * @returns {Promise<void>} A Promise that will be resolved once the network update is complete.
      */
 
-    async updateSocialMedia(id, network, data){
+    async addSocialMedia(id, data){
+        const toArray = [];
+
+        for (const key in data) {
+            toArray.push({[key]: data[key]})
+        }
+
         await User.updateOne(
-            { _id: id, "social_media.platform": network },
-            { $set: { "social_media.$.user": data }},
+            { _id: id },
+            { $push: { social_media: {$each: toArray}}},
         );
     };
+
+    async deleteSocialMedia(id, key, value) {
+        console.log(key, value)
+        if (key && value) {
+            await User.updateOne(
+                { _id: id },
+                { $pull: {social_media: {[key]: value}} }
+            )
+        }
+    }
+
+    async updateSocialMedia(id, data) {
+        const key = Object.keys(data)[0];
+
+        await User.updateOne(
+            { _id: id, [`social_media.${key}`]: {$exists: true}},
+            {$set: {[`social_media.$.${key}`]: data[key]}},
+        )
+    }
 }
 
 module.exports = UserServices;
