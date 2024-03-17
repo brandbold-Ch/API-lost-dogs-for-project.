@@ -5,7 +5,6 @@
  */
 
 const { posts, auths, admins, bulletins } = require('../singlenton/instances');
-const {raw} = require("express");
 
 /**
  * Middleware to check if a user with the specified ID exists.

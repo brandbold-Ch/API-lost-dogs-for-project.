@@ -5,6 +5,7 @@ const Bulletin = require("../models/bulletin")
 const conn = require('../configurations/connection');
 const mongoose = require("mongoose");
 const { cloudinary } = require("../configurations/config_extra");
+const Post = require("../models/post");
 
 
 class CollabServices {

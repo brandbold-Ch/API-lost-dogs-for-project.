@@ -1,4 +1,4 @@
-const { bulletins } = require("../singlenton/instances");
+const { bulletins, posts} = require("../singlenton/instances");
 
 exports.setBulletin = async (req, res) => {
     try {
@@ -37,6 +37,22 @@ exports.updateBulletin = async (req, res) => {
             message: 'Updated bulletin ✅',
             data: JSON.parse(JSON.stringify(req.body))
         });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+exports.delPartialGallery = async (req, res) => {
+    try {
+
+        if (req.query.image) {
+            await bulletins.deletePartialGallery(req.id, req.params.bulletin_id, req.query.image);
+            res.status(204).end();
+        }
+        else {
+            res.status(404).json({message: "Id image required. ⚠️"});
+        }
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }

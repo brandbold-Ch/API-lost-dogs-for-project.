@@ -2,6 +2,7 @@ const Bulletin = require("../models/bulletin");
 const Collab = require("../models/collaborator");
 const { cloudinary } = require("../configurations/config_extra");
 const conn = require("../configurations/connection");
+const Post = require("../models/post");
 
 
 class BulletinServices {
@@ -76,6 +77,25 @@ class BulletinServices {
                     }));
                 }
             }).catch((err) => {
+                throw Error(err.message);
+            })
+        await session.endSession();
+    }
+
+    async deletePartialGallery(id, bulletin_id, img_id) {
+        const session = await conn.startSession();
+
+        await session.withTransaction(async () => {
+            await Bulletin.updateOne(
+                { _id: bulletin_id, user: id},
+                { $pull: { "body.gallery": { id: img_id }}},
+                { session }
+            );
+        })
+            .then(async () => {
+                await this.deleteImage(img_id);
+            })
+            .catch((err) => {
                 throw Error(err.message);
             })
         await session.endSession();
