@@ -4,7 +4,8 @@
  * @file This module is for user middleware.
  */
 
-const { posts, auths, admins } = require('../singlenton/instances');
+const { posts, auths, admins, bulletins } = require('../singlenton/instances');
+const {raw} = require("express");
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -13,6 +14,21 @@ const { posts, auths, admins } = require('../singlenton/instances');
  * @param {Function} next - Express next middleware function.
  * @returns {void}
  */
+
+const checkBulletinExists = async (req, res, next) => {
+    try {
+        const bulletin = await bulletins.getBulletin(req.id, req.params.bulletin_id);
+
+        if (bulletin) {
+            next();
+        } else {
+            res.status(404).json({message: 'Not found bulletin 🚫'});
+        }
+        
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 const checkUserExists = async (req, res, next) => {
     try {
@@ -175,5 +191,6 @@ module.exports = {
     isActive,
     checkRequestExists,
     checkQueryStatus,
-    checkQueryAction
+    checkQueryAction,
+    checkBulletinExists
 };

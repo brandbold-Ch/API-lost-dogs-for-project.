@@ -196,7 +196,7 @@ class UserServices {
 
         await User.updateOne(
             { _id: id, [`social_media.${key}`]: {$exists: true}},
-            {$set: {[`social_media.$.${key}`]: data[key]}},
+            { $set: {[`social_media.$.${key}`]: data[key]} },
         )
     }
 }

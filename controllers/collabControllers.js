@@ -35,7 +35,7 @@ exports.deleteCollab = async (req, res) => {
 exports.updateCollab = async (req, res) => {
     try {
         await collabs.updateCollab(req.id, req.body);
-        res.status(200).json({
+        res.status(202).json({
             message: 'Updated collaborator ✅',
             data: req.body
         });

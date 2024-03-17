@@ -79,29 +79,46 @@ class CollabServices {
             {
                 $project: {
                     "_id": 0,
-                    "id": "$body.image.id"
+                    "imageId": "$body.image.id",
+                    "galleryIds": "$body.gallery.id"
                 }
+            },
+            {
+                $project: {
+                    "allIds": {
+                        $concatArrays:["$galleryIds", ["$imageId"]]
+                    }
+                }
+            },
+            {
+                $unwind: "$allIds"
             },
             {
                 $group: {
                     _id: null,
-                    ids: {
-                        $push: "$id"
+                    "allIds": {
+                        $addToSet: "$allIds"
                     }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "allIds": 1
                 }
             }
         ]);
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Request.findOneAndDelete({ user: id}, { session }),
+                Request.findOneAndDelete({ user: id }, { session }),
                 Auth.findOneAndDelete({ user: id }, { session }),
                 Collab.findOneAndDelete(id, { session }),
                 Bulletin.deleteMany({ user: id }, { session })
             ]);
         }).then(async () => {
             if (array_urls.length) {
-                await this.deleteImages(array_urls[0]["ids"]);
+                await this.deleteImages(array_urls[0]["allIds"]);
             }
         }).catch((err) => {
             throw Error(err.message);

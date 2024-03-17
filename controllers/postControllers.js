@@ -5,7 +5,6 @@
  */
 
 const { posts } = require("../singlenton/instances");
-const {json} = require("express");
 
 
 exports.insertLostPet = async (req, res) => {
@@ -84,6 +83,24 @@ exports.getFilterPostSpecie = async (req, res) => {
     }
 };
 
+exports.getFilterPostLostDate = async (req, res) => {
+    try {
+        res.status(200).json(await posts.getFilterPostLostDate(req.id, req.query.value));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+exports.getFilterPostYear = async (req, res) => {
+    try {
+        res.status(200).json(await posts.getFilterPostYear(req.id, req.query.value));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 exports.getPost = async (req, res) => {
     try {
         res.status(200).json(await posts.getPost(req.id, req.params.pet_id));
@@ -96,7 +113,7 @@ exports.getPost = async (req, res) => {
 exports.updatePost = async (req, res) => {
     try {
         await posts.updatePost(req.id, req.params.pet_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
-        res.status(200).json({
+        res.status(202).json({
             message: 'Updated post ✅',
             data: JSON.parse(JSON.stringify(req.body))
         });

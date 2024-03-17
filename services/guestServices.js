@@ -6,6 +6,7 @@
  */
 
 const Post = require('../models/post');
+const Bulletin = require('../models/bulletin');
 
 /**
  * Class that provides services related to the application.
@@ -28,7 +29,7 @@ class GuestServices {
      */
 
     async getAllLostPets(){
-        return Post.find({}, { "identify.gallery": 0, user: 0 });
+        return Post.find({}, { "identify.gallery": 0, user: 0 }).sort({ "publication.lost_date": -1 });
     };
 
     async getFilterPostGender(gender) {
@@ -77,10 +78,15 @@ class GuestServices {
 
     async getFilterPostYear(year) {
         const array = await this.getAllLostPets();
+
         return array.filter(key => {
             const date = key.publication.lost_date
             return date.getFullYear() === parseInt(year);
         });
+    }
+
+    async getBulletins() {
+        return Bulletin.find({}).sort({ "identify.timestamp": -1 });
     }
 }
 

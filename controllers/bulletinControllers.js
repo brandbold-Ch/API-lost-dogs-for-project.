@@ -2,9 +2,9 @@ const { bulletins } = require("../singlenton/instances");
 
 exports.setBulletin = async (req, res) => {
     try {
-        await bulletins.createBulletin(req.id, [JSON.parse(JSON.stringify(req.body)), req.files[0]])
+        await bulletins.createBulletin(req.id, [JSON.parse(JSON.stringify(req.body)), req.files])
         res.status(201).json({
-            message: "Added bullet ✅",
+            message: "Added bulletin ✅",
             data: req.body
         });
     } catch (error) {
@@ -31,9 +31,9 @@ exports.getBulletin = async (req, res) => {
 exports.updateBulletin = async (req, res) => {
     try {
         await bulletins.updateBulletin(req.id,
-            req.params.bulletin_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+            req.params.bulletin_id, [JSON.parse(JSON.stringify(req.body)), req.files]);
 
-        res.status(200).json({
+        res.status(202).json({
             message: 'Updated bulletin ✅',
             data: JSON.parse(JSON.stringify(req.body))
         });

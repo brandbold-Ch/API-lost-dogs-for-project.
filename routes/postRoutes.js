@@ -17,6 +17,8 @@ petsRoute.get("/filter/size", isAuthenticate, checkUserExists, checkQueryParamet
 petsRoute.get("/filter/owner", isAuthenticate, checkUserExists, checkQueryParameters, postControllers.getFilterPostOwner);
 petsRoute.get("/filter/found", isAuthenticate, checkUserExists, checkQueryParameters, postControllers.getFilterPostFound);
 petsRoute.get("/filter/specie", isAuthenticate, checkUserExists, checkQueryParameters, postControllers.getFilterPostSpecie);
+petsRoute.get("/filter/date", isAuthenticate, checkUserExists, postControllers.getFilterPostLostDate);
+petsRoute.get("/filter/year", isAuthenticate, checkUserExists, postControllers.getFilterPostYear);
 petsRoute.get("/:pet_id", isAuthenticate, checkUserExists, checkPostExists, postControllers.getPost);
 petsRoute.delete("/:pet_id", isAuthenticate, checkUserExists, checkPostExists, postControllers.deletePost);
 petsRoute.post("/gallery/:pet_id", isAuthenticate, checkUserExists, checkPostExists, processFormData, postControllers.addGallery);

@@ -14,23 +14,32 @@ const bulletinSchema = new Schema({
             default: null,
             required: false
         },
+        gallery: {
+            type: Array,
+            default: [],
+            required: false
+        },
         text: {
             type: String,
-            required: true
+            default: null,
+            required: false
         }
     },
     identify: {
         name_company: {
             type: String,
-            required: true
+            default: null,
+            required: false
         },
         address: {
             type: String,
-            required: true
+            default: null,
+            required: false
         },
         te_number: {
             type: String,
-            required: true
+            default: null,
+            required: false
         },
         timestamp: {
             type: Date,

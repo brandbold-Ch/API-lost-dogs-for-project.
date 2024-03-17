@@ -2,7 +2,6 @@ const Bulletin = require("../models/bulletin");
 const Collab = require("../models/collaborator");
 const { cloudinary } = require("../configurations/config_extra");
 const conn = require("../configurations/connection");
-const Post = require("../models/post");
 
 
 class BulletinServices {
@@ -29,22 +28,11 @@ class BulletinServices {
         });
     }
 
-    async addGallery(id, pet_id, images) {
-        await Promise.all(images.map(async (key) => {
-            let new_image = await this.uploadImage(key.buffer);
-
-            await Post.updateOne(
-                { _id: pet_id, user: id },
-                { $push: { "identify.gallery": new_image } }
-            );
-        }));
-    };
-
     async createBulletin(id, bulletin_data) {
         const session = await conn.startSession();
         const collab_ref = await Collab.findById(id);
         const obj_data = bulletin_data[0];
-        const obj_image = bulletin_data[1];
+        const array_images = bulletin_data[1];
         let output_data;
 
         await session.withTransaction(async () => {
@@ -67,14 +55,25 @@ class BulletinServices {
                     output_data = bulletin;
                 });
         }).then(async () => {
-                if (obj_image) {
-                    const new_image = await this.uploadImage(obj_image["buffer"]);
-                    const parsed_data = JSON.parse(JSON.stringify(output_data[0]))
+                if (array_images) {
+                    const parsed_data = output_data[0];
 
-                    await Bulletin.updateOne(
-                        { _id: parsed_data["_id"] },
-                        { $set: {"body.image": new_image } }
-                    );
+                    await Promise.all(array_images.map(async (key) => {
+                        const new_image = await this.uploadImage(key["buffer"]);
+
+                        if (key["fieldname"] === "image") {
+                            await Bulletin.updateOne(
+                                { _id: parsed_data["_id"] },
+                                { $set: {"body.image": new_image } }
+                            );
+                        }
+                        else {
+                            await Bulletin.updateOne(
+                                { _id: parsed_data["_id"] },
+                                { $push: { "body.gallery": new_image } }
+                            );
+                        }
+                    }));
                 }
             }).catch((err) => {
                 throw Error(err.message);
@@ -103,7 +102,16 @@ class BulletinServices {
             });
 
         }).then(async () => {
-            await this.deleteImage(output_data["body"]["image"]["id"])
+
+            if (output_data["body"]["image"]) {
+                await this.deleteImage(output_data["body"]["image"]["id"])
+            }
+
+            if (output_data["body"]["gallery"].length) {
+                output_data["body"]["gallery"].map(async (key) => {
+                    await this.deleteImage(key["id"]);
+                });
+            }
         })
         await session.endSession();
     }
@@ -112,8 +120,7 @@ class BulletinServices {
         const session = await conn.startSession();
         const context_bulletin = await Bulletin.findOne({ _id: bulletin_id, user: id })
         const obj_data = bulletin_data[0];
-        const obj_image = bulletin_data[1];
-
+        const array_images = bulletin_data[1];
 
         await session.withTransaction(async () => {
             await Bulletin.updateOne(
@@ -123,7 +130,8 @@ class BulletinServices {
                         title: obj_data["title"],
                         body: {
                             image: context_bulletin["body"]["image"],
-                            text: obj_data["text"]
+                            text: obj_data["text"],
+                            gallery: context_bulletin["body"]["gallery"]
                         },
                         identify: {
                             name_company: obj_data["name_company"],
@@ -138,15 +146,26 @@ class BulletinServices {
                 },
                 { session }
             )
-        }).then(async (bulletin) => {
-                if (obj_image) {
-                    await this.deleteImage(context_bulletin["body"]["image"]["id"]);
-                    const new_image = await this.uploadImage(obj_image["buffer"]);
+        }).then(async () => {
+                if (array_images) {
 
-                    await Bulletin.updateOne(
-                        { _id: bulletin_id, user: id },
-                        { $set: { "body.image": new_image } }
-                    );
+                    await Promise.all(array_images.map(async (key) => {
+                        const new_image = await this.uploadImage(key["buffer"]);
+
+                        if (key["fieldname"] === "image") {
+                            await this.deleteImage(context_bulletin["body"]["image"]["id"]);
+
+                            await Bulletin.updateOne(
+                                { _id: bulletin_id, user: id },
+                                { $set: {"body.image": new_image } }
+                            );
+                        } else {
+                            await Bulletin.updateOne(
+                                { _id: bulletin_id, user: id},
+                                { $push: { "body.gallery": new_image } }
+                            );
+                        }
+                    }));
                 }
         }).catch((err) => {
                 throw Error(err.message);

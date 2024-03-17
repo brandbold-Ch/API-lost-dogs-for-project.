@@ -12,10 +12,7 @@ const users = new User();
 
 class AdminServices {
 
-    constructor() {
-        const collabs = new Collab();
-        const users = new User();
-    };
+    constructor() {};
 
     async createAdmin(data) {
         const { name, lastname, email, password } = data;

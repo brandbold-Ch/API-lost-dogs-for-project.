@@ -55,7 +55,7 @@ class PostServices {
     //////////////////////////////////////////////////////////////////////
 
     async postsAll(id) {
-        return Post.find({ user: id });
+        return Post.find({ user: id }).sort({ "publication.lost_date": -1 });
     }
 
     async getGeneralPost(pet_id) {
@@ -116,7 +116,6 @@ class PostServices {
     async getFilterPostSize(id, size) {
         const array = await this.postsAll(id);
         return array.filter(key => key.details.size === size);
-        //return Post.find({})
     };
 
     async getFilterPostOwner(id, owner) {
@@ -133,6 +132,24 @@ class PostServices {
         const array = await this.postsAll(id);
         return array.filter(key => key.details.specie === specie);
     };
+
+    async getFilterPostLostDate(id, lost_date) {
+        const array = await this.postsAll(id);
+
+        return array.filter(key => {
+            const date = key.publication.lost_date
+            return date.toISOString() === lost_date.substring(0, 23)+"Z";
+        });
+    }
+
+    async getFilterPostYear(id, year) {
+        const array = await this.postsAll(id);
+
+        return array.filter(key => {
+            const date = key.publication.lost_date
+            return date.getFullYear() === parseInt(year);
+        });
+    }
 
     async deletePartialGallery(id, pet_id, img_id) {
         const session = await conn.startSession();
@@ -233,7 +250,7 @@ class PostServices {
 
     async addGallery(id, pet_id, images) {
         await Promise.all(images.map(async (key) => {
-            let new_image = await this.uploadImage(key.buffer);
+            let new_image = await this.uploadImage(key["buffer"]);
 
             await Post.updateOne(
                 { _id: pet_id, user: id },

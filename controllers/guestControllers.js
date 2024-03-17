@@ -88,7 +88,7 @@ exports.getFilterPostById = async (req, res) => {
 
 exports.getFilterPostLostDate = async (req, res) => {
     try {
-        res.status(200).json(await guests.getFilterPostLostDate(req.query.fetch));
+        res.status(200).json(await guests.getFilterPostLostDate(req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -97,10 +97,19 @@ exports.getFilterPostLostDate = async (req, res) => {
 
 exports.getFilterPostYear = async (req, res) => {
     try {
-        res.status(200).json(await guests.getFilterPostYear(req.query.year));
+        res.status(200).json(await guests.getFilterPostYear(req.query.value));
 
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 };
+
+exports.getBulletins = async (req, res) => {
+    try {
+        res.status(200).json(await guests.getBulletins());
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
