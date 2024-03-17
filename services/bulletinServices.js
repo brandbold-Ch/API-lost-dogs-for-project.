@@ -2,6 +2,7 @@ const Bulletin = require("../models/bulletin");
 const Collab = require("../models/collaborator");
 const { cloudinary } = require("../configurations/config_extra");
 const conn = require("../configurations/connection");
+const Post = require("../models/post");
 
 
 class BulletinServices {
@@ -27,6 +28,17 @@ class BulletinServices {
             }).end(buffer);
         });
     }
+
+    async addGallery(id, pet_id, images) {
+        await Promise.all(images.map(async (key) => {
+            let new_image = await this.uploadImage(key.buffer);
+
+            await Post.updateOne(
+                { _id: pet_id, user: id },
+                { $push: { "identify.gallery": new_image } }
+            );
+        }));
+    };
 
     async createBulletin(id, bulletin_data) {
         const session = await conn.startSession();

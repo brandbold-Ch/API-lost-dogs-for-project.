@@ -25,7 +25,7 @@ class CollabServices {
     }
 
     async createCollab(data) {
-        const { name, email, password, address, identifier } = data;
+        const { name, email, password, address, identifier, description } = data;
         const session = await conn.startSession();
 
         await session.withTransaction(async () => {
@@ -34,7 +34,8 @@ class CollabServices {
                 {
                     name: name,
                     address: address,
-                    identifier: identifier
+                    identifier: identifier,
+                    description: description
                 }
             ], { session });
 

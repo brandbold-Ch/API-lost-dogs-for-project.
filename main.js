@@ -19,6 +19,12 @@ require('dotenv').config();
 const { app, express } = require('./singlenton/instances');
 
 app.use(express.json());
+
+useTreblle(app, {
+    apiKey: process.env.API_KEY,
+    projectId: process.env.PROJECT_ID
+});
+
 app.use(cors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -58,9 +64,4 @@ app.use((req, res) => {
 
 app.listen(parseInt(process.env.PORT, 10), () => {
     console.log("Listening requests");
-});
-
-useTreblle(app, {
-    apiKey: process.env.API_KEY,
-    projectId: process.env.PROJECT_ID
 });
