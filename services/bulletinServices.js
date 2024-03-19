@@ -1,6 +1,6 @@
 const Bulletin = require("../models/bulletin");
 const Collab = require("../models/collaborator");
-const { cloudinary } = require("../configurations/config_extra");
+const { cloudinary } = require("../configurations/other_tools");
 const conn = require("../configurations/connection");
 const Post = require("../models/post");
 

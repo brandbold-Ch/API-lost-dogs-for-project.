@@ -35,7 +35,7 @@ app.use(cors({
 app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
-    res.status(200).json({'message': `Welcome API to lost pets: ${req.ip.substring(7)}`});
+    res.status(200).json({'message': `🐩 Welcome API to lost pets: ${req.ip.substring(7)} 🐩`});
 });
 
 app.use((req, res, next) => {

@@ -8,7 +8,7 @@
 const User = require("../models/user");
 const Post = require("../models/post");
 const Auth = require("../models/auth");
-const { cloudinary } = require("../configurations/config_extra");
+const { cloudinary } = require("../configurations/other_tools");
 const conn = require("../configurations/connection");
 const mongoose = require("mongoose")
 /**

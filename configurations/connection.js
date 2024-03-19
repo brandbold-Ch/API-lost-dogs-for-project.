@@ -5,7 +5,6 @@
  */
 
 const mongoose = require("mongoose");
-const { credentials: db } = require("./config_extra");
 require("dotenv").config();
 
 
@@ -13,18 +12,17 @@ require("dotenv").config();
  * Here the connection with mongodb is established
  * @returns {Promise<void>}
  * */
-//`mongodb://${db.host}:${db.port}/${db.database}`
 
-mongoose.connect(process.env.URL_DATABASE)
-    .then(() => {
-        console.log("Successful connection");
-    }).catch((err) => {
-    console.log(err.message);
+mongoose.connect(process.env.URL_DATABASE, {
+    maxPoolSize: 10,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
 const conn = mongoose.connection;
 
-conn.on("error", () => console.error.bind(console, "connection error"));
-conn.once("open", () => console.info("Connection to Database is successful"));
+conn.on("error", () => console.log("Connection error"));
+conn.on("connected", () => console.log("Connection to Database is successful"));
+conn.on("reconnected", () => console.log("Reconnected"));
 
 module.exports = conn;

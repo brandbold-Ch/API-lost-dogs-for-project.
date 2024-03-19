@@ -4,7 +4,7 @@ const Request = require('../models/request');
 const Bulletin = require("../models/bulletin")
 const conn = require('../configurations/connection');
 const mongoose = require("mongoose");
-const { cloudinary } = require("../configurations/config_extra");
+const { cloudinary } = require("../configurations/other_tools");
 const Post = require("../models/post");
 
 

@@ -1,13 +1,13 @@
 {
   "name": "api_pets",
-  "version": "1.5.2",
+  "version": "2.0",
   "description": "API for pets",
   "engines": {
     "node": "18"
   },
   "main": "main.js",
   "scripts": {
-    "start": "node main.js",
+    "start": "nodemon main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Brandon Jared Molina Vazquez",

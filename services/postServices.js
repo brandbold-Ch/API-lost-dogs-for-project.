@@ -8,7 +8,7 @@
 const User = require("../models/user");
 const Post = require("../models/post");
 const conn = require("../configurations/connection");
-const { cloudinary } = require("../configurations/config_extra");
+const { cloudinary } = require("../configurations/other_tools");
 
 /**
  *Class that provides CRUD services related to lost pets.
