@@ -30,7 +30,7 @@ class CollabServices {
 
         await session.withTransaction(async () => {
 
-            const collab = await Collab.create([
+            await Collab.create([
                 {
                     name: name,
                     address: address,
@@ -46,7 +46,7 @@ class CollabServices {
                 {
                     email: email,
                     password: password,
-                    user: collab[0]["_id"],
+                    user: output_data[0]["_id"],
                     role: "COLLABORATOR"
                 }
             ], { session });
@@ -54,7 +54,7 @@ class CollabServices {
             await Request.create([
                 {
                     role: "COLLABORATOR",
-                    user: collab[0]["_id"]
+                    user: output_data[0]["_id"]
                 }
             ], { session });
 
@@ -131,7 +131,6 @@ class CollabServices {
         }).catch((err) => {
             throw Error(err.message);
         })
-
         await session.endSession();
     }
 }
