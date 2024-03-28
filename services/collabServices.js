@@ -2,10 +2,8 @@ const Collab = require('../models/collaborator');
 const Auth = require('../models/auth');
 const Request = require('../models/request');
 const Bulletin = require("../models/bulletin")
-const conn = require('../configurations/connection');
 const mongoose = require("mongoose");
-const { cloudinary } = require("../configurations/other_tools");
-const Post = require("../models/post");
+const { cloudinary, conn } = require("../configurations/connections");
 
 
 class CollabServices {
@@ -28,6 +26,7 @@ class CollabServices {
     async createCollab(data) {
         const { name, email, password, address, identifier, description } = data;
         const session = await conn.startSession();
+        let output_data;
 
         await session.withTransaction(async () => {
 
@@ -38,7 +37,10 @@ class CollabServices {
                     identifier: identifier,
                     description: description
                 }
-            ], { session });
+            ], { session })
+                .then((collab) => {
+                    output_data = collab;
+                });
 
             await Auth.create([
                 {
@@ -73,6 +75,8 @@ class CollabServices {
 
     async deleteCollab(id) {
         const session = await conn.startSession();
+
+
         const array_urls = await Bulletin.aggregate([
             {
                 $match: { user: new mongoose.Types.ObjectId(id) }
@@ -112,18 +116,22 @@ class CollabServices {
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Request.findOneAndDelete({ user: id }, { session }),
-                Auth.findOneAndDelete({ user: id }, { session }),
-                Collab.findOneAndDelete(id, { session }),
+                Request.deleteOne({ user: id }, { session }),
+                Auth.deleteOne({ user: id }, { session }),
+                Collab.deleteOne({ _id: id }, { session }),
                 Bulletin.deleteMany({ user: id }, { session })
             ]);
+
         }).then(async () => {
+
             if (array_urls.length) {
                 await this.deleteImages(array_urls[0]["allIds"]);
             }
+
         }).catch((err) => {
             throw Error(err.message);
         })
+
         await session.endSession();
     }
 }

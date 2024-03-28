@@ -12,6 +12,7 @@ require('dotenv').config();
 
 
 class AuthServices {
+
     constructor() {};
 
     /**
@@ -23,10 +24,7 @@ class AuthServices {
      */
 
     async getCredentials(id){
-        return Auth.findOne(
-            { user: id },
-            { user: 0, _id: 0, role: 0 }
-        );
+        return Auth.findOne({ user: id }, { user: 0, _id: 0, role: 0 });
     };
 
     /**
@@ -43,8 +41,7 @@ class AuthServices {
 
     async getUser(user) {
         return Auth.findOne(
-            { user: user },
-            { _id: 0, email: 0, password: 0, role: 0 }
+            { user: user }, { _id: 0, email: 0, password: 0, role: 0 }
         );
     };
 
@@ -59,7 +56,7 @@ class AuthServices {
      * @returns {Promise<void>} A Promise that will be resolved once the credentials update is complete.
      */
 
-    async updateCredentials(id, data) {
+    async updateAuth(id, data) {
         let { email, new_password, old_password } = data;
         const user = await Auth.findOne({ user: id});
 
@@ -88,8 +85,10 @@ class AuthServices {
      * @throws {Error} If there's an issue during token generation.
      */
 
-    async generateTokenUser(payload) {
-        return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: process.env.EXPIRE});
+    async generateToken(payload) {
+        return jwt.sign(
+            payload, process.env.SECRET_KEY, { expiresIn: process.env.EXPIRE }
+        );
     };
 
     async detailToken(token) {

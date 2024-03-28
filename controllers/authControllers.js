@@ -20,7 +20,7 @@ exports.getCredentials =  async (req, res) => {
 
 exports.updateCredentials = async (req, res) => {
     try {
-        await auths.updateCredentials(req.id, req.body);
+        await auths.updateAuth(req.id, req.body);
         res.status(202).json({
             message: 'Updated credentials ✅',
             data: req.body.email
@@ -74,7 +74,7 @@ const validatePassword = (data) => {
 
         if (match) {
 
-            const token = await auths.generateTokenUser({
+            const token = await auths.generateToken({
                 user: data[1].user,
                 role: data[1].role
             });

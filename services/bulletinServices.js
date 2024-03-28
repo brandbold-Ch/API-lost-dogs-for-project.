@@ -1,8 +1,6 @@
 const Bulletin = require("../models/bulletin");
 const Collab = require("../models/collaborator");
-const { cloudinary } = require("../configurations/other_tools");
-const conn = require("../configurations/connection");
-const Post = require("../models/post");
+const { cloudinary, conn } = require("../configurations/connections");
 
 
 class BulletinServices {
@@ -55,30 +53,31 @@ class BulletinServices {
                 .then((bulletin) => {
                     output_data = bulletin;
                 });
+
         }).then(async () => {
-                if (array_images) {
-                    const parsed_data = output_data[0];
+            if (array_images) {
+                const parsed_data = output_data[0];
 
-                    await Promise.all(array_images.map(async (key) => {
-                        const new_image = await this.uploadImage(key["buffer"]);
+                await Promise.all(array_images.map(async (key) => {
+                    const new_image = await this.uploadImage(key["buffer"]);
+                    if (key["fieldname"] === "image") {
+                        await Bulletin.updateOne(
+                            { _id: parsed_data["_id"] },
+                            { $set: {"body.image": new_image } }
+                        );
+                    }
+                    else {
+                        await Bulletin.updateOne(
+                            { _id: parsed_data["_id"] },
+                            { $push: { "body.gallery": new_image } }
+                        );
+                    }
+                }));
+            }
 
-                        if (key["fieldname"] === "image") {
-                            await Bulletin.updateOne(
-                                { _id: parsed_data["_id"] },
-                                { $set: {"body.image": new_image } }
-                            );
-                        }
-                        else {
-                            await Bulletin.updateOne(
-                                { _id: parsed_data["_id"] },
-                                { $push: { "body.gallery": new_image } }
-                            );
-                        }
-                    }));
-                }
-            }).catch((err) => {
-                throw Error(err.message);
-            })
+        }).catch((err) => {
+            throw Error(err.message);
+        })
         await session.endSession();
     }
 
@@ -86,18 +85,17 @@ class BulletinServices {
         const session = await conn.startSession();
 
         await session.withTransaction(async () => {
-            await Bulletin.updateOne(
-                { _id: bulletin_id, user: id},
+            await Bulletin.updateOne({ _id: bulletin_id, user: id},
                 { $pull: { "body.gallery": { id: img_id }}},
                 { session }
             );
+
+        }).then(async () => {
+            await this.deleteImage(img_id);
+
+        }).catch((err) => {
+            throw Error(err.message);
         })
-            .then(async () => {
-                await this.deleteImage(img_id);
-            })
-            .catch((err) => {
-                throw Error(err.message);
-            })
         await session.endSession();
     }
 
@@ -117,6 +115,7 @@ class BulletinServices {
 
             await Bulletin.findOneAndDelete(
                 { _id: bulletin_id, user: id }, { session }
+
             ).then((bulletin) => {
                 output_data = bulletin
             });
@@ -124,7 +123,7 @@ class BulletinServices {
         }).then(async () => {
 
             if (output_data["body"]["image"]) {
-                await this.deleteImage(output_data["body"]["image"]["id"])
+                await this.deleteImage(output_data["body"]["image"]["id"]);
             }
 
             if (output_data["body"]["gallery"].length) {
@@ -132,6 +131,9 @@ class BulletinServices {
                     await this.deleteImage(key["id"]);
                 });
             }
+
+        }).catch((err) => {
+            throw Error(err.message);
         })
         await session.endSession();
     }
@@ -166,29 +168,31 @@ class BulletinServices {
                 },
                 { session }
             )
+
         }).then(async () => {
-                if (array_images) {
+            if (array_images) {
+                await Promise.all(array_images.map(async (key) => {
+                    const new_image = await this.uploadImage(key["buffer"]);
+                    
+                    if (key["fieldname"] === "image") {
+                        await this.deleteImage(context_bulletin["body"]["image"]["id"]);
+                        await Bulletin.updateOne(
+                            { _id: bulletin_id, user: id },
+                            { $set: {"body.image": new_image } }
+                        );
 
-                    await Promise.all(array_images.map(async (key) => {
-                        const new_image = await this.uploadImage(key["buffer"]);
+                    } else {
+                        await Bulletin.updateOne(
+                            { _id: bulletin_id, user: id},
+                            { $push: { "body.gallery": new_image } }
+                        );
+                    }
+                }));
+            }
 
-                        if (key["fieldname"] === "image") {
-                            await this.deleteImage(context_bulletin["body"]["image"]["id"]);
-
-                            await Bulletin.updateOne(
-                                { _id: bulletin_id, user: id },
-                                { $set: {"body.image": new_image } }
-                            );
-                        } else {
-                            await Bulletin.updateOne(
-                                { _id: bulletin_id, user: id},
-                                { $push: { "body.gallery": new_image } }
-                            );
-                        }
-                    }));
-                }
         }).catch((err) => {
-                throw Error(err.message);
+            throw Error(err.message);
+            
         })
         await session.endSession();
     }

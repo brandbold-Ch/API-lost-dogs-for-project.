@@ -7,8 +7,7 @@
 
 const User = require("../models/user");
 const Post = require("../models/post");
-const conn = require("../configurations/connection");
-const { cloudinary } = require("../configurations/other_tools");
+const { cloudinary, conn } = require("../configurations/connections");
 
 /**
  *Class that provides CRUD services related to lost pets.
@@ -46,9 +45,7 @@ class PostServices {
                  gallery.map((obj) => {
                      return obj["id"];
                  }),
-                 {
-                     type: 'upload', resource_type: 'image'
-                 }
+                 {type: 'upload', resource_type: 'image'}
              );
          }
      }
@@ -67,36 +64,50 @@ class PostServices {
     };
 
     async insertLostPet(id, pet_data) {
+        const session = await conn.startSession();
         const user_ref = await User.findById(id);
         const obj_data = pet_data[0];
         const obj_image = pet_data[1];
 
-        const image = await this.uploadImage(obj_image["buffer"]);
+        await session.withTransaction(async () => {
+            await Post.create([
+                {
+                    name: obj_data["name"],
+                    details: {
+                        specie: obj_data["specie"],
+                        gender: obj_data["gender"],
+                        age: obj_data["age"],
+                        description: obj_data["description"],
+                        size: obj_data["size"],
+                        breed: obj_data["breed"]
+                    },
+                    publication: {
+                        lost_date: obj_data["lost_date"],
+                        coordinates: JSON.parse(obj_data["coordinates"])
+                    },
+                    status: {
+                        owner: obj_data["owner"]
+                    },
+                    user: user_ref["_id"]
+                }
+            ], { session })
+                .then(async (post) => {
+                    const image = await this.uploadImage(obj_image["buffer"]);
 
-        await Post.create([
-            {
-                name: obj_data["name"],
-                details: {
-                    specie: obj_data["specie"],
-                    gender: obj_data["gender"],
-                    age: obj_data["age"],
-                    description: obj_data["description"],
-                    size: obj_data["size"],
-                    breed: obj_data["breed"]
-                },
-                publication: {
-                    lost_date: obj_data["lost_date"],
-                    coordinates: JSON.parse(obj_data["coordinates"])
-                },
-                status: {
-                    owner: obj_data["owner"]
-                },
-                identify: {
-                    image: image
-                },
-                user: user_ref["_id"]
-            }
-        ]);
+                    await Post.updateOne(
+                        { _id: post[0]["_id"] },
+                        {
+                            $set: {
+                                "identify.image": image
+                            }
+                        }
+                    )
+                })
+                .catch((err) => {
+                    throw Error(err.message);
+                });
+            await session.endSession();
+        })
     };
 
     async getPosts(id) {
@@ -163,6 +174,7 @@ class PostServices {
         })
             .then(async () => {
                 await this.deleteImage(img_id);
+
             })
             .catch((err) => {
                 throw Error(err.message);
@@ -173,7 +185,7 @@ class PostServices {
     async deletePost(id, pet_id) {
         const session = await conn.startSession();
         const array_urls = await Post.findOne(
-            {_id: pet_id, user: id },
+            { _id: pet_id, user: id },
             { identify: 1 }
         )
 
@@ -192,8 +204,8 @@ class PostServices {
                         array_urls["identify"]["gallery"]
                     )
                 ]);
-            })
-            .catch((err) => {
+
+            }).catch((err) => {
                 throw Error(err.message);
             })
         await session.endSession();
@@ -202,79 +214,92 @@ class PostServices {
 
     async updatePost(id, pet_id, pet_data) {
         const context_pet = await this.getPost(id, pet_id);
+        const session = await conn.startSession();
         const obj_data = pet_data[0];
         const obj_image = pet_data[1];
 
-        let template = {
-            name: obj_data["name"],
-            details: {
-                specie: obj_data["specie"],
-                gender: obj_data["gender"],
-                age: obj_data["age"],
-                description: obj_data["description"],
-                size: obj_data["size"],
-                breed: obj_data["breed"]
-            },
-            publication: {
-                lost_date: obj_data["lost_date"],
-                coordinates: JSON.parse(obj_data["coordinates"]),
-                update: Date.now(),
-                published: context_pet["publication"]["published"],
-            },
-            status: {
-                owner: obj_data["owner"],
-                found: obj_data["found"]
-            },
-            identify: {
-                image: context_pet["identify"]["image"],
-                gallery: context_pet["identify"]["gallery"]
-            },
-            feedback: {
-                comments: context_pet["feedback"]["comments"],
+        await session.withTransaction(async () => {
+            await Post.updateOne(
+                { _id: pet_id, user: id },
+                {
+                    $set: {
+                        name: obj_data["name"],
+                        details: {
+                            specie: obj_data["specie"],
+                            gender: obj_data["gender"],
+                            age: obj_data["age"],
+                            description: obj_data["description"],
+                            size: obj_data["size"],
+                            breed: obj_data["breed"]
+                        },
+                        publication: {
+                            lost_date: obj_data["lost_date"],
+                            coordinates: JSON.parse(obj_data["coordinates"]),
+                            update: Date.now(),
+                            published: context_pet["publication"]["published"],
+                        },
+                        status: {
+                            owner: obj_data["owner"],
+                            found: obj_data["found"]
+                        },
+                        identify: {
+                            image: context_pet["identify"]["image"],
+                            gallery: context_pet["identify"]["gallery"]
+                        },
+                        feedback: {
+                            comments: context_pet["feedback"]["comments"],
+                        }
+                    }
+                },
+                {
+                    runValidators: true
+                },
+                { session })
+
+        }).then(async () => {
+            if (obj_image !== undefined) {
+                const new_image = await this.uploadImage(obj_image["buffer"]);
+                await this.deleteImage(context_pet["identify"]["image"]["id"]);
+
+                await Post.updateOne(
+                    { _id: pet_id, user: id },
+                    {
+                        $set: {
+                            "identify.image": new_image
+                        }
+                    }
+                )
             }
-        }
 
-        if (obj_image !== undefined) {
-            await this.deleteImage(
-                context_pet["identify"]["image"]["id"]
-            );
-            template["identify"]["image"] = await this.uploadImage(obj_image["buffer"]);
-        }
-
-        await Post.updateOne(
-            { _id: pet_id, user: id },
-            { $set: template },
-            { runValidators: true }
-        );
+        }).catch((err) => {
+                throw Error(err.message);
+        })
+        await session.endSession();
     }
 
     async addGallery(id, pet_id, images) {
         await Promise.all(images.map(async (key) => {
             let new_image = await this.uploadImage(key["buffer"]);
 
-            await Post.updateOne(
-                { _id: pet_id, user: id },
+            await Post.updateOne({ _id: pet_id, user: id },
                 { $push: { "identify.gallery": new_image } }
             );
         }));
     };
 
     async insertComment(id, pet_id, data) {
-        const user = await User.findById(id,
-            {
-                lastname: 0,
-                cellphone: 0,
-                social_media: 0
-            }
-        );
-        const comment = {
-            title: data,
-            timestamp: Date.now(),
-            user: user
-        };
+        const user = await User.findById(id, { lastname: 0, cellphone: 0, social_media: 0 });
 
         await Post.findByIdAndUpdate(pet_id,
-            { $push: { "feedback.comments": comment }}
+            {
+                $push: {
+                    "feedback.comments": {
+                        title: data,
+                        timestamp: Date.now(),
+                        user: user
+                    }
+                }
+            }
         );
     };
 }

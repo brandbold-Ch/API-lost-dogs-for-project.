@@ -1,39 +1,42 @@
 const Admin = require('../models/administrator');
 const Auth = require("../models/auth");
-const Collab = require("../services/collabServices");
-const User = require("../services/userServices");
 const Request = require("../models/request");
-const conn = require("../configurations/connection");
-
-
-const collabs = new Collab();
-const users = new User();
+const { conn } = require("../configurations/connections");
+const CollabServices = require("../services/collabServices");
+const UsersServices = require("../services/userServices");
 
 
 class AdminServices {
 
-    constructor() {};
+    constructor() {
+        this.collabs = new CollabServices();
+        this.users = new UsersServices();
+    };
 
     async createAdmin(data) {
         const { name, lastname, email, password } = data;
         const session = await conn.startSession();
+        let output_data;
 
         await session.withTransaction(async () => {
-            const admin = await Admin.create([
+            await Admin.create([
                 {
                     name: name,
                     lastname: lastname
                 }
-            ], {session});
+            ], { session })
+                .then((admin) => {
+                    output_data = admin;
+                });
 
             await Auth.create([
                 {
                     email: email,
                     password: password,
-                    user: admin[0]["_id"],
+                    user: output_data[0]["_id"],
                     role: "ADMINISTRATOR"
                 }
-            ], {session});
+            ], { session });
         });
         await session.endSession();
     }
@@ -43,18 +46,15 @@ class AdminServices {
     }
 
     async updateAdmin(id, data) {
-        await Admin.findByIdAndUpdate(id,
-            { $set: data  },
-            { runValidators: true }
-        );
+        await Admin.findByIdAndUpdate(id, { $set: data  }, { runValidators: true });
     }
 
     async deleteAdmin(id) {
         const session = await conn.startSession();
 
         await session.withTransaction(async () => {
-            await Auth.findOneAndDelete({ user: id }, { session })
-            await Admin.findOneAndDelete(id, { session });
+            await Auth.deleteOne({ user: id }, { session });
+            await Admin.deleteOne({ _id: id }, { session });
         });
         await session.endSession();
     }
@@ -77,23 +77,23 @@ class AdminServices {
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Request.findOneAndDelete(request_id),
-                collabs.deleteCollab(request["user"])
+                Request.deleteOne({ _id: request_id }, { session }),
+                this.collabs.deleteCollab(request["user"])
             ])
         });
         await session.endSession();
     }
 
     async activateRequest(id) {
-        await Request.findByIdAndUpdate(id, {$set: { status: "active" }});
+        await Request.findByIdAndUpdate(id, { $set: { status: "active" }});
     }
 
     async deactivateRequest(id) {
-        await Request.findByIdAndUpdate(id, {$set: { status: "disabled" }});
+        await Request.findByIdAndUpdate(id, { $set: { status: "disabled" }});
     }
 
     async rejectRequest(id) {
-        await Request.findByIdAndUpdate(id, {$set: { status: "rejected" }});
+        await Request.findByIdAndUpdate(id, { $set: { status: "rejected" }});
     }
 
     async filterRequests(filter) {
@@ -101,27 +101,27 @@ class AdminServices {
     }
 
     async getCollabs() {
-        return await collabs.getCollabs();
+        return await this.collabs.getCollabs();
     }
 
     async getCollab(collab_id) {
-        return await collabs.getCollab(collab_id);
+        return await this.collabs.getCollab(collab_id);
     }
 
     async deleteCollab(collab_id) {
-        await collabs.deleteCollab(collab_id);
+        await this.collabs.deleteCollab(collab_id);
     }
 
     async getUsers() {
-        return await users.getUsers();
+        return await this.users.getUsers();
     }
 
     async getUser(user_id) {
-        return await users.getUser(user_id);
+        return await this.users.getUser(user_id);
     }
 
     async deleteUser(user_id) {
-        await users.deleteUser(user_id);
+        await this.users.deleteUser(user_id);
     }
 }
 

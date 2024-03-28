@@ -8,9 +8,9 @@
 const User = require("../models/user");
 const Post = require("../models/post");
 const Auth = require("../models/auth");
-const { cloudinary } = require("../configurations/other_tools");
-const conn = require("../configurations/connection");
-const mongoose = require("mongoose")
+const { cloudinary, conn } = require("../configurations/connections");
+const mongoose = require("mongoose");
+
 /**
  * Class that provides CRUD services related to users.
  * @class
@@ -25,8 +25,7 @@ class UserServices {
     async deleteImages(gallery) {
         if (gallery.length) {
             await cloudinary.api.delete_resources(
-                gallery,
-                { type: 'upload', resource_type: 'image' }
+                gallery, { type: 'upload', resource_type: 'image' }
             );
         }
     }
@@ -35,21 +34,25 @@ class UserServices {
     async createUser(data){
         const { name, lastname, cellphone, email, password } = data;
         const session = await conn.startSession();
+        let output_data;
 
         await session.withTransaction(async () => {
-            const user = await User.create([
+            await User.create([
                 {
                     name: name,
                     lastname: lastname,
                     cellphone: cellphone
                 }
-            ], { session });
+            ], { session })
+                .then((user) => {
+                    output_data = user;
+                });
 
             await Auth.create([
                 {
                     email: email,
                     password: password,
-                    user: user[0]["_id"],
+                    user: output_data[0]["_id"],
                     role: "USER"
                 }
             ], { session });
@@ -77,7 +80,7 @@ class UserServices {
      */
 
     async getUser(id) {
-        return User.findById(id, {_id: 0})
+        return User.findById(id, {_id: 0});
     };
 
     /**
@@ -127,10 +130,11 @@ class UserServices {
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Auth.findOneAndDelete({ user: id }, {session}),
-                User.findByIdAndDelete(id, {session}),
+                Auth.deleteOne({ user: id }, {session}),
+                User.deleteOne({ _id: id }, {session}),
                 Post.deleteMany({ user: id }, {session}),
             ]);
+
         })
             .then(async () => {
                 if (array_urls.length) {
@@ -152,11 +156,8 @@ class UserServices {
      * @returns {Promise<void>} A Promise that will be resolved once the user update is complete.
      */
 
-    async updateUser(id, data){
-        await User.findByIdAndUpdate(id,
-            { $set: data },
-            { runValidators: true }
-        );
+    async updateUser(id, data) {
+        await User.findByIdAndUpdate(id, { $set: data }, { runValidators: true });
     };
 
     /**
@@ -174,20 +175,12 @@ class UserServices {
         for (const key in data) {
             toArray.push({[key]: data[key]})
         }
-
-        await User.updateOne(
-            { _id: id },
-            { $push: { social_media: {$each: toArray}}},
-        );
+        await User.updateOne({ _id: id }, { $push: { social_media: {$each: toArray}}});
     };
 
     async deleteSocialMedia(id, key, value) {
-        console.log(key, value)
         if (key && value) {
-            await User.updateOne(
-                { _id: id },
-                { $pull: {social_media: {[key]: value}} }
-            )
+            await User.updateOne({ _id: id }, { $pull: {social_media: {[key]: value}} })
         }
     }
 

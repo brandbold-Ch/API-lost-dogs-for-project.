@@ -4,7 +4,7 @@
  * @file In this module are the API endpoints.
  */
 
-const conn = require('./configurations/connection');
+const { conn } = require('./configurations/connections');
 const { useTreblle } = require('treblle');
 const userRouter = require('./routes/userRoutes');
 const authRouter = require('./routes/authRoutes');
@@ -41,7 +41,6 @@ app.get('/', (req, res) => {
 app.use((req, res, next) => {
     const isConnected = () => {
         if (conn.readyState !== 1) {
-            console.log("Waiting connection");
             setTimeout(isConnected, 1);
         } else {
             next();
