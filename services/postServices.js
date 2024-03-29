@@ -68,6 +68,7 @@ class PostServices {
         const user_ref = await User.findById(id);
         const obj_data = pet_data[0];
         const obj_image = pet_data[1];
+        let output_data;
 
         await session.withTransaction(async () => {
             await Post.create([
@@ -92,22 +93,22 @@ class PostServices {
                 }
             ], { session })
                 .then(async (post) => {
-                    const image = await this.uploadImage(obj_image["buffer"]);
-
-                    await Post.updateOne(
-                        { _id: post[0]["_id"] },
-                        {
-                            $set: {
-                                "identify.image": image
-                            }
-                        }
-                    )
+                    output_data = post;
                 })
-                .catch((err) => {
-                    throw Error(err.message);
-                });
-            await session.endSession();
         })
+            .then(async () => {
+                if (obj_image.length) {
+                    const index_image = obj_image.findIndex(obj => obj["fieldname"] === "image");
+
+                    if (index_image !== -1) {
+                        const image = await this.uploadImage(obj_image.splice(index_image, 1)[0]["buffer"]);
+                        await Post.updateOne({ _id: output_data[0]["_id"] }, { $set: {"identify.image": image}});
+                    }
+
+                    await this.addGallery(id, output_data[0]["_id"], obj_image)
+                }
+            })
+        await session.endSession();
     };
 
     async getPosts(id) {
@@ -198,7 +199,7 @@ class PostServices {
             .then(async () => {
                 await Promise.all([
                     this.deleteImage(
-                        array_urls["identify"]["image"]
+                        array_urls["identify"]["image"]["id"]
                     ),
                     this.deleteGallery(
                         array_urls["identify"]["gallery"]
