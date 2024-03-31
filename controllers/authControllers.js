@@ -5,6 +5,7 @@
  */
 
 const { auths } = require('../singlenton/instances');
+const Request = require("../models/request");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -31,6 +32,26 @@ exports.updateCredentials = async (req, res) => {
     }
 };
 
+const typeUser = (data) => {
+    return new Promise(async (resolve, reject) => {
+        if (data[1]["role"] === "COLLABORATOR") {
+            const request = await Request.findOne({ user: data[1]["user"]});
+
+            if (request['status'] === 'pending') {
+                reject([403, {message: 'You are in a waiting process, ' +
+                        'the administrator must activate your account ⏳'}]);
+            }
+            else if (request['status'] === 'rejected') {
+                reject([401, {message: 'Your request was rejected by the administrator 🚫'}]);
+            }
+            else if (request['status'] === 'disabled'){
+                reject([403, {message: 'Your account is deactivated 📴'}]);
+            }
+        }
+        resolve(data)
+    })
+}
+
 const validateRequest = (body) => {
     return new Promise((resolve, reject) => {
         if (body.email && body.password) {
@@ -56,7 +77,6 @@ const validateEmail = (body) => {
 
 const validateUser = (body) => {
     return new Promise(async (resolve, reject) => {
-
         const user = await auths.getEmail(body.email);
 
         if (user) {
@@ -98,6 +118,7 @@ exports.login = async (req, res) => {
     validateRequest(req.body)
         .then(body => validateEmail(body))
         .then(email => validateUser(email))
+        .then(burden => typeUser(burden))
         .then(async data => {
             res.status(200).json(await validatePassword(data));
         })
