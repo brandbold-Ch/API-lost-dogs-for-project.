@@ -9,7 +9,7 @@ const { posts } = require("../singlenton/instances");
 
 exports.insertLostPet = async (req, res) => {
     try {
-        await posts.insertLostPet(req.id, [JSON.parse(JSON.stringify(req.body)), req.files]);
+        await posts.insertLostPet(req.id, [JSON.parse(JSON.stringify(req.body)), req.files], req.role);
         res.status(201).json({
             message: "Added post ✅",
             data: req.body

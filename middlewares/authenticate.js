@@ -29,7 +29,8 @@ const isAuthenticate = async (req, res, next) => {
             COLLABORATOR: [
                 '/api/v2/collabs',
                 '/api/v2/auth',
-                '/api/v2/bulletins'
+                '/api/v2/bulletins',
+                '/api/v2/posts'
             ],
             ADMINISTRATOR: [
                 '/api/v2/admins',
@@ -45,6 +46,7 @@ const isAuthenticate = async (req, res, next) => {
 
                 if (roles[key.role].includes(req.baseUrl)) {
                     req.id = key.user;
+                    req.role = key.role;
                     next();
 
                 } else {

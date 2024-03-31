@@ -113,3 +113,12 @@ exports.getBulletins = async (req, res) => {
     }
 }
 
+exports.getBulletin = async (req, res) => {
+    try {
+        res.status(200).json(await guests.getBulletin(req.query.ad));
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+

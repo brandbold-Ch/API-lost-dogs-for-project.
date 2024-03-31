@@ -86,7 +86,11 @@ class GuestServices {
     }
 
     async getBulletins() {
-        return Bulletin.find({}).sort({ "identify.timestamp": -1 });
+        return Bulletin.find({}, { user:0 }).sort({ "identify.timestamp": -1 });
+    }
+
+    async getBulletin(id) {
+        return Bulletin.findById(id, { user: 0 });
     }
 }
 

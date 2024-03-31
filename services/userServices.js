@@ -8,6 +8,7 @@
 const User = require("../models/user");
 const Post = require("../models/post");
 const Auth = require("../models/auth");
+const PostServices = require("../services/postServices");
 const { cloudinary, conn } = require("../configurations/connections");
 const mongoose = require("mongoose");
 
@@ -18,7 +19,9 @@ const mongoose = require("mongoose");
 
 class UserServices {
 
-    constructor() {};
+    constructor() {
+        this.posts = new PostServices();
+    };
 
     /////////////////////////////////////////////////
 
@@ -93,40 +96,7 @@ class UserServices {
 
     async deleteUser(id) {
         const session = await conn.startSession();
-
-        const array_urls = await Post.aggregate([
-            {
-                $match: { user: new mongoose.Types.ObjectId(id) }
-            },
-            {
-                $project: {
-                    "galleryIds": "$identify.gallery.id",
-                    "imageId": "$identify.image.id"
-                }
-            },
-            {
-                $project: {
-                    "allIds": {
-                        $concatArrays: ["$galleryIds", ["$imageId"]]
-                    }
-                }
-            },
-            {
-                $unwind: "$allIds"
-            },
-            {
-                $group: {
-                    _id: null,
-                    "allIds": { $addToSet: "$allIds" }
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    "allIds": 1
-                }
-            }
-        ]);
+        const array_urls_posts = await this.posts.getUrlsImages(id);
 
         await session.withTransaction(async () => {
             await Promise.all([
@@ -137,8 +107,8 @@ class UserServices {
 
         })
             .then(async () => {
-                if (array_urls.length) {
-                    await this.deleteImages(array_urls[0]["allIds"]);
+                if (array_urls_posts.length) {
+                    await this.deleteImages(array_urls_posts[0]["allIds"]);
                 }
             })
             .catch((err) => {

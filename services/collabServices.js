@@ -1,14 +1,18 @@
 const Collab = require('../models/collaborator');
 const Auth = require('../models/auth');
 const Request = require('../models/request');
-const Bulletin = require("../models/bulletin")
+const Bulletin = require("../models/bulletin");
+const Post = require("../models/post");
+const PostServices = require("../services/postServices");
 const mongoose = require("mongoose");
 const { cloudinary, conn } = require("../configurations/connections");
 
 
 class CollabServices {
 
-    constructor() {}
+    constructor() {
+        this.posts = new PostServices();
+    }
 
     async deleteImages(gallery) {
         if (gallery.length) {
@@ -75,9 +79,8 @@ class CollabServices {
 
     async deleteCollab(id) {
         const session = await conn.startSession();
-
-
-        const array_urls = await Bulletin.aggregate([
+        const array_urls_posts = await this.posts.getUrlsImages(id);
+        const array_urls_bulletins = await Bulletin.aggregate([
             {
                 $match: { user: new mongoose.Types.ObjectId(id) }
             },
@@ -119,13 +122,18 @@ class CollabServices {
                 Request.deleteOne({ user: id }, { session }),
                 Auth.deleteOne({ user: id }, { session }),
                 Collab.deleteOne({ _id: id }, { session }),
-                Bulletin.deleteMany({ user: id }, { session })
+                Bulletin.deleteMany({ user: id }, { session }),
+                Post.deleteMany({ user: id }, { session })
             ]);
 
         }).then(async () => {
 
-            if (array_urls.length) {
-                await this.deleteImages(array_urls[0]["allIds"]);
+            if (array_urls_bulletins.length) {
+                await this.deleteImages(array_urls_bulletins[0]["allIds"]);
+            }
+
+            if (array_urls_posts.length) {
+                await this.deleteImages(array_urls_posts[0]["allIds"])
             }
 
         }).catch((err) => {

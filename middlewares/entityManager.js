@@ -107,20 +107,25 @@ const checkTrust = async (req, res, next) => {
 
 const isActive = async (req, res, next) => {
     try {
-        const request = await admins.getRequestForMiddlewareIsActive(req.id);
 
-        if (request['status'] === 'pending') {
-            res.status(403).json({message: 'You are in a waiting process, ' +
-                    'the administrator must activate your account ⏳'});
-        }
-        else if (request['status'] === 'rejected') {
-            res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
-        }
-        else if (request['status'] === 'active') {
+        if (req.role === "COLLABORATOR") {
+            const request = await admins.getRequestForMiddlewareIsActive(req.id);
+
+            if (request['status'] === 'pending') {
+                res.status(403).json({message: 'You are in a waiting process, ' +
+                        'the administrator must activate your account ⏳'});
+            }
+            else if (request['status'] === 'rejected') {
+                res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
+            }
+            else if (request['status'] === 'active') {
+                next();
+            }
+            else {
+                res.status(403).json({message: 'Your account is deactivated 📴'});
+            }
+        } else {
             next();
-        }
-        else {
-            res.status(403).json({message: 'Your account is deactivated 📴'});
         }
 
     } catch (error) {

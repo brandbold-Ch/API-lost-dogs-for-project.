@@ -6,8 +6,10 @@
  */
 
 const User = require("../models/user");
+const Collab = require("../models/collaborator");
 const Post = require("../models/post");
 const { cloudinary, conn } = require("../configurations/connections");
+const mongoose = require("mongoose");
 
 /**
  *Class that provides CRUD services related to lost pets.
@@ -24,8 +26,8 @@ class PostServices {
              cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
                  if (error) { reject(error); }
                  resolve({
-                     url: result["url"],
-                     id: result["public_id"]
+                     url: result?.url,
+                     id: result?.public_id
                  });
              }).end(buffer);
          });
@@ -63,9 +65,16 @@ class PostServices {
         return Post.findOne({ _id: pet_id, user: id });
     };
 
-    async insertLostPet(id, pet_data) {
+    async insertLostPet(id, pet_data, role) {
+        let user_ref;
+
+        if (role === "USER") {
+            user_ref = await User.findById(id);
+        } else {
+            user_ref = await Collab.findById(id);
+        }
+
         const session = await conn.startSession();
-        const user_ref = await User.findById(id);
         const obj_data = pet_data[0];
         const obj_image = pet_data[1];
         let output_data;
@@ -303,6 +312,42 @@ class PostServices {
             }
         );
     };
+
+    async getUrlsImages(id) {
+        return Post.aggregate([
+            {
+                $match: { user: new mongoose.Types.ObjectId(id) }
+            },
+            {
+                $project: {
+                    "galleryIds": "$identify.gallery.id",
+                    "imageId": "$identify.image.id"
+                }
+            },
+            {
+                $project: {
+                    "allIds": {
+                        $concatArrays: ["$galleryIds", ["$imageId"]]
+                    }
+                }
+            },
+            {
+                $unwind: "$allIds"
+            },
+            {
+                $group: {
+                    _id: null,
+                    "allIds": { $addToSet: "$allIds" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "allIds": 1
+                }
+            }
+        ]);
+    }
 }
 
 module.exports = PostServices;

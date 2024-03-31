@@ -15,5 +15,6 @@ guestsRoute.get('/publications/filter/owner', checkQueryParameters, guestsContro
 guestsRoute.get('/publications/filter/date', guestsControllers.getFilterPostLostDate);
 guestsRoute.get('/publications/filter/year', guestsControllers.getFilterPostYear);
 guestsRoute.get('/bulletins', guestsControllers.getBulletins);
+guestsRoute.get('/bulletins/search', guestsControllers.getBulletin);
 
 module.exports = guestsRoute;

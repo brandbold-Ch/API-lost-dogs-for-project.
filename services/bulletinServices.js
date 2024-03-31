@@ -20,8 +20,8 @@ class BulletinServices {
             cloudinary.uploader.upload_stream({resource_type: "auto"}, (error, result) => {
                 if (error) { reject(error); }
                 resolve({
-                    url: result["url"],
-                    id: result["public_id"]
+                    url: result?.url,
+                    id: result?.public_id
                 });
             }).end(buffer);
         });

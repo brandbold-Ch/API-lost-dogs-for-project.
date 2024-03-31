@@ -1,4 +1,4 @@
-const { checkUserExists, isActive, checkBulletinExists, checkPostExists} = require("../middlewares/entityManager");
+const { checkUserExists, isActive, checkBulletinExists } = require("../middlewares/entityManager");
 const bulletinControllers = require("../controllers/bulletinControllers");
 const express = require("express");
 const bulletinRoute = express.Router();
