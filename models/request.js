@@ -22,6 +22,10 @@ const requestsSchema = new Schema({
         ],
         default: "pending"
     },
+    email: {
+        type: String,
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Collab",

@@ -48,7 +48,7 @@ const typeUser = (data) => {
                 reject([403, {message: 'Your account is deactivated 📴'}]);
             }
         }
-        resolve(data)
+        resolve(data);
     })
 }
 

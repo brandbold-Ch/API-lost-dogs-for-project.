@@ -58,6 +58,7 @@ class CollabServices {
             await Request.create([
                 {
                     role: "COLLABORATOR",
+                    email: email,
                     user: output_data[0]["_id"]
                 }
             ], { session });
