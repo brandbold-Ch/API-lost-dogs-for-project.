@@ -93,7 +93,8 @@ class PostServices {
                     },
                     publication: {
                         lost_date: obj_data["lost_date"],
-                        coordinates: JSON.parse(obj_data["coordinates"])
+                        coordinates: JSON.parse(obj_data["coordinates"]),
+                        last_seen: obj_data["last_seen"]
                     },
                     status: {
                         owner: obj_data["owner"]
@@ -247,6 +248,7 @@ class PostServices {
                             coordinates: JSON.parse(obj_data["coordinates"]),
                             update: Date.now(),
                             published: context_pet["publication"]["published"],
+                            last_seen: obj_data["last_seen"]
                         },
                         status: {
                             owner: obj_data["owner"],

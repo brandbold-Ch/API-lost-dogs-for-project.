@@ -86,6 +86,11 @@ const postSchema = new Schema({
             type: Object,
             required: false,
             default: null
+        },
+        last_seen: {
+            type: String,
+            required: false,
+            default: null
         }
     },
     status: {
