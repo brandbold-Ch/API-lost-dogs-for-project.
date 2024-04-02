@@ -301,18 +301,19 @@ class PostServices {
 
     async insertComment(id, pet_id, data) {
         const user = await User.findById(id, { lastname: 0, cellphone: 0, social_media: 0 });
+        let inserted = false;
 
-        await Post.findByIdAndUpdate(pet_id,
-            {
-                $push: {
-                    "feedback.comments": {
-                        title: data,
-                        timestamp: Date.now(),
-                        user: user
-                    }
-                }
-            }
-        );
+        const comment = {
+            title: data,
+            timestamp: Date.now(),
+            user: user
+        }
+        await Post.findByIdAndUpdate(pet_id, { $push: { "feedback.comments": comment } })
+            .then((() => {
+                inserted = true;
+            }));
+
+        return (inserted) ? comment : { alert: "No inserted comment" };
     };
 
     async getUrlsImages(id) {

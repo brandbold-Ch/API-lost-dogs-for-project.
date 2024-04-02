@@ -163,10 +163,10 @@ exports.delPartialGallery = async (req, res) => {
 
 exports.insertComment = async (req, res) => {
     try {
-        await posts.insertComment(req.id, req.query.pet, req.body);
+        const comment = await posts.insertComment(req.id, req.query.pet, req.body);
         res.status(201).json({
             message: 'Added comment ✅',
-            data: req.body
+            data: comment
         });
 
     } catch (error) {

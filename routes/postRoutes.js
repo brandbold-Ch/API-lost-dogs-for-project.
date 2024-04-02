@@ -22,6 +22,6 @@ petsRoute.get("/:pet_id", isAuthenticate, checkUserExists, isActive, checkPostEx
 petsRoute.delete("/:pet_id", isAuthenticate, checkUserExists, isActive, checkPostExists, postControllers.deletePost);
 petsRoute.post("/gallery/:pet_id", isAuthenticate, checkUserExists, isActive, checkPostExists, processFormData, postControllers.addGallery);
 petsRoute.delete("/gallery/:pet_id", isAuthenticate, checkUserExists, isActive, checkPostExists, postControllers.delPartialGallery);
-petsRoute.post("/comment/", isAuthenticate, checkUserExists, isActive, checkPostExists, express.text() ,postControllers.insertComment);
+petsRoute.post("/comment", isAuthenticate, checkUserExists, isActive, checkPostExists, express.text() ,postControllers.insertComment);
 
 module.exports = petsRoute;

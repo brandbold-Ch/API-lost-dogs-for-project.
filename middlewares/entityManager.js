@@ -48,10 +48,11 @@ const checkPostExists = async (req, res, next) => {
     try {
         let entity;
 
-        if (req.baseUrl === '/api/v2/posts' && req.path !== '/comment/') {
+        if (req.baseUrl === '/api/v2/posts' && req.path !== '/comment') {
             entity = await posts.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
         } else {
             entity = await posts.getGeneralPost(req.params.pet_id || req.query.pet);
+            console.log(req.query.pet)
         }
 
         if (entity) {
