@@ -29,7 +29,7 @@ class GuestServices {
      */
 
     async getAllLostPets(){
-        return Post.find({}, { "identify.gallery": 0, user: 0 }).sort({ "publication.lost_date": -1 });
+        return Post.find({}).sort({ "publication.lost_date": -1 });
     };
 
     async getFilterPostGender(gender) {
