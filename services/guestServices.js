@@ -84,7 +84,6 @@ class GuestServices {
             return date.getFullYear() === parseInt(year);
         });
     }
-
     async getBulletins() {
         return Bulletin.find({}, { user:0 }).sort({ "identify.timestamp": -1 });
     }
