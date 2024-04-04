@@ -66,12 +66,14 @@ class PostServices {
     };
 
     async insertLostPet(id, pet_data, role) {
-        let user_ref;
+        let user_ref, collection;
 
         if (role === "USER") {
             user_ref = await User.findById(id);
+            collection = "User";
         } else {
             user_ref = await Collab.findById(id);
+            collection = "Collab";
         }
 
         const session = await conn.startSession();
@@ -99,7 +101,8 @@ class PostServices {
                     status: {
                         owner: obj_data["owner"]
                     },
-                    user: user_ref["_id"]
+                    user: user_ref["_id"],
+                    doc_model: collection
                 }
             ], { session })
                 .then(async (post) => {
@@ -275,16 +278,12 @@ class PostServices {
 
                 await Post.updateOne(
                     { _id: pet_id, user: id },
-                    {
-                        $set: {
-                            "identify.image": new_image
-                        }
-                    }
+                    {$set: { "identify.image": new_image } }
                 )
             }
 
         }).catch((err) => {
-                throw Error(err.message);
+            throw Error(err.message);
         })
         await session.endSession();
     }
@@ -293,15 +292,15 @@ class PostServices {
         await Promise.all(images.map(async (key) => {
             let new_image = await this.uploadImage(key["buffer"]);
 
-            await Post.updateOne({ _id: pet_id, user: id },
+            await Post.updateOne(
+                { _id: pet_id, user: id },
                 { $push: { "identify.gallery": new_image } }
             );
         }));
     };
 
     async insertComment(id, pet_id, data) {
-        const user = await User.findById(id, { lastname: 0, cellphone: 0, social_media: 0 });
-        let inserted = false;
+        const user = await User.findById(id);
 
         const comment = {
             title: data,
@@ -309,11 +308,8 @@ class PostServices {
             user: user
         }
         await Post.findByIdAndUpdate(pet_id, { $push: { "feedback.comments": comment } })
-            .then((() => {
-                inserted = true;
-            }));
 
-        return (inserted) ? comment : { alert: "No inserted comment" };
+        return comment;
     };
 
     async getUrlsImages(id) {

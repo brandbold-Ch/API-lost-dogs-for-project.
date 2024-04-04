@@ -58,7 +58,7 @@ app.use('/api/v2/collabs', collabRouter);
 app.use('/api/v2/bulletins', bulletinRouter);
 
 app.use((req, res) => {
-    res.status(404).json({'message': 'This route not available'});
+    res.status(404).json({'message': 'This route not available 🚫'});
 });
 
 app.listen(parseInt(process.env.PORT, 10), () => {

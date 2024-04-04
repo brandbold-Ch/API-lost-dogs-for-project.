@@ -22,6 +22,12 @@ const collabSchema = new Schema({
         type: String,
         required: false,
         default: null
+    },
+    auth: {
+        type: Schema.Types.ObjectId,
+        required: false,
+        default: null,
+        ref: "Auth"
     }
 }, {
     versionKey: false

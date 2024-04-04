@@ -41,7 +41,10 @@ const postSchema = new Schema({
         },
         gender: {
             type: String,
-            enum: ["Macho", "Hembra"],
+            enum: [
+                "Macho",
+                "Hembra"
+            ],
             required: false,
             default: null
         },
@@ -57,7 +60,12 @@ const postSchema = new Schema({
         },
         size: {
             type: String,
-            enum: ["Chico", "Mediano", "Grande", "No aplica"],
+            enum: [
+                "Chico",
+                "Mediano",
+                "Grande",
+                "No aplica"
+            ],
             required: false,
             default: null
         },
@@ -128,7 +136,12 @@ const postSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "User"
+        refPath: "doc_model"
+    },
+    doc_model: {
+        type: String,
+        required: true,
+        enum: ["User", "Collab"]
     }
 }, {
     versionKey: false
