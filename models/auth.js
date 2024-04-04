@@ -46,8 +46,12 @@ const authSchema = new Schema({
     },
     role: {
         type: String,
-        required: false,
-        default: null,
+        required: true,
+        enum: [
+            "USER",
+            "COLLABORATOR",
+            "ADMINISTRATOR"
+        ]
     },
 }, {
     versionKey: false
@@ -75,5 +79,5 @@ authSchema.pre("save", async function (next) {
  * Mongoose model for user credentials.
  * @type {mongoose.Model<AuthSchema>}
  */
-authSchema.index({user: 1}, {unique: true});
+authSchema.index({ user: 1 }, { unique: true });
 module.exports = mongoose.model("Auth", authSchema);
