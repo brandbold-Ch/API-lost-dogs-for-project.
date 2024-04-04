@@ -1,3 +1,4 @@
+
 /**
  * @author Brandon Jared Molina Vazquez
  * @date 26/09/2023
@@ -27,7 +28,7 @@ const Schema = mongoose.Schema;
  */
 
 const postSchema = new Schema({
-    
+
     name: {
         type: String,
         required: false,

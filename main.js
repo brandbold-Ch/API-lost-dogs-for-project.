@@ -35,7 +35,9 @@ app.use(cors({
 app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
-    res.status(200).json({message: "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜"});
+    res.status(200).json(
+        {message: "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜"}
+    );
 });
 
 app.use((req, res, next) => {

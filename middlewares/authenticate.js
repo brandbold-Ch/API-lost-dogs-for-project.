@@ -34,7 +34,8 @@ const isAuthenticate = async (req, res, next) => {
             ],
             ADMINISTRATOR: [
                 '/api/v2/admins',
-                '/api/v2/auth'
+                '/api/v2/auth',
+                '/api/v2/posts'
             ]
         };
 

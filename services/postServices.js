@@ -1,3 +1,4 @@
+
 /**
  * @author Brandon Jared Molina Vazquez
  * @date 26/09/2023
@@ -21,16 +22,16 @@ class PostServices {
     constructor() {};
 
     ////////////////////////////////////////////////////////////////////
-     async uploadImage(buffer) {
-         return new Promise((resolve, reject) => {
-             cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
-                 if (error) { reject(error); }
-                 resolve({
-                     url: result?.url,
-                     id: result?.public_id
-                 });
-             }).end(buffer);
-         });
+    async uploadImage(buffer) {
+        return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
+                if (error) { reject(error); }
+                resolve({
+                    url: result?.url,
+                    id: result?.public_id
+                });
+            }).end(buffer);
+        });
     }
 
     async deleteImage(img_id) {
@@ -41,16 +42,16 @@ class PostServices {
         }
     }
 
-     async deleteGallery(gallery) {
-         if (gallery.length) {
-             await cloudinary.api.delete_resources(
-                 gallery.map((obj) => {
-                     return obj["id"];
-                 }),
-                 {type: 'upload', resource_type: 'image'}
-             );
-         }
-     }
+    async deleteGallery(gallery) {
+        if (gallery.length) {
+            await cloudinary.api.delete_resources(
+                gallery.map((obj) => {
+                    return obj["id"];
+                }),
+                {type: 'upload', resource_type: 'image'}
+            );
+        }
+    }
     //////////////////////////////////////////////////////////////////////
 
     async postsAll(id) {
@@ -284,7 +285,7 @@ class PostServices {
             }
 
         }).catch((err) => {
-                throw Error(err.message);
+            throw Error(err.message);
         })
         await session.endSession();
     }
