@@ -129,7 +129,12 @@ const postSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "User"
+        refPath: "doc_model"
+    },
+    doc_model: {
+        type: String,
+        required: true,
+        enum: ["User", "Collab"]
     }
 }, {
     versionKey: false
