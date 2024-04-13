@@ -1,12 +1,24 @@
-const { bulletins, posts} = require("../singlenton/instances");
+const {bulletin} = require("../utils/instances");
+
 
 exports.setBulletin = async (req, res) => {
     try {
-        await bulletins.createBulletin(req.id, [JSON.parse(JSON.stringify(req.body)), req.files])
+        const response_body = await bulletin.setBulletin(
+            req.id,
+            [
+                JSON.parse(JSON.stringify(req.body)),
+                req.files
+            ],
+            req.role
+        );
+
         res.status(201).json({
+            status: "Success",
             message: "Added bulletin ✅",
-            data: req.body
+            status_code: 201,
+            data: response_body
         });
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -14,7 +26,8 @@ exports.setBulletin = async (req, res) => {
 
 exports.getBulletins = async (req, res) => {
     try {
-        res.status(200).json(await bulletins.getBulletins(req.id));
+        res.status(200).json(await bulletin.getBulletins(req.id));
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -22,7 +35,7 @@ exports.getBulletins = async (req, res) => {
 
 exports.getBulletin = async (req, res) => {
     try {
-        res.status(200).json(await bulletins.getBulletin(req.id, req.params.bulletin_id));
+        res.status(200).json(await bulletin.getBulletin(req.id, req.params.bulletin_id));
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -30,7 +43,7 @@ exports.getBulletin = async (req, res) => {
 
 exports.updateBulletin = async (req, res) => {
     try {
-        await bulletins.updateBulletin(req.id,
+        await bulletin.updateBulletin(req.id,
             req.params.bulletin_id, [JSON.parse(JSON.stringify(req.body)), req.files]);
 
         res.status(202).json({
@@ -46,10 +59,9 @@ exports.delPartialGallery = async (req, res) => {
     try {
 
         if (req.query.image) {
-            await bulletins.deletePartialGallery(req.id, req.params.bulletin_id, req.query.image);
+            await bulletin.deletePartialGallery(req.id, req.params.bulletin_id, req.query.image);
             res.status(204).end();
-        }
-        else {
+        } else {
             res.status(404).json({message: "Id image required. ⚠️"});
         }
 
@@ -60,7 +72,7 @@ exports.delPartialGallery = async (req, res) => {
 
 exports.deleteBulletin = async (req, res) => {
     try {
-        await bulletins.deleteBulletin(req.id, req.params.bulletin_id);
+        await bulletin.deleteBulletin(req.id, req.params.bulletin_id);
         res.status(204).end();
     } catch (error) {
         res.status(500).json({message: error.message});

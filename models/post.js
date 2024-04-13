@@ -104,7 +104,10 @@ const postSchema = new Schema({
     status: {
         found: {
             type: Boolean,
-            enum: [true, false],
+            enum: [
+                true,
+                false
+            ],
             required: false,
             default: false
         },
@@ -141,11 +144,16 @@ const postSchema = new Schema({
     doc_model: {
         type: String,
         required: true,
-        enum: ["User", "Collab"]
+        enum: [
+            "User",
+            "Rescuer"
+        ]
     }
 }, {
     versionKey: false
 });
 
 postSchema.index({ user: 1 });
-module.exports = mongoose.model("Post", postSchema);
+
+const Post = mongoose.model("Post", postSchema);
+module.exports = { Post };

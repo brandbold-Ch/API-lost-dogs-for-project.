@@ -1,22 +1,22 @@
-const Admin = require('../models/administrator');
-const Auth = require("../models/auth");
-const Request = require("../models/request");
-const { conn } = require("../configurations/connections");
-const CollabServices = require("../services/collabServices");
-const UsersServices = require("../services/userServices");
+const {Admin} = require('../models/administrator');
+const {Auth} = require("../models/auth");
+const {Request} = require("../models/rescuer");
+const {connection} = require("../configurations/connections");
+const {RescuerServices} = require("./rescuerServices");
+const {UserServices} = require("../services/userServices");
 
 
 class AdminServices {
 
     constructor() {
-        this.collabs = new CollabServices();
-        this.users = new UsersServices();
-    };
+        this.rescuer = new RescuerServices();
+        this.users = new UserServices();
+    }
 
-    async createAdmin(data) {
-        const { name, lastname, email, password } = data;
-        const session = await conn.startSession();
-        let output_data;
+    async setAdmin(data) {
+        const {name, lastname, email, password} = data;
+        const session = await connection.startSession();
+        let output_admin, output_auth;
 
         await session.withTransaction(async () => {
             await Admin.create([
@@ -24,92 +24,154 @@ class AdminServices {
                     name: name,
                     lastname: lastname
                 }
-            ], { session })
+            ], {session})
                 .then((admin) => {
-                    output_data = admin;
+                    output_admin = admin[0];
                 });
 
             await Auth.create([
                 {
                     email: email,
                     password: password,
-                    user: output_data[0]["_id"],
-                    role: "ADMINISTRATOR"
+                    user: output_admin["_id"],
+                    role: ["ADMINISTRATOR"],
+                    doc_model: "Admin"
                 }
-            ], { session });
-        });
+            ], {session})
+                .then((auth) => {
+                    output_auth = auth[0];
+                });
+
+            await Admin.updateOne(
+                {
+                    _id: output_admin["_id"]
+                },
+                {
+                    $set: {
+                        auth: output_auth["_id"]
+                    }
+                },
+                {session}
+            );
+        })
         await session.endSession();
+
+        return output_admin;
     }
 
     async getAdmin(id) {
-        return Admin.findById(id, { _id: 0 });
+        return Admin.findById(id);
     }
 
     async updateAdmin(id, data) {
-        await Admin.findByIdAndUpdate(id, { $set: data  }, { runValidators: true });
+        return Admin.findByIdAndUpdate(id, {$set: data}, {runValidators: true, new: true});
     }
 
     async deleteAdmin(id) {
-        const session = await conn.startSession();
+        const session = await connection.startSession();
 
         await session.withTransaction(async () => {
-            await Auth.deleteOne({ user: id }, { session });
-            await Admin.deleteOne({ _id: id }, { session });
+            await Auth.deleteOne({user: id}, {session});
+            await Admin.deleteOne({_id: id}, {session});
         });
         await session.endSession();
     }
 
     async getRequestForMiddlewareCheck(id) {
-        return Request.findOne({ _id: id });
+        return Request.findOne({_id: id});
     }
 
     async getRequestForMiddlewareIsActive(id) {
-        return Request.findOne({ user: id });
+        return Request.findOne({user: id});
     }
 
-    async getRequests(){
-        return Request.find({}).populate("user", { _id: 0 });
+    async getRequests() {
+        return Request.find({}).populate("user", {_id: 0});
     }
 
     async deleteRequest(request_id) {
-        const session = await conn.startSession();
+        const session = await connection.startSession();
         const request = await Request.findById(request_id);
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Request.deleteOne({ _id: request_id }, { session }),
-                this.collabs.deleteCollab(request["user"])
+                Request.deleteOne({_id: request_id}, {session}),
+                this.rescuer.deleteRescuer(request["user"])
             ])
         });
         await session.endSession();
     }
 
     async activateRequest(id) {
-        await Request.findByIdAndUpdate(id, { $set: { status: "active" }});
+        const session = await connection.startSession();
+        const request = await Request.findById(id);
+        let output_request;
+
+        if ((request["role"].length <= 1) && (request["role"][0] === "USER")) {
+
+            await session.withTransaction(async () => {
+
+                await Request.findByIdAndUpdate(id,
+                    {
+                        $set: {
+                            status: "active"
+                        },
+                        $push: {
+                            role: "RESCUER"
+                        }
+                    },
+                    {
+                        new: true
+                    },
+                    {session}
+                )
+                    .then((request) => {
+                        output_request = request;
+                    });
+
+                await Auth.findOneAndUpdate(
+                    {
+                        user: request["user"]
+                    },
+                    {
+                        $push: {
+                            role: "RESCUER"
+                        }
+                    },
+                    {session}
+                )
+            });
+            await session.endSession();
+
+            return output_request;
+
+        } else {
+            return Request.findByIdAndUpdate(id, {$set: {status: "active"}}, {new: true});
+        }
     }
 
     async deactivateRequest(id) {
-        await Request.findByIdAndUpdate(id, { $set: { status: "disabled" }});
+        return Request.findByIdAndUpdate(id, {$set: {status: "disabled"}}, {new: true});
     }
 
     async rejectRequest(id) {
-        await Request.findByIdAndUpdate(id, { $set: { status: "rejected" }});
+        return Request.findByIdAndUpdate(id, {$set: {status: "rejected"}}, {new: true});
     }
 
     async filterRequests(filter) {
-        return Request.find({ status: filter }).populate("user", { _id: 0 });
+        return Request.find({status: filter}).populate("user", {_id: 0});
     }
 
-    async getCollabs() {
-        return await this.collabs.getCollabs();
+    async getRescuers() {
+        return await this.rescuer.getRescuers();
     }
 
-    async getCollab(collab_id) {
-        return await this.collabs.getCollab(collab_id);
+    async getRescuer(collab_id) {
+        return await this.rescuer.getRescuer(collab_id);
     }
 
-    async deleteCollab(collab_id) {
-        await this.collabs.deleteCollab(collab_id);
+    async deleteRescuer(collab_id) {
+        await this.rescuer.deleteRescuer(collab_id);
     }
 
     async getUsers() {
@@ -125,4 +187,4 @@ class AdminServices {
     }
 }
 
-module.exports = AdminServices;
+module.exports = {AdminServices};

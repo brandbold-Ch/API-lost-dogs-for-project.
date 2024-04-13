@@ -4,27 +4,29 @@
  * @file This module is for creating auth services.
  */
 
-const { auths } = require('../singlenton/instances');
-const Request = require("../models/request");
+const {auth} = require('../utils/instances');
+const {Request} = require("../models/rescuer");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 
-exports.getCredentials =  async (req, res) => {
+exports.getAuth = async (req, res) => {
     try {
-        res.status(200).json(await auths.getCredentials(req.id));
+        res.status(200).json(await auth.getAuth(req.id));
 
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 };
 
-exports.updateCredentials = async (req, res) => {
+exports.updateAuth = async (req, res) => {
     try {
-        await auths.updateAuth(req.id, req.body);
+        const response_body = await auth.updateAuth(req.id, req.body);
+
         res.status(202).json({
             message: 'Updated credentials ✅',
-            data: req.body.email
+            status_code: 200,
+            data: response_body
         });
 
     } catch (error) {
@@ -35,16 +37,16 @@ exports.updateCredentials = async (req, res) => {
 const typeUser = (data) => {
     return new Promise(async (resolve, reject) => {
         if (data[1]["role"] === "COLLABORATOR") {
-            const request = await Request.findOne({ user: data[1]["user"]});
+            const request = await Request.findOne({user: data[1]["user"]});
 
             if (request['status'] === 'pending') {
-                reject([403, {message: 'You are in a waiting process, ' +
-                        'the administrator must activate your account ⏳'}]);
-            }
-            else if (request['status'] === 'rejected') {
+                reject([403, {
+                    message: 'You are in a waiting process, ' +
+                        'the administrator must activate your account ⏳'
+                }]);
+            } else if (request['status'] === 'rejected') {
                 reject([401, {message: 'Your request was rejected by the administrator 🚫'}]);
-            }
-            else if (request['status'] === 'disabled'){
+            } else if (request['status'] === 'disabled') {
                 reject([403, {message: 'Your account is deactivated 📴'}]);
             }
         }
@@ -77,7 +79,7 @@ const validateEmail = (body) => {
 
 const validateUser = (body) => {
     return new Promise(async (resolve, reject) => {
-        const user = await auths.getEmail(body.email);
+        const user = await auth.entityExists(body.email);
 
         if (user) {
             resolve([body, user]);
@@ -94,14 +96,22 @@ const validatePassword = (data) => {
 
         if (match) {
 
-            const token = await auths.generateToken({
-                user: data[1].user,
-                role: data[1].role
-            });
+            const token = jwt.sign(
+                {
+                    user: data[1].user,
+                    role: data[1].role
+                },
+                process.env.SECRET_KEY,
+                {
+                    expiresIn: process.env.EXPIRE
+                }
+            );
+
             const decompile = jwt.verify(token, process.env.SECRET_KEY);
 
             resolve({
                 token: token,
+                role: data[1].role,
                 details: {
                     start: decompile.iat,
                     end: decompile.exp
@@ -129,7 +139,7 @@ exports.login = async (req, res) => {
 
 exports.statusToken = async (req, res) => {
     try {
-        res.status(200).json(await auths.detailToken(req.body.token));
+        res.status(200).json(await auth.detailToken(req.body.token));
 
     } catch (error) {
         res.status(500).json({message: error.message});

@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const { posts, auths, admins, bulletins } = require('../singlenton/instances');
+const {post, auth, admin, rescuer} = require('../utils/instances');
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -14,16 +14,16 @@ const { posts, auths, admins, bulletins } = require('../singlenton/instances');
  * @returns {void}
  */
 
-const checkBulletinExists = async (req, res, next) => {
+const checkRescuerExists = async (req, res, next) => {
     try {
-        const bulletin = await bulletins.getBulletin(req.id, req.params.bulletin_id);
+        const entity = await rescuer.getRescuer(req.id, req.params.bulletin_id);
 
-        if (bulletin) {
+        if (entity) {
             next();
         } else {
-            res.status(404).json({message: 'Not found bulletin 🚫'});
+            res.status(404).json({message: 'Not found rescuer 🚫'});
         }
-        
+
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -31,7 +31,7 @@ const checkBulletinExists = async (req, res, next) => {
 
 const checkUserExists = async (req, res, next) => {
     try {
-        const entity = await auths.getUser(req.query.user || req.id);
+        const entity = await auth.getUser(req.query.user || req.id);
 
         if (entity) {
             next();
@@ -49,9 +49,9 @@ const checkPostExists = async (req, res, next) => {
         let entity;
 
         if (req.baseUrl === '/api/v2/posts' && req.path !== '/comment') {
-            entity = await posts.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
+            entity = await post.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
         } else {
-            entity = await posts.getGeneralPost(req.params.pet_id || req.query.pet);
+            entity = await post.getGeneralPost(req.params.pet_id || req.query.pet);
         }
 
         if (entity) {
@@ -108,20 +108,19 @@ const checkTrust = async (req, res, next) => {
 const isActive = async (req, res, next) => {
     try {
 
-        if (req.role === "COLLABORATOR") {
-            const request = await admins.getRequestForMiddlewareIsActive(req.id);
+        if (req.role === "RESCUER") {
+            const request = await admin.getRequestForMiddlewareIsActive(req.req_id);
 
             if (request['status'] === 'pending') {
-                res.status(403).json({message: 'You are in a waiting process, ' +
-                        'the administrator must activate your account ⏳'});
-            }
-            else if (request['status'] === 'rejected') {
+                res.status(403).json({
+                    message: 'You are in a waiting process, ' +
+                        'the administrator must activate your account ⏳'
+                });
+            } else if (request['status'] === 'rejected') {
                 res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
-            }
-            else if (request['status'] === 'active') {
+            } else if (request['status'] === 'active') {
                 next();
-            }
-            else {
+            } else {
                 res.status(403).json({message: 'Your account is deactivated 📴'});
             }
         } else {
@@ -135,7 +134,7 @@ const isActive = async (req, res, next) => {
 
 const checkRequestExists = async (req, res, next) => {
     try {
-        const request = await admins.getRequestForMiddlewareCheck(req.params.id);
+        const request = await admin.getRequestForMiddlewareCheck(req.params.req_id);
 
         if (request) {
             next();
@@ -167,7 +166,7 @@ const checkQueryAction = async (req, res, next) => {
     }
 }
 
-const checkQueryStatus = async (req, res , next) => {
+const checkQueryStatus = async (req, res, next) => {
     try {
         const choices = [
             'pending',
@@ -196,5 +195,5 @@ module.exports = {
     checkRequestExists,
     checkQueryStatus,
     checkQueryAction,
-    checkBulletinExists
+    checkBulletinExists: checkRescuerExists
 };

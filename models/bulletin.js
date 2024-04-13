@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
@@ -49,10 +49,19 @@ const bulletinSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "Collab"
+        refPath: "doc_model"
+    },
+    doc_model: {
+        type: String,
+        required: true,
+        enum: [
+            "User",
+            "Rescuer"
+        ]
     }
 }, {
     versionKey: false
 });
 
-module.exports = mongoose.model("Bulletin", bulletinSchema);
+const Bulletin = mongoose.model("Bulletin", bulletinSchema);
+module.exports = { Bulletin };

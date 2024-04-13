@@ -44,7 +44,21 @@ const userSchema = new Schema({
         type: Array,
         required: false,
         default: []
-    }
+    },
+    auth: {
+        type: Schema.Types.ObjectId,
+        required: false,
+        default: null,
+        ref: "Auth"
+    },
+    posts: [{
+        type: Schema.Types.ObjectId,
+        ref: "Post"
+    }],
+    bulletins: [{
+        type: Schema.Types.ObjectId,
+        ref: "Bulletin"
+    }]
 }, {
     versionKey: false
 });
@@ -54,4 +68,5 @@ const userSchema = new Schema({
  * @type {mongoose.Model<UserSchema>}
  */
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+module.exports = { User };

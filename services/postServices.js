@@ -5,10 +5,12 @@
  * functionality to authenticated users
  */
 
-const User = require("../models/user");
-const Collab = require("../models/collaborator");
-const Post = require("../models/post");
-const { cloudinary, conn } = require("../configurations/connections");
+const {User} = require("../models/user");
+const {Rescuer} = require("../models/rescuer");
+const {Admin} = require("../models/administrator");
+const {Post} = require("../models/post");
+const {ImageTools} = require("../utils/imageTools");
+const {connection} = require("../configurations/connections");
 const mongoose = require("mongoose");
 
 /**
@@ -18,43 +20,43 @@ const mongoose = require("mongoose");
 
 class PostServices {
 
-    constructor() {};
-
-    ////////////////////////////////////////////////////////////////////
-     async uploadImage(buffer) {
-         return new Promise((resolve, reject) => {
-             cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
-                 if (error) { reject(error); }
-                 resolve({
-                     url: result?.url,
-                     id: result?.public_id
-                 });
-             }).end(buffer);
-         });
+    constructor() {
+        this.imageTools = new ImageTools();
     }
 
-    async deleteImage(img_id) {
-        if (img_id) {
-            await cloudinary.api.delete_resources(
-                [img_id], { type: 'upload', resource_type: 'image' }
-            );
+    modelDetector(role) {
+        switch (role[0]) {
+            case "USER":
+                return ["User", User];
+
+            case "RESCUER":
+                return ["Rescuer", Rescuer];
+
+            case "ADMINISTRATOR":
+                return ["Admin", Admin];
         }
     }
 
-     async deleteGallery(gallery) {
-         if (gallery.length) {
-             await cloudinary.api.delete_resources(
-                 gallery.map((obj) => {
-                     return obj["id"];
-                 }),
-                 {type: 'upload', resource_type: 'image'}
-             );
-         }
-     }
-    //////////////////////////////////////////////////////////////////////
+    async addGallery(id, pet_id, images) {
+        await Promise.all(images.map(async (key) => {
+            let new_image = await this.imageTools.uploadImage(key["buffer"]);
+
+            await Post.updateOne(
+                {
+                    _id: pet_id,
+                    user: id
+                },
+                {
+                    $push: {
+                        "identify.gallery": new_image
+                    }
+                }
+            );
+        }));
+    };
 
     async postsAll(id) {
-        return Post.find({ user: id }).sort({ "publication.lost_date": -1 });
+        return Post.find({user: id}).sort({"publication.lost_date": -1});
     }
 
     async getGeneralPost(pet_id) {
@@ -62,26 +64,18 @@ class PostServices {
     }
 
     async getPost(id, pet_id) {
-        return Post.findOne({ _id: pet_id, user: id });
+        return Post.findOne({_id: pet_id, user: id});
     };
 
-    async insertLostPet(id, pet_data, role) {
-        let user_ref, collection;
-
-        if (role === "USER") {
-            user_ref = await User.findById(id);
-            collection = "User";
-        } else {
-            user_ref = await Collab.findById(id);
-            collection = "Collab";
-        }
-
-        const session = await conn.startSession();
+    async setPost(id, pet_data, role) {
+        const session = await connection.startSession();
+        const collection = this.modelDetector(role);
         const obj_data = pet_data[0];
-        const obj_image = pet_data[1];
-        let output_data;
+        const array_images = pet_data[1];
+        let output_post;
 
         await session.withTransaction(async () => {
+
             await Post.create([
                 {
                     name: obj_data["name"],
@@ -101,27 +95,53 @@ class PostServices {
                     status: {
                         owner: obj_data["owner"]
                     },
-                    user: user_ref["_id"],
-                    doc_model: collection
+                    user: id,
+                    doc_model: collection[0]
                 }
-            ], { session })
+            ], {session})
                 .then(async (post) => {
-                    output_data = post;
+                    output_post = post[0];
                 })
+
+            await collection[1].updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $push: {
+                        posts: output_post["_id"]
+                    }
+                },
+                {session}
+            );
         })
             .then(async () => {
-                if (obj_image.length) {
-                    const index_image = obj_image.findIndex(obj => obj["fieldname"] === "image");
+                if (array_images.length) {
+                    const index_image = array_images.findIndex(obj => obj["fieldname"] === "image");
 
                     if (index_image !== -1) {
-                        const image = await this.uploadImage(obj_image.splice(index_image, 1)[0]["buffer"]);
-                        await Post.updateOne({ _id: output_data[0]["_id"] }, { $set: {"identify.image": image}});
+                        const image = await this.imageTools.uploadImage(
+                            array_images.splice(index_image, 1)[0]["buffer"]
+                        );
+
+                        await Post.updateOne(
+                            {
+                                _id: output_post["_id"]
+                            },
+                            {
+                                $set: {
+                                    "identify.image": image
+                                }
+                            }
+                        );
                     }
 
-                    await this.addGallery(id, output_data[0]["_id"], obj_image)
+                    await this.addGallery(id, output_post["_id"], array_images);
                 }
-            })
+            });
         await session.endSession();
+
+        return output_post;
     };
 
     async getPosts(id) {
@@ -163,7 +183,7 @@ class PostServices {
 
         return array.filter(key => {
             const date = key.publication.lost_date
-            return date.toISOString() === lost_date.substring(0, 23)+"Z";
+            return date.toISOString() === lost_date.substring(0, 23) + "Z";
         });
     }
 
@@ -177,17 +197,27 @@ class PostServices {
     }
 
     async deletePartialGallery(id, pet_id, img_id) {
-        const session = await conn.startSession();
+        const session = await connection.startSession();
 
         await session.withTransaction(async () => {
+
             await Post.updateOne(
-                { _id: pet_id, user: id},
-                { $pull: { "identify.gallery": { id: img_id }}},
-                { session }
+                {
+                    _id: pet_id,
+                    user: id
+                },
+                {
+                    $pull: {
+                        "identify.gallery": {
+                            id: img_id
+                        }
+                    }
+                },
+                {session}
             );
         })
             .then(async () => {
-                await this.deleteImage(img_id);
+                await this.imageTools.deleteImages(img_id);
 
             })
             .catch((err) => {
@@ -196,27 +226,37 @@ class PostServices {
         await session.endSession();
     }
 
-    async deletePost(id, pet_id) {
-        const session = await conn.startSession();
-        const array_urls = await Post.findOne(
-            { _id: pet_id, user: id },
-            { identify: 1 }
-        )
+    async deletePost(id, pet_id, role) {
+        const session = await connection.startSession();
+        const array_urls = await Post.findOne({_id: pet_id, user: id}, {identify: 1});
+        const collection = this.modelDetector(role);
 
         await session.withTransaction(async () => {
+
             await Post.deleteOne(
-                { _id: pet_id, user: id },
-                { session }
+                {
+                    _id: pet_id,
+                    user: id
+                },
+                {session}
+            );
+
+            await collection[1].updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $pull: {
+                        posts: pet_id
+                    }
+                },
+                {session}
             );
         })
             .then(async () => {
                 await Promise.all([
-                    this.deleteImage(
-                        array_urls["identify"]["image"]["id"]
-                    ),
-                    this.deleteGallery(
-                        array_urls["identify"]["gallery"]
-                    )
+                    this.imageTools.deleteImages(array_urls["identify"]["image"]),
+                    this.imageTools.deleteGallery(array_urls["identify"]["gallery"])
                 ]);
 
             }).catch((err) => {
@@ -225,16 +265,20 @@ class PostServices {
         await session.endSession();
     };
 
-
     async updatePost(id, pet_id, pet_data) {
-        const context_pet = await this.getPost(id, pet_id);
-        const session = await conn.startSession();
+        const context_post = await this.getPost(id, pet_id);
+        const session = await connection.startSession();
         const obj_data = pet_data[0];
-        const obj_image = pet_data[1];
+        const array_images = pet_data[1];
+        let output_post;
 
         await session.withTransaction(async () => {
-            await Post.updateOne(
-                { _id: pet_id, user: id },
+
+            await Post.findOneAndUpdate(
+                {
+                    _id: pet_id,
+                    user: id
+                },
                 {
                     $set: {
                         name: obj_data["name"],
@@ -250,7 +294,7 @@ class PostServices {
                             lost_date: obj_data["lost_date"],
                             coordinates: JSON.parse(obj_data["coordinates"]),
                             update: Date.now(),
-                            published: context_pet["publication"]["published"],
+                            published: context_post["publication"]["published"],
                             last_seen: obj_data["last_seen"]
                         },
                         status: {
@@ -258,56 +302,63 @@ class PostServices {
                             found: obj_data["found"]
                         },
                         identify: {
-                            image: context_pet["identify"]["image"],
-                            gallery: context_pet["identify"]["gallery"]
+                            image: context_post["identify"]["image"],
+                            gallery: context_post["identify"]["gallery"]
                         },
                         feedback: {
-                            comments: context_pet["feedback"]["comments"],
+                            comments: context_post["feedback"]["comments"],
                         }
                     }
                 },
                 {
-                    runValidators: true
+                    runValidators: true,
+                    new: true
                 },
-                { session })
+                {session}
+            )
+                .then((post) => {
+                    output_post = post;
+                })
 
         }).then(async () => {
-            if (obj_image !== undefined) {
-                const new_image = await this.uploadImage(obj_image["buffer"]);
-                await this.deleteImage(context_pet["identify"]["image"]["id"]);
+
+            if (array_images !== undefined) {
+                await this.imageTools.deleteImages(context_post["identify"]["image"]);
+                const new_image = await this.imageTools.uploadImage(array_images["buffer"]);
 
                 await Post.updateOne(
-                    { _id: pet_id, user: id },
-                    {$set: { "identify.image": new_image } }
-                )
+                    {
+                        _id: pet_id,
+                        user: id
+                    },
+                    {
+                        $set: {
+                            "identify.image": new_image
+                        }
+                    }
+                );
             }
 
         }).catch((err) => {
             throw Error(err.message);
         })
         await session.endSession();
+
+        return output_post;
     }
 
-    async addGallery(id, pet_id, images) {
-        await Promise.all(images.map(async (key) => {
-            let new_image = await this.uploadImage(key["buffer"]);
+    async insertComment(id, pet_id, data, role) {
+        const collection = this.modelDetector(role);
+        const entity = await collection[1].findById(id, {name: 1});
+        const comment = {title: data, timestamp: Date.now(), user: entity}
 
-            await Post.updateOne(
-                { _id: pet_id, user: id },
-                { $push: { "identify.gallery": new_image } }
-            );
-        }));
-    };
-
-    async insertComment(id, pet_id, data) {
-        const user = await User.findById(id);
-
-        const comment = {
-            title: data,
-            timestamp: Date.now(),
-            user: user
-        }
-        await Post.findByIdAndUpdate(pet_id, { $push: { "feedback.comments": comment } })
+        await Post.updateOne(pet_id,
+            {
+                $push: {
+                    "feedback.comments": comment
+                }
+            }
+        );
 
         return comment;
     };
@@ -315,7 +366,7 @@ class PostServices {
     async getUrlsImages(id) {
         return Post.aggregate([
             {
-                $match: { user: new mongoose.Types.ObjectId(id) }
+                $match: {user: new mongoose.Types.ObjectId(id)}
             },
             {
                 $project: {
@@ -336,7 +387,7 @@ class PostServices {
             {
                 $group: {
                     _id: null,
-                    "allIds": { $addToSet: "$allIds" }
+                    "allIds": {$addToSet: "$allIds"}
                 }
             },
             {
@@ -349,4 +400,4 @@ class PostServices {
     }
 }
 
-module.exports = PostServices;
+module.exports = {PostServices};

@@ -4,172 +4,267 @@
  * @file This module is for creating pets services.
  */
 
-const { posts } = require("../singlenton/instances");
+const {post} = require("../utils/instances");
 
 
-exports.insertLostPet = async (req, res) => {
+exports.setPost = async (req, res) => {
     try {
-        await posts.insertLostPet(req.id, [JSON.parse(JSON.stringify(req.body)), req.files], req.role);
+        const response_body = await post.setPost(
+            req.id,
+            [
+                JSON.parse(JSON.stringify(req.body)),
+                req.files
+            ],
+            req.role
+        );
+
         res.status(201).json({
+            status: "Success",
             message: "Added post ✅",
-            data: req.body
+            status_code: 201,
+            data: response_body
         });
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getPosts = async (req, res) => {
     try {
-        res.status(200).json(await posts.getPosts(req.id));
+        res.status(200).json(await post.getPosts(req.id));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostGender = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostGender(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostGender(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostBreed = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostBreed(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostBreed(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostSize = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostSize(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostSize(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostOwner = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostOwner(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostOwner(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostFound = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostFound(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostFound(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostSpecie = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostSpecie(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostSpecie(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostLostDate = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostLostDate(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostLostDate(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getFilterPostYear = async (req, res) => {
     try {
-        res.status(200).json(await posts.getFilterPostYear(req.id, req.query.value));
+        res.status(200).json(await post.getFilterPostYear(req.id, req.query.value));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.getPost = async (req, res) => {
     try {
-        res.status(200).json(await posts.getPost(req.id, req.params.pet_id));
+        res.status(200).json(await post.getPost(req.id, req.params.pet_id));
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.updatePost = async (req, res) => {
     try {
-        await posts.updatePost(req.id, req.params.pet_id, [JSON.parse(JSON.stringify(req.body)), req.files[0]]);
+        const response_body = await post.updatePost(
+            req.id,
+            req.params.pet_id,
+            [
+                JSON.parse(JSON.stringify(req.body)),
+                req.files[0]
+            ]
+        );
+
         res.status(202).json({
-            message: 'Updated post ✅',
-            data: JSON.parse(JSON.stringify(req.body))
+            status: "Success",
+            message: "Updated post ✅",
+            status_code: 202,
+            data: response_body
         });
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.deletePost = async (req, res) => {
     try {
-        await posts.deletePost(req.id, req.params.pet_id);
+        await post.deletePost(req.id, req.params.pet_id, req.role);
+
         res.status(204).end();
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.addGallery = async (req, res) => {
     try {
-        await posts.addGallery(req.id, req.params.pet_id, req.files);
+        await post.addGallery(req.id, req.params.pet_id, req.files);
+
         res.status(201).json({
-            message: 'Added images ✅',
+            status: "Success",
+            message: "Added images ✅",
+            status_code: 201,
             data: `${req.files.length} buffered images`
         });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };
 
 exports.delPartialGallery = async (req, res) => {
     try {
-
         if (req.query.image) {
-            await posts.deletePartialGallery(req.id, req.params.pet_id, req.query.image);
+            await post.deletePartialGallery(req.id, req.params.pet_id, req.query.image);
+
             res.status(204).end();
-        }
-        else {
-            res.status(404).json({message: "Id image required. ⚠️"});
+
+        } else {
+            res.status(400).json({
+                status: "Error",
+                message: "Id image required. ⚠️",
+                status_code: 400
+            });
         }
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 }
 
 exports.insertComment = async (req, res) => {
     try {
-        const comment = await posts.insertComment(req.id, req.query.pet, req.body);
+        const comment = await post.insertComment(req.id, req.params.pet_id, req.body, req.role);
+
         res.status(201).json({
-            message: 'Added comment ✅',
+            status: "Success",
+            message: "Added comment ✅",
+            status_code: 201,
             data: comment
         });
 
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            status: "Failed",
+            message: error.message,
+            status_code: 500
+        });
     }
 };

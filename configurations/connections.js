@@ -34,13 +34,13 @@ mongoose.connect(process.env.URL_DATABASE, {
     useUnifiedTopology: true
 });
 
-const conn = mongoose.connection;
+const connection = mongoose.connection;
 
-conn.on("error", () => console.log("Connection error"));
-conn.on("connected", () => console.log("Connection to Database is successful"));
-conn.on("reconnected", () => console.log("Reconnected"));
+connection.on("error", () => console.log("Connection error"));
+connection.on("connected", () => console.log("Connection to Database is successful"));
+connection.on("reconnected", () => console.log("Reconnected"));
 
 module.exports = {
-    conn,
+    connection,
     cloudinary
 };

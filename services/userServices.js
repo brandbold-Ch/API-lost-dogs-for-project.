@@ -5,12 +5,13 @@
  * functionality to authenticated users
  */
 
-const User = require("../models/user");
-const Post = require("../models/post");
-const Auth = require("../models/auth");
-const PostServices = require("../services/postServices");
-const { cloudinary, conn } = require("../configurations/connections");
-const mongoose = require("mongoose");
+const {User} = require("../models/user");
+const {Post} = require("../models/post");
+const {Auth} = require("../models/auth");
+const {Request} = require("../models/rescuer");
+const {PostServices} = require("../services/postServices");
+const {cloudinary, connection} = require("../configurations/connections");
+
 
 /**
  * Class that provides CRUD services related to users.
@@ -21,46 +22,70 @@ class UserServices {
 
     constructor() {
         this.posts = new PostServices();
-    };
+    }
 
     /////////////////////////////////////////////////
 
     async deleteImages(gallery) {
         if (gallery.length) {
             await cloudinary.api.delete_resources(
-                gallery, { type: 'upload', resource_type: 'image' }
+                gallery,
+                {
+                    type: 'upload',
+                    resource_type: 'image'
+                }
             );
         }
     }
+
     /////////////////////////////////////////////////
 
-    async createUser(data){
-        const { name, lastname, cellphone, email, password } = data;
-        const session = await conn.startSession();
-        let output_data;
+    async setUser(data) {
+        const {name, lastname, cellphone, email, password} = data;
+        const session = await connection.startSession();
+        let output_user, output_auth;
 
         await session.withTransaction(async () => {
+
             await User.create([
                 {
                     name: name,
                     lastname: lastname,
                     cellphone: cellphone
                 }
-            ], { session })
+            ], {session})
                 .then((user) => {
-                    output_data = user;
+                    output_user = user[0];
                 });
 
             await Auth.create([
                 {
                     email: email,
                     password: password,
-                    user: output_data[0]["_id"],
-                    role: "USER"
+                    user: output_user["_id"],
+                    role: "USER",
+                    doc_model: "User"
                 }
-            ], { session });
+            ], {session})
+                .then((auth) => {
+                    output_auth = auth[0];
+                });
+
+            await User.updateOne(
+                {
+                    _id: output_user["_id"]
+                },
+                {
+                    $set: {
+                        auth: output_auth["_id"]
+                    }
+                },
+                {session}
+            );
         });
         await session.endSession();
+
+        return output_user;
     };
 
     /**
@@ -70,7 +95,7 @@ class UserServices {
      * @returns {Promise<Array>} A Promise that will resolve to the list of users.
      */
 
-    async getUsers(){
+    async getUsers() {
         return User.find({});
     };
 
@@ -83,7 +108,7 @@ class UserServices {
      */
 
     async getUser(id) {
-        return User.findById(id, {_id: 0});
+        return User.findById(id);
     };
 
     /**
@@ -95,21 +120,25 @@ class UserServices {
      */
 
     async deleteUser(id) {
-        const session = await conn.startSession();
+        const session = await connection.startSession();
         const array_urls_posts = await this.posts.getUrlsImages(id);
 
         await session.withTransaction(async () => {
+
             await Promise.all([
-                Auth.deleteOne({ user: id }, {session}),
-                User.deleteOne({ _id: id }, {session}),
-                Post.deleteMany({ user: id }, {session}),
+                Auth.findOneAndDelete({user: id}, {session}),
+                User.findByIdAndDelete({_id: id}, {session}),
+                Post.deleteMany({user: id}, {session}),
+                Request.deleteMany({user: id}, {session})
             ]);
 
         })
             .then(async () => {
+
                 if (array_urls_posts.length) {
                     await this.deleteImages(array_urls_posts[0]["allIds"]);
                 }
+
             })
             .catch((err) => {
                 throw Error(err.message);
@@ -127,7 +156,16 @@ class UserServices {
      */
 
     async updateUser(id, data) {
-        await User.findByIdAndUpdate(id, { $set: data }, { runValidators: true });
+        return User.findByIdAndUpdate(id,
+            {
+                $set: data
+            },
+            {
+                runValidators: true,
+                new: true,
+                select: "-posts -auth -social_media -bulletins"
+            }
+        );
     };
 
     /**
@@ -139,18 +177,18 @@ class UserServices {
      * @returns {Promise<void>} A Promise that will be resolved once the network update is complete.
      */
 
-    async addSocialMedia(id, data){
+    async addSocialMedia(id, data) {
         const toArray = [];
 
         for (const key in data) {
             toArray.push({[key]: data[key]})
         }
-        await User.updateOne({ _id: id }, { $push: { social_media: {$each: toArray}}});
+        await User.findByIdAndUpdate(id, {$push: {social_media: {$each: toArray}}});
     };
 
     async deleteSocialMedia(id, key, value) {
         if (key && value) {
-            await User.updateOne({ _id: id }, { $pull: {social_media: {[key]: value}} })
+            await User.findByIdAndUpdate(id, {$pull: {social_media: {[key]: value}}})
         }
     }
 
@@ -158,10 +196,33 @@ class UserServices {
         const key = Object.keys(data)[0];
 
         await User.updateOne(
-            { _id: id, [`social_media.${key}`]: {$exists: true}},
-            { $set: {[`social_media.$.${key}`]: data[key]} },
+            {
+                _id: id,
+                [`social_media.${key}`]: {
+                    $exists: true
+                }
+            },
+            {
+                $set: {
+                    [`social_media.$.${key}`]: data[key]
+                }
+            },
         )
+    }
+
+    async makeRescuer(id) {
+        const email = await Auth.findOne({user: id});
+
+        const output_request = await Request.create([
+            {
+                role: "USER",
+                email: email["email"],
+                user: id
+            }
+        ]);
+
+        return output_request[0];
     }
 }
 
-module.exports = UserServices;
+module.exports = {UserServices};

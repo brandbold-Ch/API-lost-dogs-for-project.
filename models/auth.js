@@ -41,18 +41,34 @@ const authSchema = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        refPath: "doc_model",
         required: true
     },
-    role: {
+    role: [{
         type: String,
         required: true,
         enum: [
             "USER",
-            "COLLABORATOR",
+            "RESCUER",
             "ADMINISTRATOR"
+        ],
+        validate: {
+            validator: function (role) {
+                if (this.role.length <= 2) {
+                    return role
+                }
+            }
+        }
+    }],
+    doc_model: {
+        type: String,
+        required: true,
+        enum: [
+            "User",
+            "Admin",
+            "Rescuer"
         ]
-    },
+    }
 }, {
     versionKey: false
 });
@@ -79,5 +95,8 @@ authSchema.pre("save", async function (next) {
  * Mongoose model for user credentials.
  * @type {mongoose.Model<AuthSchema>}
  */
-authSchema.index({ user: 1 }, { unique: true });
-module.exports = mongoose.model("Auth", authSchema);
+
+authSchema.index({user: 1}, {unique: true});
+
+const Auth = mongoose.model("Auth", authSchema);
+module.exports = {Auth};

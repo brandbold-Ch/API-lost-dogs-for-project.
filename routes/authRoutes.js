@@ -1,12 +1,11 @@
-const { checkUserExists } = require('../middlewares/entityManager');
+const {checkUserExists} = require('../middlewares/entityManager');
 const authControllers = require('../controllers/authControllers');
-const isAuthenticate = require('../middlewares/authenticate');
+const isAuthenticate = require('../middlewares/authenticator');
 const express = require('express');
-const authRoute = express.Router();
+const authRouter = express.Router();
 
-authRoute.get('/credentials', isAuthenticate, checkUserExists, authControllers.getCredentials);
-authRoute.post('/login', express.urlencoded({ extended: true }), authControllers.login);
-authRoute.put('/credentials', isAuthenticate, checkUserExists, express.urlencoded({ extended: true }), authControllers.updateCredentials);
-authRoute.post('/status/token', authControllers.statusToken);
 
-module.exports = authRoute;
+authRouter.post('/login', express.urlencoded({extended: true}), authControllers.login);
+authRouter.post('/status/token', authControllers.statusToken);
+
+module.exports = {authRouter};

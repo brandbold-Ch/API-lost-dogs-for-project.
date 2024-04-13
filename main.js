@@ -4,19 +4,21 @@
  * @file In this module are the API endpoints.
  */
 
-const { conn } = require('./configurations/connections');
-const { useTreblle } = require('treblle');
-const userRouter = require('./routes/userRoutes');
-const authRouter = require('./routes/authRoutes');
-const petsRouter = require('./routes/postRoutes');
-const guestsRouter = require('./routes/guestRoutes');
-const adminRouter = require('./routes/adminRoutes');
-const collabRouter = require('./routes/collabRoutes');
-const bulletinRouter = require("./routes/bulletinRoutes");
-const morgan = require('morgan');
-const cors = require('cors');
-require('dotenv').config();
-const { app, express } = require('./singlenton/instances');
+const { connection } = require("./configurations/connections");
+const { useTreblle } = require("treblle");
+const { userRouter } = require("./routes/userRoutes");
+const { authRouter } = require("./routes/authRoutes");
+const { postRouter } = require("./routes/postRoutes");
+const { guestRouter } = require("./routes/guestRoutes");
+const { adminRouter } = require("./routes/adminRoutes");
+const { rescuerRouter } = require("./routes/rescuerRoutes");
+const { bulletinRouter } = require("./routes/bulletinRoutes");
+const morgan = require("morgan");
+const cors = require("cors");
+require("dotenv").config();
+const  express = require("express");
+const app = express();
+
 
 app.use(express.json());
 
@@ -34,13 +36,13 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
-    res.status(200).json({message: "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜"});
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜" });
 });
 
 app.use((req, res, next) => {
     const isConnected = () => {
-        if (conn.readyState !== 1) {
+        if (connection.readyState !== 1) {
             setTimeout(isConnected, 1);
         } else {
             next();
@@ -49,16 +51,16 @@ app.use((req, res, next) => {
     isConnected();
 });
 
-app.use('/api/v2/users', userRouter);
-app.use('/api/v2/auth', authRouter);
-app.use('/api/v2/posts', petsRouter);
-app.use('/api/v2/guests', guestsRouter);
-app.use('/api/v2/admins', adminRouter);
-app.use('/api/v2/collabs', collabRouter);
-app.use('/api/v2/bulletins', bulletinRouter);
+app.use("/api/v2/users", userRouter);
+app.use("/api/v2/auth", authRouter);
+app.use("/api/v2/posts", postRouter);
+app.use("/api/v2/guests", guestRouter);
+app.use("/api/v2/admins", adminRouter);
+app.use("/api/v2/rescuers", rescuerRouter);
+app.use("/api/v2/bulletins", bulletinRouter);
 
 app.use((req, res) => {
-    res.status(404).json({'message': 'This route not available 🚫'});
+    res.status(404).json({ message: "This route not available 🚫" });
 });
 
 app.listen(parseInt(process.env.PORT, 10), () => {

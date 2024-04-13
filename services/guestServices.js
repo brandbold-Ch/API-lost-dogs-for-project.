@@ -5,8 +5,8 @@
  * functionality to unauthenticated users
  */
 
-const Post = require('../models/post');
-const Bulletin = require('../models/bulletin');
+const {Post} = require('../models/post');
+const {Bulletin} = require('../models/bulletin');
 
 /**
  * Class that provides services related to the application.
@@ -15,10 +15,11 @@ const Bulletin = require('../models/bulletin');
 
 class GuestServices {
 
-    constructor() {};
+    constructor() {
+    }
 
-    async getUserAndPet(pet_id){
-        return Post.findById(pet_id, { _id: 0 }).populate('user');
+    async getUserAndPet(pet_id) {
+        return Post.findById(pet_id, {_id: 0}).populate("user");
     };
 
     /**
@@ -28,8 +29,8 @@ class GuestServices {
      * @returns {Promise<Array||Object>} A Promise that resolves to an array containing information about lost dogs.
      */
 
-    async getAllLostPets(){
-        return Post.find({}).sort({ "publication.lost_date": -1 });
+    async getAllLostPets() {
+        return Post.find({}).sort({"publication.lost_date": -1});
     };
 
     async getFilterPostGender(gender) {
@@ -72,7 +73,7 @@ class GuestServices {
 
         return array.filter(key => {
             const date = key.publication.lost_date
-            return date.toISOString() === lost_date.substring(0, 23)+"Z";
+            return date.toISOString() === lost_date.substring(0, 23) + "Z";
         });
     }
 
@@ -84,8 +85,9 @@ class GuestServices {
             return date.getFullYear() === parseInt(year);
         });
     }
+
     async getBulletins() {
-        return Bulletin.find({}, { user:0 }).sort({ "identify.timestamp": -1 });
+        return Bulletin.find({}, {user: 0}).sort({"identify.timestamp": -1});
     }
 
     async getBulletin(id) {
@@ -93,4 +95,4 @@ class GuestServices {
     }
 }
 
-module.exports = GuestServices;
+module.exports = {GuestServices};
