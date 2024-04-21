@@ -2,23 +2,23 @@ const rescuerControllers = require("../controllers/rescuerControllers");
 const bulletinControllers = require("../controllers/bulletinControllers");
 const postControllers = require("../controllers/postControllers");
 const processFormData = require("../middlewares/formData");
-const isAuthenticate = require("../middlewares/authenticator");
+const {Authenticate} = require("../middlewares/authenticator");
 const express = require("express");
 const rescuerRouter = express.Router();
 const {
-    checkUserExists,
+    checkEntityExists,
     isActive,
     checkBulletinExists,
     checkQueryParameters,
     checkPostExists
-} = require("../middlewares/entityManager");
+} = require("../middlewares/generalMiddlewares");
 
 
 rescuerRouter.post("/", express.urlencoded({extended: true}), rescuerControllers.setRescuer);
 
 rescuerRouter.use([
-    isAuthenticate,
-    checkUserExists,
+    Authenticate,
+    checkEntityExists,
     isActive
 ]);
 

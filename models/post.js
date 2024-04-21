@@ -27,7 +27,7 @@ const Schema = mongoose.Schema;
  */
 
 const postSchema = new Schema({
-    
+
     name: {
         type: String,
         required: false,
@@ -36,8 +36,7 @@ const postSchema = new Schema({
     details: {
         specie: {
             type: String,
-            required: false,
-            default: null
+            required: true
         },
         gender: {
             type: String,
@@ -55,8 +54,7 @@ const postSchema = new Schema({
         },
         description: {
             type: String,
-            required: false,
-            default: null
+            required: true
         },
         size: {
             type: String,
@@ -87,8 +85,7 @@ const postSchema = new Schema({
         },
         lost_date: {
             type: Date,
-            required: false,
-            default: null
+            required: true
         },
         coordinates: {
             type: Object,
@@ -153,7 +150,7 @@ const postSchema = new Schema({
     versionKey: false
 });
 
-postSchema.index({ user: 1 });
+postSchema.index({user: 1});
 
 const Post = mongoose.model("Post", postSchema);
-module.exports = { Post };
+module.exports = {Post};

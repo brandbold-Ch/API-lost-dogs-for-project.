@@ -2,24 +2,28 @@ const userControllers = require('../controllers/userControllers');
 const authControllers = require('../controllers/authControllers');
 const postControllers = require("../controllers/postControllers");
 const bulletinControllers = require("../controllers/bulletinControllers");
-const isAuthenticate = require('../middlewares/authenticator');
+const {Authenticate} = require('../middlewares/authenticator');
+const {validateSetUserData} = require("../middlewares/handlerInputData/handlerUserData");
+const {validateUpdateAuthData} = require("../middlewares/handlerInputData/handlerAuthData");
+const {validateSetPostData} = require("../middlewares/handlerInputData/handlerPostData");
+
 const express = require('express');
 const processFormData = require("../middlewares/formData");
 const userRouter = express.Router();
 const {
-    checkUserExists,
     isActive,
     checkPostExists,
     checkQueryParameters,
-    checkBulletinExists
-} = require('../middlewares/entityManager');
+    checkBulletinExists,
+    checkEntityExists,
+    checkAccountExists
+} = require('../middlewares/generalMiddlewares');
 
-
-userRouter.post("/", express.urlencoded({extended: true}), userControllers.setUser);
+userRouter.post("/", express.urlencoded({extended: true}), validateSetUserData, checkAccountExists, userControllers.setUser);
 
 userRouter.use([
-    isAuthenticate,
-    checkUserExists,
+    Authenticate,
+    checkEntityExists,
     isActive
 ]);
 
@@ -28,15 +32,13 @@ userRouter.delete("/", userControllers.deleteUser);
 userRouter.put("/", express.urlencoded({extended: true}), userControllers.updateUser);
 
 userRouter.get("/auth", authControllers.getAuth);
-userRouter.put("/auth", express.urlencoded({extended: true}), authControllers.updateAuth);
+userRouter.put("/auth", express.urlencoded({extended: true}), validateUpdateAuthData, authControllers.updateAuth);
 
-userRouter.post('/socials', express.urlencoded({extended: true}), userControllers.addSocialMedia);
-userRouter.delete('/socials', userControllers.deleteSocialMedia);
-userRouter.put('/socials', express.urlencoded({extended: true}), userControllers.updateSocialMedia);
+userRouter.delete('/networks', userControllers.deleteSocialMedia);
 
 userRouter.post("/rescuer", userControllers.makeRescuer);
 
-userRouter.post("/posts", processFormData, postControllers.setPost);
+userRouter.post("/posts", processFormData, validateSetPostData, postControllers.setPost);
 userRouter.get("/posts/:pet_id", checkPostExists, postControllers.getPost);
 userRouter.put("/posts/:pet_id", checkPostExists, processFormData, postControllers.updatePost);
 userRouter.delete("/posts/:pet_id", checkPostExists, postControllers.deletePost);

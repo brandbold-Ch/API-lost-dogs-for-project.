@@ -5,6 +5,7 @@
  */
 
 const {post, auth, admin, rescuer} = require('../utils/instances');
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -14,7 +15,58 @@ const {post, auth, admin, rescuer} = require('../utils/instances');
  * @returns {void}
  */
 
-const checkRescuerExists = async (req, res, next) => {
+
+const checkEntityExists = async (req, res, next) => {
+    try {
+        const entity = await auth.getAuthByUser(req.id || req.query.user);
+
+        if (entity) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found account 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+const checkAccountExists = async (req, res, next) => {
+    try {
+        const account = await auth.getAuthByEmail(req.body["email"]);
+
+        if (!account) {
+            next();
+
+        } else {
+            res.status(400).json(
+                HandlerHttpVerbs.badRequest(
+                    "Account already exists 🤪",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+const checkBulletinExists = async (req, res, next) => {
     try {
         const entity = await rescuer.getRescuer(req.id, req.params.bulletin_id);
 
@@ -24,44 +76,37 @@ const checkRescuerExists = async (req, res, next) => {
             res.status(404).json({message: 'Not found rescuer 🚫'});
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
-const checkUserExists = async (req, res, next) => {
-    try {
-        const entity = await auth.getUser(req.query.user || req.id);
-
-        if (entity) {
-            next();
-        } else {
-            res.status(404).json({message: 'Not found user 🚫'});
-        }
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
 const checkPostExists = async (req, res, next) => {
     try {
-        let entity;
-
-        if (req.baseUrl === '/api/v2/posts' && req.path !== '/comment') {
-            entity = await post.getPost(req.query.user || req.id, req.params.pet_id || req.query.pet);
-        } else {
-            entity = await post.getGeneralPost(req.params.pet_id || req.query.pet);
-        }
+        const entity = await post.getPost(req.id, req.params.pet_id);
 
         if (entity) {
             next();
+
         } else {
-            res.status(404).json({message: 'Not found post 🚫'});
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found post 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -105,24 +150,32 @@ const checkTrust = async (req, res, next) => {
     }
 };
 
-const isActive = async (req, res, next) => {
+const recuerIsActive = async (req, res, next) => {
     try {
+        const url = req.path.split("/");
 
-        if (req.role === "RESCUER") {
-            const request = await admin.getRequestForMiddlewareIsActive(req.req_id);
+        if (req.role.includes("RESCUER")) {
+            const request = await admin.getRequestByUser(req.id);
 
             if (request['status'] === 'pending') {
                 res.status(403).json({
                     message: 'You are in a waiting process, ' +
                         'the administrator must activate your account ⏳'
                 });
+
             } else if (request['status'] === 'rejected') {
                 res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
+
             } else if (request['status'] === 'active') {
                 next();
+
             } else {
                 res.status(403).json({message: 'Your account is deactivated 📴'});
             }
+
+        } else if ((req.role.length === 1) && (url.includes("bulletins") && (req.role[0] === "USER"))) {
+            res.status(401).json({message: "You don´t have access to this route 🚫"});
+
         } else {
             next();
         }
@@ -134,7 +187,7 @@ const isActive = async (req, res, next) => {
 
 const checkRequestExists = async (req, res, next) => {
     try {
-        const request = await admin.getRequestForMiddlewareCheck(req.params.req_id);
+        const request = await admin.getRequestById(req.params.req_id);
 
         if (request) {
             next();
@@ -187,13 +240,14 @@ const checkQueryStatus = async (req, res, next) => {
 }
 
 module.exports = {
-    checkUserExists,
     checkPostExists,
     checkQueryParameters,
     checkTrust,
-    isActive,
+    isActive: recuerIsActive,
     checkRequestExists,
     checkQueryStatus,
     checkQueryAction,
-    checkBulletinExists: checkRescuerExists
+    checkBulletinExists,
+    checkEntityExists,
+    checkAccountExists
 };

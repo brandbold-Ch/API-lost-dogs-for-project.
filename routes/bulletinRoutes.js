@@ -1,4 +1,4 @@
-const {checkBulletinExists} = require("../middlewares/entityManager");
+const {checkBulletinExists} = require("../middlewares/generalMiddlewares");
 const bulletinControllers = require("../controllers/bulletinControllers");
 const express = require("express");
 const bulletinRouter = express.Router();

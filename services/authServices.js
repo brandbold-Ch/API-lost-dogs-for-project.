@@ -24,17 +24,8 @@ class AuthServices {
      * @returns {Promise<Array>} A Promise that will resolve to the user's credentials.
      */
 
-    async getAuth(id) {
-        return Auth.findOne(
-            {
-                user: id
-            },
-            {
-                doc_model: 0,
-                user: 0,
-                _id: 0
-            }
-        );
+    async getAuthByUser(id) {
+        return Auth.findOne({user: id});
     };
 
     /**
@@ -45,7 +36,7 @@ class AuthServices {
      * @returns {Promise<Array>} A Promise that will resolve to the user's credentials.
      */
 
-    async entityExists(email) {
+    async getAuthByEmail(email) {
         return Auth.findOne({email: email});
     };
 
@@ -68,10 +59,10 @@ class AuthServices {
         let {email, new_password, old_password} = data;
         const user = await Auth.findOne({user: id});
 
-        if (bcrypt.compareSync(old_password, user.password)) {
+        if (bcrypt.compareSync(old_password, user["password"])) {
             new_password = await bcrypt.hash(new_password, 10);
         } else {
-            throw Error('Incorrect password 🤬');
+            throw Error('Incorrect');
         }
 
         return Auth.findOneAndUpdate(

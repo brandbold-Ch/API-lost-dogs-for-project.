@@ -10,7 +10,8 @@ const {Post} = require("../models/post");
 const {Auth} = require("../models/auth");
 const {Request} = require("../models/rescuer");
 const {PostServices} = require("../services/postServices");
-const {cloudinary, connection} = require("../configurations/connections");
+const {connection} = require("../configurations/connections");
+const {ImageTools} = require("../utils/imageTools");
 
 
 /**
@@ -22,23 +23,8 @@ class UserServices {
 
     constructor() {
         this.posts = new PostServices();
+        this.imageTools = new ImageTools();
     }
-
-    /////////////////////////////////////////////////
-
-    async deleteImages(gallery) {
-        if (gallery.length) {
-            await cloudinary.api.delete_resources(
-                gallery,
-                {
-                    type: 'upload',
-                    resource_type: 'image'
-                }
-            );
-        }
-    }
-
-    /////////////////////////////////////////////////
 
     async setUser(data) {
         const {name, lastname, cellphone, email, password} = data;
@@ -51,7 +37,8 @@ class UserServices {
                 {
                     name: name,
                     lastname: lastname,
-                    cellphone: cellphone
+                    cellphone: cellphone,
+                    social_networks: data["social_networks"]
                 }
             ], {session})
                 .then((user) => {
@@ -71,20 +58,23 @@ class UserServices {
                     output_auth = auth[0];
                 });
 
-            await User.updateOne(
-                {
-                    _id: output_user["_id"]
-                },
+            await User.findByIdAndUpdate(
+                output_user["_id"],
                 {
                     $set: {
                         auth: output_auth["_id"]
                     }
                 },
-                {session}
-            );
+                {
+                    new: true
+                }
+            ).session(session)
+                .then((newUser) => {
+                    output_user = newUser;
+                });
         });
-        await session.endSession();
 
+        await session.endSession();
         return output_user;
     };
 
@@ -108,7 +98,26 @@ class UserServices {
      */
 
     async getUser(id) {
-        return User.findById(id);
+        return User.findById(id)
+            .populate("auth",
+                {email: 1, password: 1, _id: 0}
+            )
+            .populate({
+                path: "posts",
+                options: {
+                    sort: {
+                        "publication.published": -1
+                    }
+                }
+            })
+            .populate({
+                path: "bulletins",
+                options: {
+                    sort: {
+                        "identify.timestamp": -1
+                    }
+                }
+            });
     };
 
     /**
@@ -134,15 +143,11 @@ class UserServices {
 
         })
             .then(async () => {
-
                 if (array_urls_posts.length) {
-                    await this.deleteImages(array_urls_posts[0]["allIds"]);
+                    await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
                 }
+            })
 
-            })
-            .catch((err) => {
-                throw Error(err.message);
-            })
         await session.endSession();
     };
 
@@ -156,58 +161,41 @@ class UserServices {
      */
 
     async updateUser(id, data) {
-        return User.findByIdAndUpdate(id,
-            {
-                $set: data
+        const {name, lastname, cellphone, social_networks} = data;
+        const socials = [];
+
+        for (const key in social_networks) {
+            socials.push({[key]: social_networks[key]})
+        }
+
+        return User.findByIdAndUpdate(id, {
+                $set: {
+                    name: name,
+                    lastname: lastname,
+                    cellphone: cellphone,
+                    social_networks: socials
+                }
             },
             {
-                runValidators: true,
                 new: true,
-                select: "-posts -auth -social_media -bulletins"
+                upsert: true
             }
         );
-    };
-
-    /**
-     * Updates a user's network information by their ID and network platform.
-     * @async
-     * @function
-     * @param {string} id - User ID.
-     * @param {Array} data - Platform of the network to update.
-     * @returns {Promise<void>} A Promise that will be resolved once the network update is complete.
-     */
-
-    async addSocialMedia(id, data) {
-        const toArray = [];
-
-        for (const key in data) {
-            toArray.push({[key]: data[key]})
-        }
-        await User.findByIdAndUpdate(id, {$push: {social_media: {$each: toArray}}});
-    };
+    }
 
     async deleteSocialMedia(id, key, value) {
         if (key && value) {
-            await User.findByIdAndUpdate(id, {$pull: {social_media: {[key]: value}}})
+            await User.updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $pull: {
+                        social_networks: {[key]: value}
+                    }
+                }
+            );
         }
-    }
-
-    async updateSocialMedia(id, data) {
-        const key = Object.keys(data)[0];
-
-        await User.updateOne(
-            {
-                _id: id,
-                [`social_media.${key}`]: {
-                    $exists: true
-                }
-            },
-            {
-                $set: {
-                    [`social_media.$.${key}`]: data[key]
-                }
-            },
-        )
     }
 
     async makeRescuer(id) {

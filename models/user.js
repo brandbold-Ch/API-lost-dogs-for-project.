@@ -40,9 +40,9 @@ const userSchema = new Schema({
         default: null,
         maxLength: 10,
     },
-    social_media: {
+    social_networks: {
         type: Array,
-        required: false,
+        required: true,
         default: []
     },
     auth: {
@@ -61,6 +61,22 @@ const userSchema = new Schema({
     }]
 }, {
     versionKey: false
+});
+
+
+userSchema.pre("save", function (next) {
+    try {
+        const socials = this.social_networks[0];
+        this.social_networks = [];
+
+        for (const key in socials) {
+            this.social_networks.push({[key]: socials[key]});
+        }
+        next();
+
+    } catch (err) {
+        next(err);
+    }
 });
 
 /**

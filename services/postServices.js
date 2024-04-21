@@ -59,10 +59,6 @@ class PostServices {
         return Post.find({user: id}).sort({"publication.lost_date": -1});
     }
 
-    async getGeneralPost(pet_id) {
-        return Post.findById(pet_id);
-    }
-
     async getPost(id, pet_id) {
         return Post.findOne({_id: pet_id, user: id});
     };

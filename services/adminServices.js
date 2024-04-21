@@ -77,11 +77,11 @@ class AdminServices {
         await session.endSession();
     }
 
-    async getRequestForMiddlewareCheck(id) {
-        return Request.findOne({_id: id});
+    async getRequestById(id) {
+        return Request.findById({_id: id});
     }
 
-    async getRequestForMiddlewareIsActive(id) {
+    async getRequestByUser(id) {
         return Request.findOne({user: id});
     }
 

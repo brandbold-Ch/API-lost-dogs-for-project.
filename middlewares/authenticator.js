@@ -4,24 +4,102 @@
  * @file This module is for user authentication.
  */
 
+// Authenticator.js
 const jwt = require("jsonwebtoken");
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const {TokenExpiredError} = require("jsonwebtoken");
 require("dotenv").config();
 
 
-const templateErrorResponse = (status_code, message, base_url, role, status, method) => {
-    return {
-        status: status,
-        error: {
-            status_code: status_code,
-            message: message,
-            details: {
-                base_url: base_url,
-                allowed_role: role,
-                method: method
-            }
-        }
+const roles = [
+    "USER",
+    "RESCUER",
+    "ADMINISTRATOR"
+];
+
+const routes = {
+    USER: [
+        '/api/v2/users',
+        '/api/v2/auth'
+    ],
+    RESCUER: [
+        '/api/v2/rescuers',
+        '/api/v2/auth',
+    ],
+    ADMINISTRATOR: [
+        '/api/v2/admins',
+        '/api/v2/auth'
+    ]
+};
+
+const rolePermissions = (url) => {
+    switch (url) {
+        case "/api/v2/users":
+            return "USER";
+
+        case "/api/v2/rescuers":
+            return "RESCUER";
+
+        case "/api/v2/admins":
+            return "ADMINISTRATOR";
     }
 }
+
+const routesPermissions = (userData, url) => {
+    return new Promise((resolve, reject) => {
+        const key = userData["role"];
+
+        if (routes[key[0]].includes(url)) {
+            resolve(userData);
+
+        } else {
+            reject([401, "You don´t have access to this route 🚫"]);
+        }
+    });
+}
+
+const verifyRole = (tokenDecrypted) => {
+    return new Promise((resolve, reject) => {
+        const role = tokenDecrypted?.role;
+
+        if (role?.length) {
+
+            role.forEach(rol => {
+                if (!roles.includes(rol)) {
+                    reject([400, "Some of your roles do not exist in the system 😒"]);
+                }
+            });
+            resolve(tokenDecrypted);
+
+        } else {
+            reject([400, "You are not sending me your roles 😒"]);
+        }
+    });
+}
+
+const verifyToken = (token) => {
+    return new Promise((resolve, reject) => {
+        if (token) {
+            try {
+                resolve(jwt.verify(token.substring(7), process.env.SECRET_KEY));
+
+            } catch (err) {
+
+                if (err instanceof TokenExpiredError) {
+                    reject([401, "Expired token 💨"]);
+
+                } else {
+                    reject(err);
+                }
+
+            }
+
+        } else {
+            reject([400, "You didn't send the token 🙄"]);
+        }
+    });
+}
+
 
 /**
  * Middleware to check the authentication using JSON Web Tokens (JWT).
@@ -31,109 +109,42 @@ const templateErrorResponse = (status_code, message, base_url, role, status, met
  * @returns {void}
  */
 
-const isAuthenticate = async (req, res, next) => {
-    try {
-        // Extract the token from the Authorization header
-        const token = req.headers.authorization;
-        let allowed_role;
+const Authenticate = (req, res, next) => {
 
-        const routes = {
-            USER: [
-                '/api/v2/users',
-                '/api/v2/users/bulletins',
-                '/api/v2/auth'
-            ],
-            RESCUER: [
-                '/api/v2/rescuers',
-                '/api/v2/auth',
-            ],
-            ADMINISTRATOR: [
-                '/api/v2/admins',
-                '/api/v2/auth'
-            ]
-        };
+    verifyToken(req.headers.authorization)
+        .then(tokenDecrypted => verifyRole(tokenDecrypted))
+        .then(role => routesPermissions(role, req.baseUrl))
+        .then(data => {
 
-        switch (req.baseUrl) {
-            case "/api/v2/users":
-                allowed_role = "USER";
-                break;
+            req.id = data["user"];
+            req.role = data["role"];
+            next();
 
-            case "/api/v2/rescuers":
-                allowed_role = "RESCUER";
-                break;
+        })
+        .catch(err => {
 
-            case "/api/v2/admins":
-                allowed_role = "ADMINISTRATOR";
-                break;
-        }
+            if (err instanceof Array) {
 
-        if (token) {
-
-            // Verify the token and attach user information to the request object
-            const key = jwt.verify(token.substring(7), process.env.SECRET_KEY);
-
-            if (key.role) {
-                const permissions = key.role.map(role => {
-                    return routes[role].includes(req.baseUrl);
-                });
-
-                if (permissions.some(role => role === true)) {
-                    req.id = key.user;
-                    req.role = key.role;
-                    next();
-
-                } else {
-                    res.status(401).json(
-                        templateErrorResponse(
-                            401,
-                            "You don´t have access to this route 🚫",
-                            req.baseUrl,
-                            allowed_role,
-                            "No permissions",
-                            req.method
-                        )
-                    );
-                }
+                res.status(err[0]).json(
+                    HandlerHttpVerbs.automaticClientErrorSelection(
+                        err[1],
+                        {
+                            url: req.baseUrl,
+                            verb: req.method,
+                            role: rolePermissions(req.baseUrl)
+                        },
+                        err[0]
+                    )
+                );
 
             } else {
-                res.status(401).json(
-                    templateErrorResponse(
-                        401,
-                        "Your role does not exist in the system 😒",
-                        req.baseUrl,
-                        undefined,
-                        "Does not exist",
-                        req.method
+                res.status(500).json(
+                    HandlerHttpVerbs.internalServerError(
+                        err.message, {url: req.baseUrl, verb: req.method}
                     )
                 );
             }
+        })
+}
 
-        } else {
-            res.status(400).json(
-                templateErrorResponse(
-                    400,
-                    "You didn't send the token 🙄",
-                    req.baseUrl,
-                    undefined,
-                    "No access",
-                    req.method
-                )
-            );
-        }
-
-    } catch (error) {
-
-        res.status(500).json(
-            templateErrorResponse(
-                500,
-                error.message,
-                req.baseUrl,
-                undefined,
-                "Authentication failed",
-                req.method
-            )
-        );
-    }
-};
-
-module.exports = isAuthenticate;
+module.exports = {Authenticate};

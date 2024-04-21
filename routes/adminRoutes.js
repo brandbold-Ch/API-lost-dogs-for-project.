@@ -1,18 +1,22 @@
-const {checkTrust} = require("../middlewares/entityManager");
-const {checkUserExists, checkRequestExists} = require("../middlewares/entityManager");
-const {checkQueryStatus, checkQueryAction} = require("../middlewares/entityManager");
-const isAuthenticate = require("../middlewares/authenticator");
+const {Authenticate} = require("../middlewares/authenticator");
 const adminControllers = require("../controllers/adminControllers");
 const authControllers = require("../controllers/authControllers");
 const express = require("express");
 const adminRouter = express.Router();
+const {
+    checkTrust,
+    checkEntityExists,
+    checkRequestExists,
+    checkQueryStatus,
+    checkQueryAction,
+} = require("../middlewares/generalMiddlewares");
 
 
 adminRouter.post("/", express.urlencoded({extended: true}), checkTrust, adminControllers.setAdmin);
 
 adminRouter.use([
-    isAuthenticate,
-    checkUserExists
+    Authenticate,
+    checkEntityExists
 ]);
 
 adminRouter.get("/", adminControllers.getAdmin);

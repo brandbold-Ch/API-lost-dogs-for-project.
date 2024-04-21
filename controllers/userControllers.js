@@ -5,20 +5,29 @@
  */
 
 const {user} = require("../utils/instances");
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
 exports.setUser = async (req, res) => {
     try {
         const response_body = await user.setUser(req.body);
 
-        res.status(201).json({
-            message: "Added user ✅",
-            status_code: 201,
-            data: response_body
-        });
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Added user ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -26,8 +35,12 @@ exports.getUsers = async (req, res) => {
     try {
         res.status(200).json(await user.getUsers());
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -35,8 +48,12 @@ exports.getUser = async (req, res) => {
     try {
         res.status(200).json(await user.getUser(req.id));
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -45,8 +62,12 @@ exports.deleteUser = async (req, res) => {
         await user.deleteUser(req.id);
         res.status(204).end();
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -54,29 +75,22 @@ exports.updateUser = async (req, res) => {
     try {
         const response_body = await user.updateUser(req.id, req.body);
 
-        res.status(202).json({
-            message: 'Updated user ✅',
-            status_code: 202,
-            data: response_body
-        });
+        res.status(202).json(
+            HandlerHttpVerbs.accepted(
+                "Updated user ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-exports.addSocialMedia = async (req, res) => {
-    try {
-        await user.addSocialMedia(req.id, req.body);
-
-        res.status(202).json({
-            message: "Updated social media ✅",
-            status_code: 202,
-            data: req.body
-        });
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -85,23 +99,12 @@ exports.deleteSocialMedia = async (req, res) => {
         await user.deleteSocialMedia(req.id, req.query.key, req.query.value);
         res.status(204).end();
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
-
-exports.updateSocialMedia = async (req, res) => {
-    try {
-        await user.updateSocialMedia(req.id, req.body);
-
-        res.status(202).json({
-            message: "Updated social media ✅",
-            status_code: 202,
-            data: req.body
-        });
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -109,13 +112,21 @@ exports.makeRescuer = async (req, res) => {
     try {
         const response_body = await user.makeRescuer(req.id);
 
-        res.status(202).json({
-            message: "Request sent successfully ✅",
-            status_code: 202,
-            data: response_body
-        });
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Request sent successfully ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }

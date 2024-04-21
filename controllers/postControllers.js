@@ -5,6 +5,7 @@
  */
 
 const {post} = require("../utils/instances");
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
 exports.setPost = async (req, res) => {
@@ -18,19 +19,22 @@ exports.setPost = async (req, res) => {
             req.role
         );
 
-        res.status(201).json({
-            status: "Success",
-            message: "Added post ✅",
-            status_code: 201,
-            data: response_body
-        });
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Added post ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
