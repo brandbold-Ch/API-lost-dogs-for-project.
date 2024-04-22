@@ -1,5 +1,5 @@
-const {setUserSchema} = require("../../schemaValidator/userScheme");
-const {setAuthSchema} = require("../../schemaValidator/authScheme");
+const {setUserSchema} = require("../../models/schemaValidator/userScheme");
+const {setAuthSchema} = require("../../models/schemaValidator/authScheme");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 

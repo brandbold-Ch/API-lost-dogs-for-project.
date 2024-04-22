@@ -6,12 +6,13 @@ const {Authenticate} = require('../middlewares/authenticator');
 const {validateSetUserData} = require("../middlewares/handlerInputData/handlerUserData");
 const {validateUpdateAuthData} = require("../middlewares/handlerInputData/handlerAuthData");
 const {validateSetPostData} = require("../middlewares/handlerInputData/handlerPostData");
+const {validateQueryDeleteImage} = require("../middlewares/handlerInputData/handlerAnyData");
 
 const express = require('express');
 const processFormData = require("../middlewares/formData");
 const userRouter = express.Router();
 const {
-    isActive,
+    recuerIsActive,
     checkPostExists,
     checkQueryParameters,
     checkBulletinExists,
@@ -23,8 +24,7 @@ userRouter.post("/", express.urlencoded({extended: true}), validateSetUserData, 
 
 userRouter.use([
     Authenticate,
-    checkEntityExists,
-    isActive
+    checkEntityExists
 ]);
 
 userRouter.get("/", userControllers.getUser);
@@ -53,16 +53,15 @@ userRouter.get("/posts/filter/specie", checkQueryParameters, postControllers.get
 userRouter.get("/posts/filter/date", postControllers.getFilterPostLostDate);
 userRouter.get("/posts/filter/year", postControllers.getFilterPostYear);
 
-userRouter.post("/posts/gallery/:pet_id", checkPostExists, processFormData, postControllers.addGallery);
-userRouter.delete("/posts/gallery/:pet_id", checkPostExists, postControllers.delPartialGallery);
+userRouter.delete("/posts/gallery/:pet_id", checkPostExists, validateQueryDeleteImage, postControllers.deleteImage);
 userRouter.post("/posts/comment/:pet_id", checkPostExists, express.text(), postControllers.insertComment);
 
-userRouter.post("/bulletins", processFormData, bulletinControllers.setBulletin);
-userRouter.get("/bulletins", bulletinControllers.getBulletins);
-userRouter.get("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.getBulletin);
-userRouter.delete("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.deleteBulletin);
+userRouter.post("/bulletins", recuerIsActive, processFormData, bulletinControllers.setBulletin);
+userRouter.get("/bulletins", recuerIsActive, bulletinControllers.getBulletins);
+userRouter.get("/bulletins/:bulletin_id", recuerIsActive, checkBulletinExists, bulletinControllers.getBulletin);
+userRouter.delete("/bulletins/:bulletin_id", recuerIsActive, checkBulletinExists, bulletinControllers.deleteBulletin);
 
-userRouter.put("/bulletins/:bulletin_id", checkBulletinExists, processFormData, bulletinControllers.updateBulletin);
-userRouter.delete("/bulletins/gallery/:bulletin_id", checkBulletinExists, bulletinControllers.delPartialGallery);
+userRouter.put("/bulletins/:bulletin_id", recuerIsActive, checkBulletinExists, processFormData, bulletinControllers.updateBulletin);
+userRouter.delete("/bulletins/gallery/:bulletin_id", recuerIsActive, checkBulletinExists, bulletinControllers.delPartialGallery);
 
 module.exports = {userRouter};

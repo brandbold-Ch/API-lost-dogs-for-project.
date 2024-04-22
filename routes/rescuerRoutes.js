@@ -7,7 +7,7 @@ const express = require("express");
 const rescuerRouter = express.Router();
 const {
     checkEntityExists,
-    isActive,
+    recuerIsActive,
     checkBulletinExists,
     checkQueryParameters,
     checkPostExists
@@ -19,7 +19,7 @@ rescuerRouter.post("/", express.urlencoded({extended: true}), rescuerControllers
 rescuerRouter.use([
     Authenticate,
     checkEntityExists,
-    isActive
+    recuerIsActive
 ]);
 
 rescuerRouter.get("/", rescuerControllers.getRescuer);
@@ -41,8 +41,7 @@ rescuerRouter.get("/posts/filter/specie", checkQueryParameters, postControllers.
 rescuerRouter.get("/posts/filter/date", postControllers.getFilterPostLostDate);
 rescuerRouter.get("/posts/filter/year", postControllers.getFilterPostYear);
 
-rescuerRouter.post("/posts/gallery/:pet_id", checkPostExists, processFormData, postControllers.addGallery);
-rescuerRouter.delete("/posts/gallery/:pet_id", checkPostExists, postControllers.delPartialGallery);
+rescuerRouter.delete("/posts/gallery/:pet_id", checkPostExists, postControllers.deleteImage);
 rescuerRouter.post("/posts/comment", checkPostExists, express.text(), postControllers.insertComment);
 
 rescuerRouter.post("/bulletins", processFormData, bulletinControllers.setBulletin);

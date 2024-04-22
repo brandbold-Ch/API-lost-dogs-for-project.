@@ -127,61 +127,98 @@ const checkQueryParameters = async (req, res, next) => {
 
         if (link && choices[value].includes(link) || choices[value].length === 0) {
             next();
+
         } else {
-            res.status(400).json({message: `The parameters must be 👉 ${choices[value]} 👈`});
+            res.status(400).json(
+                HandlerHttpVerbs.badRequest(
+                    `The parameters must be 👉 ${choices[value]} 👈`,
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
 
-    } catch (error) {
-        res.status(404).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
 const checkTrust = async (req, res, next) => {
     try {
-
         if (req.body.token === process.env.TRUSTED_PERMISSIONS) {
             next();
+
         } else {
-            res.status(403).json({message: 'Can\'t create an administrator account 💩'});
+            res.status(403).json(
+                HandlerHttpVerbs.forbidden(
+                    "Can\'t create an administrator account 💩",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
 const recuerIsActive = async (req, res, next) => {
     try {
-        const url = req.path.split("/");
 
         if (req.role.includes("RESCUER")) {
             const request = await admin.getRequestByUser(req.id);
 
             if (request['status'] === 'pending') {
-                res.status(403).json({
-                    message: 'You are in a waiting process, ' +
-                        'the administrator must activate your account ⏳'
-                });
+                res.status(403).json(
+                    HandlerHttpVerbs.forbidden(
+                        "You are in a waiting process, " +
+                        "the administrator must activate your account ⏳",
+                        {url: req.baseUrl, verb: req.method, role: req.role}
+                    )
+                );
 
             } else if (request['status'] === 'rejected') {
-                res.status(401).json({message: 'Your request was rejected by the administrator 🚫'});
+                res.status(401).json(
+                    HandlerHttpVerbs.unauthorized(
+                        "Your request was rejected by the administrator 🚫",
+                        {url: req.baseUrl, verb: req.method, role: req.role}
+                    )
+                );
 
             } else if (request['status'] === 'active') {
                 next();
 
             } else {
-                res.status(403).json({message: 'Your account is deactivated 📴'});
+                res.status(403).json(
+                    HandlerHttpVerbs.forbidden(
+                        "Your account is deactivated 📴",
+                        {url: req.baseUrl, verb: req.method, role: req.role}
+                    )
+                );
             }
 
-        } else if ((req.role.length === 1) && (url.includes("bulletins") && (req.role[0] === "USER"))) {
-            res.status(401).json({message: "You don´t have access to this route 🚫"});
-
         } else {
-            next();
+            res.status(401).json(
+                HandlerHttpVerbs.unauthorized(
+                    "You don´t have access to this route 🚫",
+                    {url: req.baseUrl, verb: req.method, role: ["RESCUER"]}
+                )
+            );
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -191,12 +228,17 @@ const checkRequestExists = async (req, res, next) => {
 
         if (request) {
             next();
+
         } else {
             res.status(404).json({message: 'Not found request 🚫'});
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -210,12 +252,17 @@ const checkQueryAction = async (req, res, next) => {
 
         if (choices.includes(req.query.action)) {
             next();
+
         } else {
             res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -230,12 +277,17 @@ const checkQueryStatus = async (req, res, next) => {
 
         if (choices.includes(req.query.status)) {
             next();
+
         } else {
             res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -243,7 +295,7 @@ module.exports = {
     checkPostExists,
     checkQueryParameters,
     checkTrust,
-    isActive: recuerIsActive,
+    recuerIsActive,
     checkRequestExists,
     checkQueryStatus,
     checkQueryAction,

@@ -1,11 +1,11 @@
-const {updateAuthSchema} = require("../../schemaValidator/authScheme");
+const {updateAuthSchema} = require("../../models/schemaValidator/authScheme");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 
 
 const validateUpdateAuthData = async (req, res, next) => {
     try {
-        await updateAuthSchema.validateAsync({...req.body});
+        await updateAuthSchema.validateAsync(req.body);
         next();
 
     } catch (err) {

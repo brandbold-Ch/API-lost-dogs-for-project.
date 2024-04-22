@@ -37,21 +37,36 @@ class PostServices {
         }
     }
 
-    async addGallery(id, pet_id, images) {
+    async addGalleryToAPost(id, pet_id, images) {
         await Promise.all(images.map(async (key) => {
             let new_image = await this.imageTools.uploadImage(key["buffer"]);
 
-            await Post.updateOne(
-                {
-                    _id: pet_id,
-                    user: id
-                },
-                {
-                    $push: {
-                        "identify.gallery": new_image
+            if (key["fieldname"] === "image") {
+                await Post.updateOne(
+                    {
+                        _id: pet_id,
+                        user: id
+                    },
+                    {
+                        $set: {
+                            "identify.image": new_image
+                        }
                     }
-                }
-            );
+                );
+
+            } else {
+                await Post.updateOne(
+                    {
+                        _id: pet_id,
+                        user: id
+                    },
+                    {
+                        $push: {
+                            "identify.gallery": new_image
+                        }
+                    }
+                );
+            }
         }));
     };
 
@@ -113,30 +128,11 @@ class PostServices {
         })
             .then(async () => {
                 if (array_images.length) {
-                    const index_image = array_images.findIndex(obj => obj["fieldname"] === "image");
-
-                    if (index_image !== -1) {
-                        const image = await this.imageTools.uploadImage(
-                            array_images.splice(index_image, 1)[0]["buffer"]
-                        );
-
-                        await Post.updateOne(
-                            {
-                                _id: output_post["_id"]
-                            },
-                            {
-                                $set: {
-                                    "identify.image": image
-                                }
-                            }
-                        );
-                    }
-
-                    await this.addGallery(id, output_post["_id"], array_images);
+                    await this.addGalleryToAPost(id, output_post["_id"], array_images);
                 }
             });
-        await session.endSession();
 
+        await session.endSession();
         return output_post;
     };
 
@@ -192,33 +188,55 @@ class PostServices {
         });
     }
 
-    async deletePartialGallery(id, pet_id, img_id) {
+    async deletePartialGallery(id, pet_id, queries) {
         const session = await connection.startSession();
+        let output_update;
 
         await session.withTransaction(async () => {
 
-            await Post.updateOne(
-                {
-                    _id: pet_id,
-                    user: id
-                },
-                {
-                    $pull: {
-                        "identify.gallery": {
-                            id: img_id
+            if (queries["tag"] === "image") {
+                await Post.updateOne(
+                    {
+                        _id: pet_id,
+                        user: id
+                    },
+                    {
+                        $set: {
+                            "identify.image": null
                         }
-                    }
-                },
-                {session}
-            );
+                    },
+                    {session}
+                )
+                    .then((update) => {
+                        output_update = update;
+                    });
+
+            } else {
+                await Post.updateOne(
+                    {
+                        _id: pet_id,
+                        user: id
+                    },
+                    {
+                        $pull: {
+                            "identify.gallery": {
+                                id: queries["id"]
+                            }
+                        }
+                    },
+                    {session}
+                )
+                    .then((update) => {
+                        output_update = update;
+                    });
+            }
         })
             .then(async () => {
-                await this.imageTools.deleteImages(img_id);
+                if (output_update["modifiedCount"] !== 0) {
+                    await this.imageTools.deleteImages(queries["id"]);
+                }
+            })
 
-            })
-            .catch((err) => {
-                throw Error(err.message);
-            })
         await session.endSession();
     }
 
@@ -229,25 +247,9 @@ class PostServices {
 
         await session.withTransaction(async () => {
 
-            await Post.deleteOne(
-                {
-                    _id: pet_id,
-                    user: id
-                },
-                {session}
-            );
+            await Post.deleteOne({_id: pet_id, user: id}, {session});
+            await collection[1].updateOne({_id: id}, {$pull: {posts: pet_id}}, {session});
 
-            await collection[1].updateOne(
-                {
-                    _id: id
-                },
-                {
-                    $pull: {
-                        posts: pet_id
-                    }
-                },
-                {session}
-            );
         })
             .then(async () => {
                 await Promise.all([
@@ -255,9 +257,8 @@ class PostServices {
                     this.imageTools.deleteGallery(array_urls["identify"]["gallery"])
                 ]);
 
-            }).catch((err) => {
-                throw Error(err.message);
             })
+
         await session.endSession();
     };
 
@@ -316,30 +317,14 @@ class PostServices {
                     output_post = post;
                 })
 
-        }).then(async () => {
-
-            if (array_images !== undefined) {
-                await this.imageTools.deleteImages(context_post["identify"]["image"]);
-                const new_image = await this.imageTools.uploadImage(array_images["buffer"]);
-
-                await Post.updateOne(
-                    {
-                        _id: pet_id,
-                        user: id
-                    },
-                    {
-                        $set: {
-                            "identify.image": new_image
-                        }
-                    }
-                );
-            }
-
-        }).catch((err) => {
-            throw Error(err.message);
         })
-        await session.endSession();
+            .then(async () => {
+                if (array_images.length) {
+                    await this.addGalleryToAPost(id, pet_id, array_images);
+                }
+            })
 
+        await session.endSession();
         return output_post;
     }
 
@@ -348,7 +333,10 @@ class PostServices {
         const entity = await collection[1].findById(id, {name: 1});
         const comment = {title: data, timestamp: Date.now(), user: entity}
 
-        await Post.updateOne(pet_id,
+        await Post.updateOne(
+            {
+                _id: pet_id
+            },
             {
                 $push: {
                     "feedback.comments": comment

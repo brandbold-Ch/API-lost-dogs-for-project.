@@ -1,11 +1,11 @@
-const {setPostSchema} = require("../../models/schemaValidator/postSchema");
+const {deleteImageScheme} = require("../../models/schemaValidator/anyScheme");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 
 
-const validateSetPostData = async (req, res, next) => {
+const validateQueryDeleteImage = async (req, res, next) => {
     try {
-        await setPostSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
+        await deleteImageScheme.validateAsync(req.query);
         next();
 
     } catch (err) {
@@ -27,4 +27,4 @@ const validateSetPostData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateSetPostData}
+module.exports = {validateQueryDeleteImage}

@@ -43,7 +43,10 @@ exports.updateAuth = async (req, res) => {
         if (err.message === "Incorrect") {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    "Passwords do not match 🔐", {url: req.baseUrl, verb: req.method}
+                    "Passwords do not match 🔐", {
+                        url: req.baseUrl,
+                        verb: req.method
+                    }
                 )
             );
 

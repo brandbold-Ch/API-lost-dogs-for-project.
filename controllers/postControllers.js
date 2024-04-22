@@ -159,12 +159,12 @@ exports.getPost = async (req, res) => {
     try {
         res.status(200).json(await post.getPost(req.id, req.params.pet_id));
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -175,81 +175,54 @@ exports.updatePost = async (req, res) => {
             req.params.pet_id,
             [
                 JSON.parse(JSON.stringify(req.body)),
-                req.files[0]
+                req.files
             ]
         );
 
-        res.status(202).json({
-            status: "Success",
-            message: "Updated post ✅",
-            status_code: 202,
-            data: response_body
-        });
+        res.status(202).json(
+            HandlerHttpVerbs.accepted(
+                "Updated post ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
 exports.deletePost = async (req, res) => {
     try {
         await post.deletePost(req.id, req.params.pet_id, req.role);
-
         res.status(204).end();
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
-exports.addGallery = async (req, res) => {
+exports.deleteImage = async (req, res) => {
     try {
-        await post.addGallery(req.id, req.params.pet_id, req.files);
+        await post.deletePartialGallery(req.id, req.params.pet_id, req.query);
+        res.status(204).end();
 
-        res.status(201).json({
-            status: "Success",
-            message: "Added images ✅",
-            status_code: 201,
-            data: `${req.files.length} buffered images`
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
-
-exports.delPartialGallery = async (req, res) => {
-    try {
-        if (req.query.image) {
-            await post.deletePartialGallery(req.id, req.params.pet_id, req.query.image);
-
-            res.status(204).end();
-
-        } else {
-            res.status(400).json({
-                status: "Error",
-                message: "Id image required. ⚠️",
-                status_code: 400
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -257,18 +230,21 @@ exports.insertComment = async (req, res) => {
     try {
         const comment = await post.insertComment(req.id, req.params.pet_id, req.body, req.role);
 
-        res.status(201).json({
-            status: "Success",
-            message: "Added comment ✅",
-            status_code: 201,
-            data: comment
-        });
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Added comment ✅", {
+                    data: comment,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
