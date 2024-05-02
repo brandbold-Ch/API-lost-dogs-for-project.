@@ -8,11 +8,10 @@ const { connection } = require("./configurations/connections");
 const { useTreblle } = require("treblle");
 const { userRouter } = require("./routes/userRoutes");
 const { authRouter } = require("./routes/authRoutes");
-const { postRouter } = require("./routes/postRoutes");
-const { guestRouter } = require("./routes/guestRoutes");
+const { postsRouter, bulletinsRouter } = require("./routes/guestRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
-const { bulletinRouter } = require("./routes/bulletinRoutes");
+const {HandlerHttpVerbs} = require("./errors/handlerHttpVerbs");
 const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
@@ -37,7 +36,14 @@ app.use(cors({
 app.use(morgan('dev'));
 
 app.get("/", (req, res) => {
-    res.status(200).json({ message: "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜" });
+    res.status(200).json(
+        HandlerHttpVerbs.ok(
+            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜", {
+                url: req.baseUrl,
+                verb: req.method
+            }
+        )
+    );
 });
 
 app.use((req, res, next) => {
@@ -53,14 +59,18 @@ app.use((req, res, next) => {
 
 app.use("/api/v2/users", userRouter);
 app.use("/api/v2/auth", authRouter);
-app.use("/api/v2/posts", postRouter);
-app.use("/api/v2/guests", guestRouter);
+app.use("/api/v2/bulletins", bulletinsRouter);
+app.use("/api/v2/posts", postsRouter);
 app.use("/api/v2/admins", adminRouter);
 app.use("/api/v2/rescuers", rescuerRouter);
-app.use("/api/v2/bulletins", bulletinRouter);
 
 app.use((req, res) => {
-    res.status(404).json({ message: "This route not available 🚫" });
+    res.status(404).json(
+        HandlerHttpVerbs.notFound(
+            "This route not available 🚧",
+            {url: req.baseUrl, verb: req.method}
+        )
+    );
 });
 
 app.listen(parseInt(process.env.PORT, 10), () => {

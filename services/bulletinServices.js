@@ -12,6 +12,30 @@ class BulletinServices {
         this.imageTools = new ImageTools();
     }
 
+    async addGalleryToABulletin(id, bulletin_id, images) {
+        await Promise.all(images.map(async (key) => {
+            let new_image = await this.imageTools.uploadImage(key["buffer"]);
+            let chunk;
+
+            if (key["fieldname"] === "image") {
+                chunk = {
+                    $set: {
+                        "body.image": new_image
+                    }
+                }
+
+            } else {
+                chunk = {
+                    $push: {
+                        "body.gallery": new_image
+                    }
+                }
+            }
+
+            await Bulletin.updateOne({_id: bulletin_id, user: id}, chunk);
+        }));
+    };
+
     modelDetector(role) {
         switch (role[0]) {
             case "USER":
@@ -58,77 +82,68 @@ class BulletinServices {
                     $push: {
                         bulletins: output_bulletin["_id"]
                     }
-                },
-                {session}
+                }, {session}
             );
 
-        }).then(async () => {
-            if (array_images) {
-
-                await Promise.all(array_images.map(async (key) => {
-                    const new_image = await this.imageTools.uploadImage(key["buffer"]);
-
-                    if (key["fieldname"] === "image") {
-                        await Bulletin.updateOne(
-                            {
-                                _id: output_bulletin["_id"]
-                            },
-                            {
-                                $set: {
-                                    "body.image": new_image
-                                }
-                            }
-                        );
-
-                    } else {
-                        await Bulletin.updateOne(
-                            {
-                                _id: output_bulletin["_id"]
-                            },
-                            {
-                                $push: {
-                                    "body.gallery": new_image
-                                }
-                            }
-                        );
-                    }
-                }));
-            }
-
-        }).catch((err) => {
-            throw Error(err.message);
         })
-        await session.endSession();
+            .then(async () => {
+                if (array_images.length) {
+                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images);
+                }
+            })
 
+        await session.endSession();
         return output_bulletin;
     }
 
-    async deletePartialGallery(id, bulletin_id, img_id) {
+    async deletePartialGallery(id, bulletin_id, queries) {
         const session = await connection.startSession();
+        let output_update, chunk, selector;
+
+        if (queries["tag"] === "image") {
+            selector = {
+                "body.image.id": queries["id"]
+            }
+            chunk = {
+                $set: {
+                    "body.image": null
+                }
+            }
+
+        } else {
+            selector = {
+                "body.gallery.id": queries["id"]
+            }
+            chunk = {
+                $pull: {
+                    "body.gallery": {
+                        id: queries["id"]
+                    }
+                }
+            }
+        }
 
         await session.withTransaction(async () => {
 
-            await Bulletin.deleteOne(
+            await Bulletin.updateOne(
                 {
                     _id: bulletin_id,
-                    user: id
+                    user: id,
+                    ...selector
                 },
-                {
-                    $pull: {
-                        "body.gallery": {
-                            id: img_id
-                        }
-                    }
-                },
+                chunk,
                 {session}
-            );
-
-        }).then(async () => {
-            await this.imageTools.deleteImages(img_id);
-
-        }).catch((err) => {
-            throw Error(err.message);
+            )
+                .then((update) => {
+                    output_update = update;
+                });
         })
+            .then(async () => {
+                if (output_update["modifiedCount"] !== 0) {
+                    await this.imageTools.deleteImages(queries["id"]);
+                }
+            })
+
         await session.endSession();
     }
 
@@ -140,13 +155,14 @@ class BulletinServices {
         return Bulletin.findOne({_id: bulletin_id, user: id});
     }
 
-    async deleteBulletin(id, bulletin_id) {
+    async deleteBulletin(id, bulletin_id, role) {
         const session = await connection.startSession();
+        const collection = this.modelDetector(role);
         let output_data;
 
         await session.withTransaction(async () => {
 
-            await Bulletin.deleteOne(
+            await Bulletin.findOneAndDelete(
                 {
                     _id: bulletin_id,
                     user: id
@@ -154,30 +170,43 @@ class BulletinServices {
                 {session}
             )
                 .then((bulletin) => {
-                    output_data = bulletin
+                    output_data = bulletin;
                 });
 
-        }).then(async () => {
-
-            await Promise.all([
-                this.imageTools.deleteImages(output_data["body"]["image"]),
-                this.imageTools.deleteGallery(output_data["body"]["gallery"])
-            ]);
-
-        }).catch((err) => {
-            throw Error(err.message);
+            await collection[1].updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $pull: {
+                        bulletins: bulletin_id
+                    }
+                }, {session}
+            );
         })
+            .then(async () => {
+                if (output_data["body"]["image"]) {
+                   await this.imageTools.deleteImages(output_data["body"]["image"]["id"]);
+                }
+
+                if (output_data["body"]["gallery"].length) {
+                   await this.imageTools.deleteGallery(output_data["body"]["gallery"]);
+                }
+            })
+
         await session.endSession();
     }
 
     async updateBulletin(id, bulletin_id, bulletin_data) {
         const session = await connection.startSession();
-        const context_bulletin = await Bulletin.findOne({_id: bulletin_id, user: id})
+        const context_bulletin = await Bulletin.findOne({_id: bulletin_id, user: id});
         const obj_data = bulletin_data[0];
         const array_images = bulletin_data[1];
+        let output_bulletin;
 
         await session.withTransaction(async () => {
-            await Bulletin.updateOne(
+
+            await Bulletin.findOneAndUpdate(
                 {
                     _id: bulletin_id,
                     user: id
@@ -193,7 +222,9 @@ class BulletinServices {
                         identify: {
                             name_company: obj_data["name_company"],
                             address: obj_data["address"],
-                            te_number: obj_data["te_number"]
+                            te_number: obj_data["te_number"],
+                            timestamp: context_bulletin["identify"]["timestamp"],
+                            update: Date.now()
                         },
                         user: context_bulletin["user"]
                     }
@@ -203,48 +234,19 @@ class BulletinServices {
                 },
                 {session}
             )
-
-        }).then(async () => {
-            if (array_images) {
-                await Promise.all(array_images.map(async (key) => {
-                    const new_image = await this.imageTools.uploadImage(key["buffer"]);
-
-                    if (key["fieldname"] === "image") {
-                        await this.imageTools.deleteImages(context_bulletin["body"]["image"]);
-
-                        await Bulletin.updateOne(
-                            {
-                                _id: bulletin_id,
-                                user: id
-                            },
-                            {
-                                $set: {
-                                    "body.image": new_image
-                                }
-                            }
-                        );
-
-                    } else {
-                        await Bulletin.updateOne(
-                            {
-                                _id: bulletin_id,
-                                user: id
-                            },
-                            {
-                                $push: {
-                                    "body.gallery": new_image
-                                }
-                            }
-                        );
-                    }
-                }));
-            }
-
-        }).catch((err) => {
-            throw Error(err.message);
+                .then((bulletin) => {
+                    output_bulletin = bulletin;
+                })
 
         })
+            .then(async () => {
+                if (array_images.length) {
+                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images)
+                }
+            })
+
         await session.endSession();
+        return output_bulletin
     }
 
     async getUrlsImages(id) {

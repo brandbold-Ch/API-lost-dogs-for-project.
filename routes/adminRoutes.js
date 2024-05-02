@@ -1,18 +1,21 @@
 const {Authenticate} = require("../middlewares/authenticator");
 const adminControllers = require("../controllers/adminControllers");
 const authControllers = require("../controllers/authControllers");
+const {validateQueryAction} = require("../middlewares/handlerInputData/handlerAnyData");
+const {validateSetAdminData} = require("../middlewares/handlerInputData/handlerAdminData");
+const {validateUpdateAuthData} = require("../middlewares/handlerInputData/handlerAuthData");
 const express = require("express");
 const adminRouter = express.Router();
 const {
-    checkTrust,
     checkEntityExists,
     checkRequestExists,
     checkQueryStatus,
-    checkQueryAction,
+    checkAccountExists,
+    verifyUpdateAuth
 } = require("../middlewares/generalMiddlewares");
 
 
-adminRouter.post("/", express.urlencoded({extended: true}), checkTrust, adminControllers.setAdmin);
+adminRouter.post("/", express.urlencoded({extended: true}), validateSetAdminData, checkAccountExists, adminControllers.setAdmin);
 
 adminRouter.use([
     Authenticate,
@@ -24,11 +27,11 @@ adminRouter.delete("/", adminControllers.delAdmin);
 adminRouter.put("/", express.urlencoded({extended: true}), adminControllers.updateAdmin);
 
 adminRouter.get("/auth", authControllers.getAuth);
-adminRouter.put("/auth", express.urlencoded({extended: true}), authControllers.updateAuth);
+adminRouter.put("/auth", express.urlencoded({extended: true}), validateUpdateAuthData, verifyUpdateAuth, authControllers.updateAuth);
 
 adminRouter.get("/requests", adminControllers.getRequests);
 adminRouter.delete("/requests/:req_id", adminControllers.deleteRequest);
-adminRouter.post("/requests/:req_id", checkRequestExists, checkQueryAction, adminControllers.actionRequest);
+adminRouter.post("/requests/:req_id", checkRequestExists, validateQueryAction, adminControllers.actionRequest);
 adminRouter.get("/requests/filter", checkQueryStatus, adminControllers.filterRequests);
 
 adminRouter.get("/rescuers", adminControllers.getRescuers);

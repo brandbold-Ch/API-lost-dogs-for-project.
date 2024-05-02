@@ -71,22 +71,43 @@ class RescuerServices {
                 },
                 {session}
             );
+        });
 
-        })
         await session.endSession();
+        return output_rescuer;
     }
 
     async getRescuer(id) {
-        return Rescuer.findById(id);
+        return Rescuer.findById(id)
+            .populate("auth",
+                {email: 1, password: 1, _id: 0}
+            )
+            .populate({
+                path: "posts",
+                options: {
+                    sort: {
+                        "publication.published": -1
+                    }
+                }
+            })
+            .populate({
+                path: "bulletins",
+                options: {
+                    sort: {
+                        "identify.timestamp": -1
+                    }
+                }
+            });
     }
 
     async updateRescuer(id, data) {
-        await Rescuer.findByIdAndUpdate(id,
+        return Rescuer.findByIdAndUpdate(id,
             {
                 $set: data
             },
             {
-                runValidators: true
+                runValidators: true,
+                new: true
             }
         );
     }
@@ -105,14 +126,17 @@ class RescuerServices {
                 Bulletin.deleteMany({user: id}, {session}),
                 Post.deleteMany({user: id}, {session})
             ]);
-
-        }).then(async () => {
-            const array = array_urls_bulletins[0]["allIds"].concat(array_urls_posts[0]["allIds"]);
-            await this.imageTools.deleteImages(array);
-
-        }).catch((err) => {
-            throw Error(err.message);
         })
+            .then(async () => {
+                if (array_urls_bulletins.length) {
+                    await this.imageTools.deleteImages(array_urls_bulletins[0]["allIds"]);
+                }
+                
+                if (array_urls_posts.length) {
+                    await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
+                }
+            })
+
         await session.endSession();
     }
 }

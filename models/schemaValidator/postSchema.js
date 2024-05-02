@@ -40,6 +40,7 @@ const setPostSchema = Joi.object({
 
     owner: Joi.bool()
         .optional(),
-});
+})
+    .options({allowUnknown: true});
 
 module.exports = {setPostSchema}

@@ -60,7 +60,7 @@ class AdminServices {
     }
 
     async getAdmin(id) {
-        return Admin.findById(id);
+        return Admin.findById(id).populate("auth", {email: 1, password: 1, _id: 0});
     }
 
     async updateAdmin(id, data) {
@@ -86,7 +86,7 @@ class AdminServices {
     }
 
     async getRequests() {
-        return Request.find({}).populate("user", {_id: 0});
+        return Request.find({});
     }
 
     async deleteRequest(request_id) {
@@ -141,8 +141,8 @@ class AdminServices {
                     {session}
                 )
             });
-            await session.endSession();
 
+            await session.endSession();
             return output_request;
 
         } else {
@@ -159,7 +159,7 @@ class AdminServices {
     }
 
     async filterRequests(filter) {
-        return Request.find({status: filter}).populate("user", {_id: 0});
+        return Request.find({status: filter})
     }
 
     async getRescuers() {

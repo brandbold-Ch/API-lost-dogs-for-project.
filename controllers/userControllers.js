@@ -55,7 +55,20 @@ exports.getUser = async (req, res) => {
             )
         );
     }
-};
+}
+
+exports.getRequest = async (req, res) => {
+    try {
+        res.status(200).json(await user.getRequest(req.id));
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
 
 exports.deleteUser = async (req, res) => {
     try {
@@ -69,7 +82,7 @@ exports.deleteUser = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.updateUser = async (req, res) => {
     try {
@@ -92,7 +105,7 @@ exports.updateUser = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.deleteSocialMedia = async (req, res) => {
     try {
@@ -110,7 +123,7 @@ exports.deleteSocialMedia = async (req, res) => {
 
 exports.makeRescuer = async (req, res) => {
     try {
-        const response_body = await user.makeRescuer(req.id);
+        const response_body = await user.makeRescuer(req.id, req.role);
 
         res.status(201).json(
             HandlerHttpVerbs.created(

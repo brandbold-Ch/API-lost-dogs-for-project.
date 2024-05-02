@@ -63,19 +63,24 @@ exports.updateAuth = async (req, res) => {
 const typeUser = (data) => {
     return new Promise(async (resolve, reject) => {
 
-        if (data[1]["role"][0] === "COLLABORATOR") {
+        if (data[1]["role"][0] === "RESCUER") {
             const request = await Request.findOne({user: data[1]["user"]});
 
-            if (request['status'] === 'pending') {
-                reject([403, "You are in a waiting process, " +
-                "the administrator must activate your account ⏳"
-                ]);
+            switch (request["status"]) {
+                case "pending":
+                    reject([403, "You are in a waiting process, " +
+                    "the administrator must activate your account ⏳"
+                    ]);
+                    break;
 
-            } else if (request['status'] === 'rejected') {
-                reject([401, "Your request was rejected by the administrator 🚫"]);
+                case "rejected":
+                    reject([401, "Your request was rejected by the administrator 🚫"]);
+                    break;
 
-            } else if (request['status'] === 'disabled') {
-                reject([403, "Your account is deactivated 📴"]);
+                case "disabled":
+                    reject([403, "Your account is deactivated 📴"]);
+                    break;
+
             }
         }
         resolve(data);
@@ -87,6 +92,7 @@ const validateRequest = (body) => {
 
         if (body.email && body.password) {
             resolve(body);
+
         } else {
             reject([400, "You did not send your credentials correctly 🙅‍♂️"]);
         }
@@ -99,6 +105,7 @@ const validateEmail = (body) => {
 
         if (parseEmail) {
             resolve(body);
+
         } else {
             reject([400, "Invalid email field 🤦‍♂️"]);
         }
@@ -120,7 +127,6 @@ const validateUser = (body) => {
 
 const validatePassword = (data) => {
     return new Promise(async (resolve, reject) => {
-
         const match = bcrypt.compareSync(data[0].password, data[1].password);
 
         if (match) {
@@ -131,9 +137,7 @@ const validatePassword = (data) => {
                     role: data[1].role
                 },
                 process.env.SECRET_KEY,
-                {
-                    expiresIn: process.env.EXPIRE
-                }
+                {expiresIn: process.env.EXPIRE}
             );
 
             const decompile = jwt.verify(token, process.env.SECRET_KEY);

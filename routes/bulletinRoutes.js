@@ -1,16 +1,19 @@
-const {checkBulletinExists} = require("../middlewares/generalMiddlewares");
+const {checkBulletinExists, rescuerRolePermission} = require("../middlewares/generalMiddlewares");
 const bulletinControllers = require("../controllers/bulletinControllers");
 const express = require("express");
 const bulletinRouter = express.Router();
 const processFormData = require("../middlewares/formData");
+const {validateBulletinData} = require("../middlewares/handlerInputData/handlerBulletinData");
+const {validateQueryDeleteImage} = require("../middlewares/handlerInputData/handlerAnyData");
 
 
-bulletinRouter.post("/", processFormData, bulletinControllers.setBulletin);
-bulletinRouter.get("/", bulletinControllers.getBulletins);
-bulletinRouter.get("/:bulletin_id", checkBulletinExists, bulletinControllers.getBulletin);
-bulletinRouter.put("/:bulletin_id", checkBulletinExists, processFormData, bulletinControllers.updateBulletin);
-bulletinRouter.delete("/:bulletin_id", checkBulletinExists, bulletinControllers.deleteBulletin);
+bulletinRouter.use(rescuerRolePermission);
 
-bulletinRouter.delete("/gallery/:bulletin_id", checkBulletinExists, bulletinControllers.delPartialGallery);
+bulletinRouter.post("/bulletins", processFormData, validateBulletinData, bulletinControllers.setBulletin);
+bulletinRouter.get("/bulletins", bulletinControllers.getBulletins);
+bulletinRouter.get("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.getBulletin);
+bulletinRouter.delete("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.deleteBulletin);
+bulletinRouter.put("/bulletins/:bulletin_id", checkBulletinExists, processFormData, validateBulletinData, bulletinControllers.updateBulletin);
+bulletinRouter.delete("/bulletins/images/:bulletin_id", checkBulletinExists, validateQueryDeleteImage, bulletinControllers.deleteImage);
 
 module.exports = {bulletinRouter};

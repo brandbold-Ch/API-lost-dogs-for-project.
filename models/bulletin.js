@@ -21,15 +21,13 @@ const bulletinSchema = new Schema({
         },
         text: {
             type: String,
-            default: null,
-            required: false
+            required: true
         }
     },
     identify: {
         name_company: {
             type: String,
-            default: null,
-            required: false
+            required: true
         },
         address: {
             type: String,
@@ -39,6 +37,10 @@ const bulletinSchema = new Schema({
         te_number: {
             type: String,
             default: null,
+            required: false
+        },
+        update: {
+            type: Date,
             required: false
         },
         timestamp: {
@@ -64,4 +66,4 @@ const bulletinSchema = new Schema({
 });
 
 const Bulletin = mongoose.model("Bulletin", bulletinSchema);
-module.exports = { Bulletin };
+module.exports = {Bulletin}

@@ -3,9 +3,13 @@ const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 
 
-const validateSetPostData = async (req, res, next) => {
+const validatePostData = async (req, res, next) => {
     try {
-        await setPostSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
+        await setPostSchema.validateAsync(
+            JSON.parse(JSON.stringify(req.body)),
+            {abortEarly: false}
+        );
+
         next();
 
     } catch (err) {
@@ -27,4 +31,4 @@ const validateSetPostData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateSetPostData}
+module.exports = {validatePostData}

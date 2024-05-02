@@ -1,32 +1,29 @@
-const {setUserSchema} = require("../../models/schemaValidator/userSchema");
+const {setAdminSchema} = require("../../models/schemaValidator/adminSchema");
 const {setAuthSchema} = require("../../models/schemaValidator/authSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 
 
-const validateUserData = async (req, res, next) => {
+const validateSetAdminData = async (req, res, next) => {
     try {
-        const {name, lastname, cellphone, social_networks, email, password} = req.body;
+        const {name, lastname, token, email, password} = req.body;
 
-        await setUserSchema.validateAsync(
+        await setAdminSchema.validateAsync(
             {
                 name: name,
                 lastname: lastname,
-                cellphone: cellphone,
-                social_networks: social_networks
+                token: token
             },
             {abortEarly: false}
         );
 
-        if (req.method === "POST") {
-            await setAuthSchema.validateAsync(
-                {
-                    email: email,
-                    password: password
-                },
-                {abortEarly: false}
-            );
-        }
+        await setAuthSchema.validateAsync(
+            {
+                email: email,
+                password: password
+            },
+            {abortEarly: false}
+        );
 
         next();
 
@@ -49,4 +46,4 @@ const validateUserData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateUserData}
+module.exports = {validateSetAdminData}

@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const {post, auth, admin, rescuer} = require('../utils/instances');
+const {post, auth, admin, bulletin} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 /**
@@ -41,6 +41,36 @@ const checkEntityExists = async (req, res, next) => {
     }
 }
 
+const verifyUpdateAuth = async (req, res, next) => {
+    try {
+        const account = await auth.getAuthByEmail(req.body["email"]);
+
+        if (account) {
+            if ((account["user"].toString() === req.id) &&
+                (account["email"] === req.body["email"])) {
+                next();
+
+            } else {
+                res.status(400).json(
+                    HandlerHttpVerbs.badRequest(
+                        "Account already exists 🤪",
+                        {url: req.baseUrl, verb: req.method}
+                    )
+                );
+            }
+        } else {
+            next();
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
 const checkAccountExists = async (req, res, next) => {
     try {
         const account = await auth.getAuthByEmail(req.body["email"]);
@@ -66,14 +96,45 @@ const checkAccountExists = async (req, res, next) => {
     }
 }
 
+const checkRequestExistsForUser = async (req, res, next) => {
+    try {
+        const request = await admin.getRequestByUser(req.id);
+
+        if (request) {
+            res.status(400).json(
+                HandlerHttpVerbs.badRequest(
+                    "Only one request can be made 🤪",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+
+        } else {
+            next();
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
 const checkBulletinExists = async (req, res, next) => {
     try {
-        const entity = await rescuer.getRescuer(req.id, req.params.bulletin_id);
+        const data = await bulletin.getBulletin(req.id, req.params.bulletin_id);
 
-        if (entity) {
+        if (data) {
             next();
+
         } else {
-            res.status(404).json({message: 'Not found rescuer 🚫'});
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found bulletin 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
 
     } catch (err) {
@@ -108,7 +169,7 @@ const checkPostExists = async (req, res, next) => {
             )
         );
     }
-};
+}
 
 const checkQueryParameters = async (req, res, next) => {
     try {
@@ -144,20 +205,20 @@ const checkQueryParameters = async (req, res, next) => {
             )
         );
     }
-};
+}
 
-const checkTrust = async (req, res, next) => {
+const userRolePermission = async (req, res, next) => {
     try {
-        if (req.body.token === process.env.TRUSTED_PERMISSIONS) {
+        if (req.role.includes("USER")) {
             next();
 
         } else {
-            res.status(403).json(
-                HandlerHttpVerbs.forbidden(
-                    "Can\'t create an administrator account 💩",
-                    {url: req.baseUrl, verb: req.method}
+            res.status(401).json(
+                HandlerHttpVerbs.unauthorized(
+                    "You don´t have access to this route 🚫",
+                    {url: req.baseUrl, verb: req.method, role: ["USER"]}
                 )
-            );
+            )
         }
 
     } catch (err) {
@@ -167,15 +228,15 @@ const checkTrust = async (req, res, next) => {
             )
         );
     }
-};
+}
 
-const recuerIsActive = async (req, res, next) => {
+const rescuerRolePermission = async (req, res, next) => {
     try {
 
         if (req.role.includes("RESCUER")) {
             const request = await admin.getRequestByUser(req.id);
 
-            if (request['status'] === 'pending') {
+            if (request["status"] === "pending") {
                 res.status(403).json(
                     HandlerHttpVerbs.forbidden(
                         "You are in a waiting process, " +
@@ -184,7 +245,7 @@ const recuerIsActive = async (req, res, next) => {
                     )
                 );
 
-            } else if (request['status'] === 'rejected') {
+            } else if (request["status"] === "rejected") {
                 res.status(401).json(
                     HandlerHttpVerbs.unauthorized(
                         "Your request was rejected by the administrator 🚫",
@@ -192,7 +253,7 @@ const recuerIsActive = async (req, res, next) => {
                     )
                 );
 
-            } else if (request['status'] === 'active') {
+            } else if (request["status"] === "active") {
                 next();
 
             } else {
@@ -230,31 +291,12 @@ const checkRequestExists = async (req, res, next) => {
             next();
 
         } else {
-            res.status(404).json({message: 'Not found request 🚫'});
-        }
-
-    } catch (err) {
-        res.status(500).json(
-            HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
-            )
-        );
-    }
-}
-
-const checkQueryAction = async (req, res, next) => {
-    try {
-        const choices = [
-            "activate",
-            "deactivate",
-            "reject"
-        ];
-
-        if (choices.includes(req.query.action)) {
-            next();
-
-        } else {
-            res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found request 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
 
     } catch (err) {
@@ -279,8 +321,39 @@ const checkQueryStatus = async (req, res, next) => {
             next();
 
         } else {
-            res.status(400).json({message: `The parameters must be 👉 ${choices} 👈`});
+            res.status(400).json(
+                HandlerHttpVerbs.badRequest(
+                    `The parameters must be 👉 ${choices} 👈`,
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
         }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+const seeRequest = async (req, res, next) => {
+    try {
+        const request = await admin.getRequestByUser(req.id);
+
+        if (request) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "You have no request, you must make one if you want to be a rescuer. 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
 
     } catch (err) {
         res.status(500).json(
@@ -294,12 +367,14 @@ const checkQueryStatus = async (req, res, next) => {
 module.exports = {
     checkPostExists,
     checkQueryParameters,
-    checkTrust,
-    recuerIsActive,
+    rescuerRolePermission,
+    userRolePermission,
     checkRequestExists,
     checkQueryStatus,
-    checkQueryAction,
     checkBulletinExists,
     checkEntityExists,
-    checkAccountExists
-};
+    checkAccountExists,
+    checkRequestExistsForUser,
+    verifyUpdateAuth,
+    seeRequest
+}

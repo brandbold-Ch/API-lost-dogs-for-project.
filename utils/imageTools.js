@@ -12,6 +12,7 @@ class ImageTools {
                 if (error) {
                     reject(error);
                 }
+
                 resolve({
                     url: result?.url,
                     id: result?.public_id
@@ -21,12 +22,18 @@ class ImageTools {
     }
 
     async deleteImages(images) {
-        if (images) {
-            await cloudinary.api.delete_resources(
-                (images instanceof Object) ? [images["id"]] : images,
-                {type: 'upload', resource_type: 'image'}
-            );
+        let value;
+
+        if (images instanceof Array) {
+            value = images;
+
+        } else {
+            value = [images];
         }
+
+        await cloudinary.api.delete_resources(
+            value, {type: 'upload', resource_type: 'image'}
+        );
     }
 
     async deleteGallery(gallery) {

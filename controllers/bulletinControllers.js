@@ -1,26 +1,31 @@
 const {bulletin} = require("../utils/instances");
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
 exports.setBulletin = async (req, res) => {
     try {
         const response_body = await bulletin.setBulletin(
             req.id,
-            [
-                JSON.parse(JSON.stringify(req.body)),
-                req.files
-            ],
+            [JSON.parse(JSON.stringify(req.body)), req.files],
             req.role
         );
 
-        res.status(201).json({
-            status: "Success",
-            message: "Added bulletin ✅",
-            status_code: 201,
-            data: response_body
-        });
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Added bulletin ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -28,53 +33,79 @@ exports.getBulletins = async (req, res) => {
     try {
         res.status(200).json(await bulletin.getBulletins(req.id));
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
 exports.getBulletin = async (req, res) => {
     try {
         res.status(200).json(await bulletin.getBulletin(req.id, req.params.bulletin_id));
-    } catch (error) {
-        res.status(500).json({message: error.message});
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
 exports.updateBulletin = async (req, res) => {
     try {
-        await bulletin.updateBulletin(req.id,
-            req.params.bulletin_id, [JSON.parse(JSON.stringify(req.body)), req.files]);
+        const response_body = await bulletin.updateBulletin(
+            req.id,
+            req.params.bulletin_id,
+            [JSON.parse(JSON.stringify(req.body)), req.files]
+        );
 
-        res.status(202).json({
-            message: 'Updated bulletin ✅',
-            data: JSON.parse(JSON.stringify(req.body))
-        });
-    } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(202).json(
+            HandlerHttpVerbs.accepted(
+                "Updated bulletin ✅", {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
-exports.delPartialGallery = async (req, res) => {
+exports.deleteImage = async (req, res) => {
     try {
+        await bulletin.deletePartialGallery(req.id, req.params.bulletin_id, req.query);
+        res.status(204).end();
 
-        if (req.query.image) {
-            await bulletin.deletePartialGallery(req.id, req.params.bulletin_id, req.query.image);
-            res.status(204).end();
-        } else {
-            res.status(404).json({message: "Id image required. ⚠️"});
-        }
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
 exports.deleteBulletin = async (req, res) => {
     try {
-        await bulletin.deleteBulletin(req.id, req.params.bulletin_id);
+        await bulletin.deleteBulletin(req.id, req.params.bulletin_id, req.role);
         res.status(204).end();
-    } catch (error) {
-        res.status(500).json({message: error.message});
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }

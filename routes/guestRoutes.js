@@ -1,20 +1,25 @@
 const guestControllers = require('../controllers/guestControllers');
 const {checkPostExists, checkQueryParameters} = require('../middlewares/generalMiddlewares');
 const express = require('express');
-const guestRouter = express.Router();
+const postsRouter = express.Router();
+const bulletinsRouter = express.Router();
 
 
-guestRouter.get('/publications', guestControllers.getLostPets);
-guestRouter.get('/publications/search', checkPostExists, guestControllers.getUserAndPet);
-guestRouter.get('/publications/filter/specie', checkQueryParameters, guestControllers.getFilterPostSpecie);
-guestRouter.get('/publications/filter/gender', checkQueryParameters, guestControllers.getFilterPostGender);
-guestRouter.get('/publications/filter/size', checkQueryParameters, guestControllers.getFilterPostSize);
-guestRouter.get('/publications/filter/breed', guestControllers.getFilterPostBreed);
-guestRouter.get('/publications/filter/found', checkQueryParameters, guestControllers.getFilterPostFound);
-guestRouter.get('/publications/filter/owner', checkQueryParameters, guestControllers.getFilterPostOwner);
-guestRouter.get('/publications/filter/date', guestControllers.getFilterPostLostDate);
-guestRouter.get('/publications/filter/year', guestControllers.getFilterPostYear);
-guestRouter.get('/bulletins', guestControllers.getBulletins);
-guestRouter.get('/bulletins/search', guestControllers.getBulletin);
+postsRouter.get('', guestControllers.getLostPets);
+postsRouter.get('/search', checkPostExists, guestControllers.getUserAndPet);
+postsRouter.get('/filter/specie', checkQueryParameters, guestControllers.getFilterPostSpecie);
+postsRouter.get('/filter/gender', checkQueryParameters, guestControllers.getFilterPostGender);
+postsRouter.get('/filter/size', checkQueryParameters, guestControllers.getFilterPostSize);
+postsRouter.get('/filter/breed', guestControllers.getFilterPostBreed);
+postsRouter.get('/filter/found', checkQueryParameters, guestControllers.getFilterPostFound);
+postsRouter.get('/filter/owner', checkQueryParameters, guestControllers.getFilterPostOwner);
+postsRouter.get('/filter/date', guestControllers.getFilterPostLostDate);
+postsRouter.get('/filter/year', guestControllers.getFilterPostYear);
 
-module.exports = {guestRouter};
+bulletinsRouter.get('/', guestControllers.getBulletins);
+bulletinsRouter.get('/search', guestControllers.getBulletin);
+
+module.exports = {
+    postsRouter,
+    bulletinsRouter
+}

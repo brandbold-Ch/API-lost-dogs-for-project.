@@ -10,8 +10,10 @@ const {Post} = require("../models/post");
 const {Auth} = require("../models/auth");
 const {Request} = require("../models/rescuer");
 const {PostServices} = require("../services/postServices");
+const {BulletinServices} = require("../services/bulletinServices");
 const {connection} = require("../configurations/connections");
 const {ImageTools} = require("../utils/imageTools");
+const {Bulletin} = require("../models/bulletin");
 
 
 /**
@@ -23,6 +25,7 @@ class UserServices {
 
     constructor() {
         this.posts = new PostServices();
+        this.bulletins = new BulletinServices();
         this.imageTools = new ImageTools();
     }
 
@@ -131,6 +134,7 @@ class UserServices {
     async deleteUser(id) {
         const session = await connection.startSession();
         const array_urls_posts = await this.posts.getUrlsImages(id);
+        const array_urls_bulletins = await this.bulletins.getUrlsImages(id);
 
         await session.withTransaction(async () => {
 
@@ -138,11 +142,15 @@ class UserServices {
                 Auth.findOneAndDelete({user: id}, {session}),
                 User.findByIdAndDelete({_id: id}, {session}),
                 Post.deleteMany({user: id}, {session}),
-                Request.deleteMany({user: id}, {session})
+                Request.deleteMany({user: id}, {session}),
+                Bulletin.deleteMany({user: id}, {session})
             ]);
-
         })
             .then(async () => {
+                if (array_urls_bulletins.length) {
+                    await this.imageTools.deleteImages(array_urls_bulletins[0]["allIds"]);
+                }
+
                 if (array_urls_posts.length) {
                     await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
                 }
@@ -177,8 +185,7 @@ class UserServices {
                 }
             },
             {
-                new: true,
-                upsert: true
+                new: true
             }
         );
     }
@@ -198,18 +205,26 @@ class UserServices {
         }
     }
 
-    async makeRescuer(id) {
-        const email = await Auth.findOne({user: id});
+    async getRequest(id) {
+        return Request.findOne({user: id});
+    }
 
-        const output_request = await Request.create([
+    async makeRescuer(id, role) {
+        const email = await Auth.findOne({user: id});
+        let output_request;
+
+        await Request.create([
             {
-                role: "USER",
+                role: role,
                 email: email["email"],
                 user: id
             }
-        ]);
+        ])
+            .then((request) => {
+                output_request = request[0]
+            });
 
-        return output_request[0];
+        return output_request;
     }
 }
 

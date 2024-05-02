@@ -1,11 +1,15 @@
-const {updateAuthSchema} = require("../../models/schemaValidator/authSchema");
+const {setBulletinsSchema} = require("../../models/schemaValidator/bulletinSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 
 
-const validateUpdateAuthData = async (req, res, next) => {
+const validateBulletinData = async (req, res, next) => {
     try {
-        await updateAuthSchema.validateAsync(req.body, {abortEarly: false});
+        await setBulletinsSchema.validateAsync(
+            JSON.parse(JSON.stringify(req.body)),
+            {abortEarly: false}
+        );
+
         next();
 
     } catch (err) {
@@ -27,4 +31,4 @@ const validateUpdateAuthData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateUpdateAuthData};
+module.exports = {validateBulletinData}
