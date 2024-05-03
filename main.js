@@ -54,7 +54,7 @@ useTreblle(app, {
     projectId: process.env.PROJECT_ID
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options)));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: " https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css "}));
 
 app.use(cors({
     origin: '*',
