@@ -12,6 +12,8 @@ const { postsRouter, bulletinsRouter } = require("./routes/guestRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
 const {HandlerHttpVerbs} = require("./errors/handlerHttpVerbs");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
@@ -19,12 +21,40 @@ const  express = require("express");
 const app = express();
 
 
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'PET (Perdidos en Tapachula)',
+            version: '2.0',
+            description: 'API pets lost',
+        },
+        servers: [
+            {
+                url: 'http://localhost:5000',
+            },
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                },
+            },
+        }
+    },
+    apis: ['./routes/*.js']
+}
+
 app.use(express.json());
 
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options)));
 
 app.use(cors({
     origin: '*',

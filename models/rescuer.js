@@ -73,8 +73,13 @@ const requestsSchema = new Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Rescuer",
+        refPath: "doc_model",
         required: true,
+    },
+    doc_model: {
+        type: String,
+        required: true,
+        enum: ["User", "Rescuer"]
     }
 }, {
     versionKey: false

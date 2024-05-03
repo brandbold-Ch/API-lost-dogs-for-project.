@@ -1,7 +1,8 @@
 const userControllers = require('../controllers/userControllers');
 const {postRouter} = require("./postRoutes");
 const {bulletinRouter} = require("./bulletinRoutes");const {Authenticate} = require('../middlewares/authenticator');
-const {authRouter} = require("./authRoutes");const {validateUserData} = require("../middlewares/handlerInputData/handlerUserData");
+const {authRouter} = require("./authRoutes");
+const {validateUserData} = require("../middlewares/handlerInputData/handlerUserData");
 const express = require('express');
 const userRouter = express.Router();
 const {
@@ -27,6 +28,7 @@ userRouter.delete('/networks', userControllers.deleteSocialMedia);
 
 userRouter.post("/requests", checkRequestExistsForUser, userControllers.makeRescuer);
 userRouter.get("/requests", seeRequest, userControllers.getRequest);
+
 
 userRouter.use([
     authRouter,

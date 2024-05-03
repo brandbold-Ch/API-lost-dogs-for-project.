@@ -217,7 +217,8 @@ class UserServices {
             {
                 role: role,
                 email: email["email"],
-                user: id
+                user: id,
+                doc_model: "User"
             }
         ])
             .then((request) => {

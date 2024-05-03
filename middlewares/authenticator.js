@@ -110,7 +110,6 @@ const verifyToken = (token) => {
  */
 
 const Authenticate = (req, res, next) => {
-
     verifyToken(req.headers.authorization)
         .then(tokenDecrypted => verifyRole(tokenDecrypted))
         .then(role => routesPermissions(role, req.baseUrl))

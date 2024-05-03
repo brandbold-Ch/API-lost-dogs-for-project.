@@ -56,7 +56,8 @@ class RescuerServices {
                 {
                     role: ["RESCUER", "USER"],
                     email: email,
-                    user: output_rescuer["_id"]
+                    user: output_rescuer["_id"],
+                    doc_model: "Rescuer"
                 }
             ], {session});
 

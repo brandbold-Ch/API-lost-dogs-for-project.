@@ -86,7 +86,7 @@ class AdminServices {
     }
 
     async getRequests() {
-        return Request.find({});
+        return Request.find({}).populate("user", {posts: 0, bulletins: 0, auth: 0});
     }
 
     async deleteRequest(request_id) {
@@ -94,11 +94,17 @@ class AdminServices {
         const request = await Request.findById(request_id);
 
         await session.withTransaction(async () => {
-            await Promise.all([
-                Request.deleteOne({_id: request_id}, {session}),
-                this.rescuer.deleteRescuer(request["user"])
-            ])
+            if (request["role"][0] === "RESCUER") {
+                await Promise.all([
+                    Request.deleteOne({_id: request_id}, {session}),
+                    this.rescuer.deleteRescuer(request["user"])
+                ]);
+
+            } else {
+                await Request.deleteOne({_id: request_id}, {session});
+            }
         });
+
         await session.endSession();
     }
 
