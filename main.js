@@ -20,6 +20,16 @@ require("dotenv").config();
 const  express = require("express");
 const app = express();
 
+const customJs = [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js'
+];
+
+const customCss = [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css'
+];
 
 const options = {
     definition: {
@@ -31,7 +41,7 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:5000',
+                url: 'http://localhost:5000'
             },
         ],
         components: {
@@ -54,7 +64,7 @@ useTreblle(app, {
     projectId: process.env.PROJECT_ID
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: " https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css "}));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: customCss, customJs: customJs}));
 
 app.use(cors({
     origin: '*',
