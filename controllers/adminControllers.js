@@ -171,7 +171,7 @@ exports.getRescuers = async (req, res) => {
 
 exports.getRescuer = async (req, res) => {
     try {
-        res.status(200).json(await admin.getRescuer(req.params.collab_id));
+        res.status(200).json(await admin.getRescuer(req.params.rescuer_id));
 
     } catch (err) {
         res.status(500).json(
@@ -184,7 +184,7 @@ exports.getRescuer = async (req, res) => {
 
 exports.deleteRescuer = async (req, res) => {
     try {
-        await admin.deleteRescuer(req.params.collab_id);
+        await admin.deleteRescuer(req.params.rescuer_id);
 
         res.status(204).end();
 

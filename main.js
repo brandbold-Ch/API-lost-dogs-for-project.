@@ -20,10 +20,6 @@ require("dotenv").config();
 const  express = require("express");
 const app = express();
 
-const customJs = [
-    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js'
-];
 
 const customCss = [
     'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
@@ -64,7 +60,7 @@ useTreblle(app, {
     projectId: process.env.PROJECT_ID
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: customCss, customJs: customJs}));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: customCss}));
 
 app.use(cors({
     origin: '*',

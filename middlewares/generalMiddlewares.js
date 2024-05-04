@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const {post, auth, admin, bulletin} = require('../utils/instances');
+const {post, auth, admin, bulletin, user} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 /**
@@ -30,6 +30,48 @@ const checkEntityExists = async (req, res, next) => {
                     {url: req.baseUrl, verb: req.method}
                 )
             );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+
+const entityExists = async (req, res, next) => {
+    try {
+        const entity = await auth.getAuthByUser(req.params.rescuer_id || req.params.user_id);
+        const route = req.path.split("/");
+
+        if (route.includes("users")) {
+            if (entity) {
+                next();
+
+            } else {
+                res.status(404).json(
+                    HandlerHttpVerbs.notFound(
+                        "Not found user 🚫",
+                        {url: req.baseUrl, verb: req.method}
+                    )
+                );
+            }
+
+        } else if (route.includes("rescuers")) {
+            if (entity) {
+                next();
+
+            } else {
+                res.status(404).json(
+                    HandlerHttpVerbs.notFound(
+                        "Not found rescuer 🚫",
+                        {url: req.baseUrl, verb: req.method}
+                    )
+                );
+            }
         }
 
     } catch (err) {
@@ -376,5 +418,6 @@ module.exports = {
     checkAccountExists,
     checkRequestExistsForUser,
     verifyUpdateAuth,
-    seeRequest
+    seeRequest,
+    entityExists
 }

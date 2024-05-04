@@ -9,7 +9,8 @@ const {
     checkEntityExists,
     checkRequestExists,
     checkQueryStatus,
-    checkAccountExists
+    checkAccountExists,
+    entityExists
 } = require("../middlewares/generalMiddlewares");
 
 
@@ -147,6 +148,45 @@ adminRouter.put("/", express.urlencoded({extended: true}), adminControllers.upda
 /**
  * @swagger
  * /api/v2/admins/auth:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Actualizar las credenciales de un administrador.
+ *     description: Actualizar el email y contraseña de un usuario administrador.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email del administrador.
+ *               new_password:
+ *                 type: string
+ *                 description: Nueva contraseña para el administrador.
+ *               old_password:
+ *                 type: string
+ *                 description: Actual contraseña del administrador.
+ *     responses:
+ *       200:
+ *         description: Credenciales modificadas.
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+
+/**
+ * @swagger
+ * /api/v2/admins/auth:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -184,7 +224,7 @@ adminRouter.use(authRouter);
  *       400:
  *         description: Error del cliente.
  *       404:
- *         description: Administrador no encontrado.
+ *         description: Administrador no encontrado o Solicitud no encontrada.
  *       401:
  *         description: Sin permisos para ver esta ruta.
  *       500:
@@ -220,7 +260,7 @@ adminRouter.get("/requests", adminControllers.getRequests);
  *       500:
  *         description: Error interno del servidor.
  */
-adminRouter.delete("/requests/:req_id", adminControllers.deleteRequest);
+adminRouter.delete("/requests/:req_id", checkRequestExists, adminControllers.deleteRequest);
 
 /**
  * @swagger
@@ -289,12 +329,172 @@ adminRouter.post("/requests/:req_id", checkRequestExists, validateQueryAction, a
  */
 adminRouter.get("/requests/filter", checkQueryStatus, adminControllers.filterRequests);
 
+/**
+ * @swagger
+ * /api/v2/admins/rescuers:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Obtener las solicitudes.
+ *     description: Obtener todas las solicitudes.
+ *     responses:
+ *       400:
+ *         description: Error del cliente.
+ *       200:
+ *         description: Todos las solicitudes.
+ *       404:
+ *         description: Administrador no encontrado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
 adminRouter.get("/rescuers", adminControllers.getRescuers);
-adminRouter.get("/rescuers/:rescuer_id", adminControllers.getRescuer);
-adminRouter.delete("/rescuers/:rescuer_id", adminControllers.deleteRescuer);
 
+/**
+ * @swagger
+ * /api/v2/admins/rescuers/{rescuer_id}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Obener un rescatista.
+ *     description: Obtener los datos de un rescatistas.
+ *     parameters:
+ *       - in: path
+ *         name: rescuer_id
+ *         description: Id de rescatista.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado o Rescatista no encontrado.
+ *       200:
+ *         description: Datos del rescatista.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+adminRouter.get("/rescuers/:rescuer_id", entityExists, adminControllers.getRescuer);
+
+/**
+ * @swagger
+ * /api/v2/admins/rescuers/{rescuer_id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Eliminar un rescatista.
+ *     description: Eliminar un usuario rescatista.
+ *     parameters:
+ *       - in: path
+ *         name: rescuer_id
+ *         description: Id de rescatista.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado o Rescatista no encontrado.
+ *       204:
+ *         description: Rescatista eliminado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+adminRouter.delete("/rescuers/:rescuer_id", entityExists, adminControllers.deleteRescuer);
+
+/**
+ * @swagger
+ * /api/v2/admins/users:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Obtener los usuarios.
+ *     description: Obtener todos los usuarios.
+ *     responses:
+ *       200:
+ *         description: Todas los usuarios.
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
 adminRouter.get("/users", adminControllers.getUsers);
-adminRouter.get("/users/:user_id", adminControllers.getUser);
-adminRouter.delete("/users/:user_id", adminControllers.deleteUser);
+
+/**
+ * @swagger
+ * /api/v2/admins/users/{user_id}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Obener un usuario.
+ *     description: Obtener los datos de un usuario.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         description: Id de rescatista.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado o Usuario no encontrado.
+ *       200:
+ *         description: Datos del usuario.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+adminRouter.get("/users/:user_id", entityExists, adminControllers.getUser);
+
+/**
+ * @swagger
+ * /api/v2/admins/users/{user_id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Admin controllers
+ *     summary: Eliminar un usuario.
+ *     description: Eliminar un usuario.
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         description: Id de usuario.
+ *         required: true
+ *         type: string
+ *     responses:
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Administrador no encontrado o Usuario no encontrado.
+ *       204:
+ *         description: Usuario eliminado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+adminRouter.delete("/users/:user_id", entityExists, adminControllers.deleteUser);
 
 module.exports = {adminRouter};
