@@ -21,7 +21,13 @@ const  express = require("express");
 const app = express();
 
 
-const customCss ="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css";
+const customJs = [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css'
+];
+
+const customCss = [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css'
+];
 
 const options = {
     definition: {
@@ -56,7 +62,7 @@ useTreblle(app, {
     projectId: process.env.PROJECT_ID
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: customCss}));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc(options), {customCssUrl: customCss, customJs: customJs}));
 
 app.use(cors({
     origin: '*',
