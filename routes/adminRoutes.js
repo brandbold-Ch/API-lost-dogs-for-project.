@@ -183,29 +183,6 @@ adminRouter.put("/", express.urlencoded({extended: true}), adminControllers.upda
  *       500:
  *         description: Error interno del servidor.
  */
-
-/**
- * @swagger
- * /api/v2/admins/auth:
- *   get:
- *     security:
- *       - bearerAuth: []
- *     tags:
- *       - Admin controllers
- *     summary: Obtener las credenciales de un administrador.
- *     description: Obtener el email y contraseña de un usuario administrador.
- *     responses:
- *       200:
- *         description: Credenciales.
- *       400:
- *         description: Error del cliente.
- *       404:
- *         description: Administrador no encontrado.
- *       401:
- *         description: Sin permisos para ver esta ruta.
- *       500:
- *         description: Error interno del servidor.
- */
 adminRouter.use(authRouter);
 
 /**
@@ -281,9 +258,10 @@ adminRouter.delete("/requests/:req_id", checkRequestExists, adminControllers.del
  *       - in: query
  *         name: action
  *         description: Opción para la solicitud
- *         type: string
  *         required: true
- *         example: activate, reject, deactivate
+ *         schema:
+ *           type: string
+ *           enum: [activate, reject, deactivate]
  *     responses:
  *       400:
  *         description: Error del cliente.
@@ -312,9 +290,10 @@ adminRouter.post("/requests/:req_id", checkRequestExists, validateQueryAction, a
  *       - in: query
  *         name: status
  *         description: Opción de filtro
- *         type: string
  *         required: true
- *         example: active, rejected, deactivated, pending
+ *         schema:
+ *           type: string
+ *           enum: [active, rejected, deactivated, pending]
  *     responses:
  *       400:
  *         description: Error del cliente.

@@ -5,6 +5,7 @@ const {ValidationError} = require("joi");
 
 const validatePostData = async (req, res, next) => {
     try {
+        console.log(req.body)
         await setPostSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body)),
             {abortEarly: false}

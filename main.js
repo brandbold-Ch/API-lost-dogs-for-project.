@@ -33,6 +33,9 @@ const options = {
             {
                 url: 'http://localhost:5000'
             },
+            {
+                url: 'https://pabed-api-xi.vercel.app/'
+            }
         ],
         components: {
             securitySchemes: {

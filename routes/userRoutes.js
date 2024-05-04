@@ -247,6 +247,103 @@ userRouter.post("/requests", checkRequestExistsForUser, userControllers.makeResc
  */
 userRouter.get("/requests", seeRequest, userControllers.getRequests);
 
+/**
+ * @swagger
+ * /api/v2/users/auth:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - User controllers
+ *     summary: Actualizar las credenciales de un usuario.
+ *     description: Actualizar el email y contraseña de un usuario.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Email del usuario.
+ *               new_password:
+ *                 type: string
+ *                 description: Nueva contraseña para el usuario.
+ *               old_password:
+ *                 type: string
+ *                 description: Actual contraseña del usuario.
+ *     responses:
+ *       202:
+ *         description: Credenciales modificadas.
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Usuario no encontrado.
+ *       401:
+ *         description: Sin permisos para ver esta ruta.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+
+/**
+ * @swagger
+ * /api/v2/users/posts:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - User controllers
+ *     summary: Crear una mascota
+ *     description: Crea una nueva mascota en la base de datos.
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               specie:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [Macho, Hembra]
+ *               age:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               size:
+ *                 type: string
+ *                 enum: [Chico, Mediano, Grande, No aplica]
+ *               breed:
+ *                 type: string
+ *               lost_date:
+ *                 type: string
+ *               coordinates:
+ *                 type: string
+ *               last_seen:
+ *                 type: string
+ *               owner:
+ *                 type: boolean
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *               images:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Mascota creada correctamente.
+ *       500:
+ *         description: Error interno del servidor.
+ *       400:
+ *         description: Error del cliente.
+ *       404:
+ *         description: Usuario no encontrado.
+ */
 userRouter.use([
     authRouter,
     postRouter,
