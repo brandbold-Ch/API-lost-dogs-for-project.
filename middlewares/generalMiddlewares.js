@@ -48,7 +48,7 @@ const entityExists = async (req, res, next) => {
         const route = req.path.split("/");
 
         if (route.includes("users")) {
-            if (entity) {
+            if (entity?.role[0] === "USER") {
                 next();
 
             } else {
@@ -61,7 +61,7 @@ const entityExists = async (req, res, next) => {
             }
 
         } else if (route.includes("rescuers")) {
-            if (entity) {
+            if (entity?.role[0] === "RESCUER") {
                 next();
 
             } else {

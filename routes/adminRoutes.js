@@ -117,7 +117,7 @@ adminRouter.delete("/", adminControllers.delAdmin);
  *     tags:
  *       - Admin controllers
  *     summary: Actualizar datos de administrador.
- *     description: Actualziar datos de usuario administrador.
+ *     description: Actualizar datos de usuario administrador.
  *     requestBody:
  *       required: true
  *       content:
@@ -132,8 +132,8 @@ adminRouter.delete("/", adminControllers.delAdmin);
  *                 type: string
  *                 description: Apellido del administrador.
  *     responses:
- *       204:
- *         description: Administrador eliminado.
+ *       202:
+ *         description: Datos de administrador actualizados.
  *       400:
  *         description: Error del cliente.
  *       404:
@@ -172,7 +172,7 @@ adminRouter.put("/", express.urlencoded({extended: true}), adminControllers.upda
  *                 type: string
  *                 description: Actual contraseña del administrador.
  *     responses:
- *       200:
+ *       202:
  *         description: Credenciales modificadas.
  *       400:
  *         description: Error del cliente.
@@ -337,7 +337,7 @@ adminRouter.get("/requests/filter", checkQueryStatus, adminControllers.filterReq
  *       - bearerAuth: []
  *     tags:
  *       - Admin controllers
- *     summary: Obtener las solicitudes.
+ *     summary: Obtener todos los rescatistas.
  *     description: Obtener todas las solicitudes.
  *     responses:
  *       400:
@@ -497,4 +497,4 @@ adminRouter.get("/users/:user_id", entityExists, adminControllers.getUser);
  */
 adminRouter.delete("/users/:user_id", entityExists, adminControllers.deleteUser);
 
-module.exports = {adminRouter};
+module.exports = {adminRouter}

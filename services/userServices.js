@@ -139,8 +139,8 @@ class UserServices {
         await session.withTransaction(async () => {
 
             await Promise.all([
-                Auth.findOneAndDelete({user: id}, {session}),
-                User.findByIdAndDelete({_id: id}, {session}),
+                Auth.deleteOne({user: id}, {session}),
+                User.deleteOne({_id: id}, {session}),
                 Post.deleteMany({user: id}, {session}),
                 Request.deleteMany({user: id}, {session}),
                 Bulletin.deleteMany({user: id}, {session})
@@ -205,8 +205,8 @@ class UserServices {
         }
     }
 
-    async getRequest(id) {
-        return Request.findOne({user: id});
+    async getRequests(id) {
+        return Request.find({user: id});
     }
 
     async makeRescuer(id, role) {

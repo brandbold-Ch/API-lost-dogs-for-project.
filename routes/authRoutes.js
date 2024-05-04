@@ -33,6 +33,8 @@ const authRouter = express.Router();
  *         description: Error interno del servidor.
  *       400:
  *         description: Error del cliente.
+ *       401:
+ *         description: Contraseña incorrecta.
  *       404:
  *         description: El usuario no existe.
  */
@@ -42,9 +44,7 @@ authRouter.post('/login', express.urlencoded({extended: true}), authControllers.
 authRouter.post('/status/token', authControllers.statusToken);
 
 
-authRouter.get("/auth", authControllers.getAuth);
-
-
 authRouter.put("/auth", express.urlencoded({extended: true}), validateUpdateAuthData, verifyUpdateAuth, authControllers.updateAuth);
+
 
 module.exports = {authRouter};

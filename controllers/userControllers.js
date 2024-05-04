@@ -57,9 +57,9 @@ exports.getUser = async (req, res) => {
     }
 }
 
-exports.getRequest = async (req, res) => {
+exports.getRequests = async (req, res) => {
     try {
-        res.status(200).json(await user.getRequest(req.id));
+        res.status(200).json(await user.getRequests(req.id));
 
     } catch (err) {
         res.status(500).json(
