@@ -12,22 +12,20 @@ const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
 const {HandlerHttpVerbs} = require("./errors/handlerHttpVerbs");
 const mainDocs = require("./swagger/mainDocs");
-const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
 const  express = require("express");
+const {postsRouter, bulletinsRouter} = require("./routes/guestRoutes");
 const app = express();
 
 
 app.use(express.json());
-
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
-
 app.use(
     "/api-docs",
     swaggerUi.serve,
@@ -37,7 +35,6 @@ app.use(
         }
     )
 );
-
 app.use(cors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -46,18 +43,16 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',
 }));
 app.use(morgan('dev'));
-
 app.get("/", (req, res) => {
     res.status(200).json(
         HandlerHttpVerbs.ok(
-            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API 🦮🐩🐈🦜", {
+            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.0 🦮🐩🐈🦜", {
                 url: req.baseUrl,
                 verb: req.method
             }
         )
     );
 });
-
 app.use((req, res, next) => {
     const isConnected = () => {
         if (connection.readyState !== 1) {
@@ -68,12 +63,12 @@ app.use((req, res, next) => {
     }
     isConnected();
 });
-
 app.use("/api/v2/users", userRouter);
 app.use("/api/v2/auth", authRouter);
 app.use("/api/v2/admins", adminRouter);
 app.use("/api/v2/rescuers", rescuerRouter);
-
+app.use("/api/v2/posts", postsRouter);
+app.use("/api/v2/bulletins", bulletinsRouter);
 app.use((req, res) => {
     res.status(404).json(
         HandlerHttpVerbs.notFound(

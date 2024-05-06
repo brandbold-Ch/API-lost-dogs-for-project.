@@ -106,7 +106,7 @@ function postDocs(tags) {
                 "summary": "Obtener las mascota de un usuario",
                 "description": "Obtener todas las mascotas.",
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Todas las mascotas."
                     },
                     "500": {
@@ -143,7 +143,7 @@ function postDocs(tags) {
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Datos de mascota."
                     },
                     "500": {

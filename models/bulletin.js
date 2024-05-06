@@ -41,7 +41,8 @@ const bulletinSchema = new Schema({
         },
         update: {
             type: Date,
-            required: false
+            required: false,
+            default: null
         },
         timestamp: {
             type: Date,

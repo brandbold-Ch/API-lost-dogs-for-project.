@@ -2,6 +2,7 @@ const adminDocs = require("./adminDocs");
 const authDocs = require("./authDocs");
 const userDocs = require("./userDocs");
 const rescuerDocs = require("./rescuerDocs");
+const guestDocs = require("./guestDocs");
 
 
 module.exports = {
@@ -32,6 +33,7 @@ module.exports = {
         ...adminDocs,
         ...authDocs,
         ...userDocs,
-        ...rescuerDocs
+        ...rescuerDocs,
+        ...guestDocs
     }
 }

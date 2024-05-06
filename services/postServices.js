@@ -63,7 +63,11 @@ class PostServices {
 
     async getPost(id, pet_id) {
         return Post.findOne({_id: pet_id, user: id});
-    };
+    }
+
+    async getPostForGuest(id) {
+        return Post.findById(id);
+    }
 
     async setPost(id, pet_data, role) {
         const session = await connection.startSession();

@@ -77,7 +77,7 @@ function bulletinDocs(tags) {
                 "summary": "Obtener anuncios.",
                 "description": "Obtener todos los anuncios.",
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Todos los anuncios."
                     },
                     "500": {
@@ -114,7 +114,7 @@ function bulletinDocs(tags) {
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Datos de anuncio."
                     },
                     "500": {

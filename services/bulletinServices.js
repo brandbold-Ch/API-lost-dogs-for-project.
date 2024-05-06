@@ -148,11 +148,15 @@ class BulletinServices {
     }
 
     async getBulletins(id) {
-        return Bulletin.find({user: id});
+        return Bulletin.find({user: id}).sort({"identify.timestamp": -1});
     }
 
     async getBulletin(id, bulletin_id) {
         return Bulletin.findOne({_id: bulletin_id, user: id});
+    }
+
+    async getBulletinForGuest(bulletin_id) {
+        return Bulletin.findById(bulletin_id);
     }
 
     async deleteBulletin(id, bulletin_id, role) {

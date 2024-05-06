@@ -4,103 +4,76 @@
  * @file This module is for creating application services.
  */
 
-const { guest } = require('../utils/instances');
+const { guest, post} = require('../utils/instances');
+const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+
 
 exports.getLostPets = async (req, res) => {
     try {
         res.status(200).json(await guest.getAllLostPets());
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
 exports.getUserAndPet = async (req, res) => {
     try {
         res.status(200).json(await guest.getUserAndPet(req.query.pet));
-    } catch (error) {
-        res.status(500).json({message: error.message});
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
-exports.getFilterPostGender = async (req, res) => {
+exports.filterAllPosts = async (req, res) => {
     try {
-        res.status(200).json(await guest.getFilterPostGender(req.query.value));
+        if (req.query?.gender) {
+            res.status(200).json(await guest.getFilterPostGender(req.query.gender));
+        }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+        else if (req.query?.breed) {
+            res.status(200).json(await guest.getFilterPostBreed(req.query.breed));
+        }
 
-exports.getFilterPostBreed = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostBreed(req.query.value));
+        else if (req.query?.size) {
+            res.status(200).json(await guest.getFilterPostSize(req.query.size));
+        }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+        else if (req.query?.owner) {
+            res.status(200).json(await guest.getFilterPostOwner(req.query.owner));
+        }
 
-exports.getFilterPostSize = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostSize(req.query.value));
+        else if (req.query?.found) {
+            res.status(200).json(await guest.getFilterPostFound(req.query.found));
+        }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+        else if (req.query?.specie) {
+            res.status(200).json(await guest.getFilterPostSpecie(req.query.specie));
+        }
 
-exports.getFilterPostOwner = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostOwner(req.query.value));
+        else if (req.query?.date) {
+            res.status(200).json(await guest.getFilterPostLostDate(req.query.date));
+        }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+        else if (req.query?.year) {
+            res.status(200).json(await guest.getFilterPostYear(req.query.year));
+        }
 
-exports.getFilterPostFound = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostFound(req.query.value));
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-exports.getFilterPostSpecie = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostSpecie(req.query.value));
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-exports.getFilterPostById = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostById(req.query.value));
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-exports.getFilterPostLostDate = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostLostDate(req.query.value));
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-exports.getFilterPostYear = async (req, res) => {
-    try {
-        res.status(200).json(await guest.getFilterPostYear(req.query.value));
-
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
@@ -108,8 +81,12 @@ exports.getBulletins = async (req, res) => {
     try {
         res.status(200).json(await guest.getBulletins());
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 
@@ -117,8 +94,12 @@ exports.getBulletin = async (req, res) => {
     try {
         res.status(200).json(await guest.getBulletin(req.query.ad));
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 }
 

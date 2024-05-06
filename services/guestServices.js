@@ -7,6 +7,7 @@
 
 const {Post} = require('../models/post');
 const {Bulletin} = require('../models/bulletin');
+const {Rescuer} = require('../models/rescuer');
 
 /**
  * Class that provides services related to the application.
@@ -19,7 +20,15 @@ class GuestServices {
     }
 
     async getUserAndPet(pet_id) {
-        return Post.findById(pet_id, {_id: 0}).populate("user");
+        return Post.findById(pet_id, {_id: 0})
+            .populate({
+                path: "user",
+                select: {posts: 0, bulletins: 0},
+                populate: {
+                    path: "auth",
+                    select: {email: 1, _id: 0}
+                }
+            });
     };
 
     /**
@@ -30,7 +39,16 @@ class GuestServices {
      */
 
     async getAllLostPets() {
-        return Post.find({}).sort({"publication.lost_date": -1});
+        return Post.find({})
+            .populate({
+                path: "user",
+                select: {posts: 0, bulletins: 0},
+                populate: {
+                    path: "auth",
+                    select: {email: 1, _id: 0}
+                }
+            })
+            .sort({"publication.lost_date": -1});
     };
 
     async getFilterPostGender(gender) {
@@ -87,11 +105,27 @@ class GuestServices {
     }
 
     async getBulletins() {
-        return Bulletin.find({}, {user: 0}).sort({"identify.timestamp": -1});
+        return Rescuer.find({}, {user: 0, posts: 0})
+            .populate({
+                path: "bulletins",
+                select: {user: 0, _id: 0},
+                options: {
+                    sort: {"identify.timestmap": -1}
+                }
+            })
+            .populate("auth", {email: 1, _id: 0})
     }
 
     async getBulletin(id) {
-        return Bulletin.findById(id).populate("user");
+        return Bulletin.findById(id)
+            .populate({
+                path: "user",
+                select: {posts: 0, _id: 0, bulletins: 0},
+                populate: {
+                    path: "auth",
+                    select: {email: 1, _id: 0}
+                }
+            });
     }
 }
 

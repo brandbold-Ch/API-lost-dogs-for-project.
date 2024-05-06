@@ -100,6 +100,7 @@ const verifyUpdateAuth = async (req, res, next) => {
                     )
                 );
             }
+
         } else {
             next();
         }
@@ -188,9 +189,59 @@ const checkBulletinExists = async (req, res, next) => {
     }
 }
 
+const checkBulletinExistsForGuest = async (req, res, next) => {
+    try {
+        const data = await bulletin.getBulletinForGuest(req.query.ad);
+
+        if (data) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found bulletin 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
 const checkPostExists = async (req, res, next) => {
     try {
         const entity = await post.getPost(req.id, req.params.pet_id);
+
+        if (entity) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found post 🚫",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+const checkPostExistsForGuest = async (req, res, next) => {
+    try {
+        const entity = await post.getPostForGuest(req.query.pet);
 
         if (entity) {
             next();
@@ -229,7 +280,7 @@ const checkQueryParameters = async (req, res, next) => {
         }
 
         if (keys.length) {
-            if (choices[keys[0]].includes(values[0]) || choices[keys[0]].length === 0) {
+            if (choices[keys[0]]?.includes(values[0]) || choices[keys[0]]?.length === 0) {
                 next();
 
             } else {
@@ -270,7 +321,7 @@ const userRolePermission = async (req, res, next) => {
                     "You don´t have access to this route 🚫",
                     {url: req.baseUrl, verb: req.method, role: ["USER"]}
                 )
-            )
+            );
         }
 
     } catch (err) {
@@ -419,14 +470,16 @@ const seeRequest = async (req, res, next) => {
 module.exports = {
     checkPostExists,
     checkQueryParameters,
+    checkRequestExistsForUser,
+    checkPostExistsForGuest,
     rescuerRolePermission,
     userRolePermission,
     checkRequestExists,
     checkQueryStatus,
     checkBulletinExists,
+    checkBulletinExistsForGuest,
     checkEntityExists,
     checkAccountExists,
-    checkRequestExistsForUser,
     verifyUpdateAuth,
     seeRequest,
     entityExists
