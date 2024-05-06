@@ -1,11 +1,6 @@
 module.exports = {
     "/api/v2/posts/search/chrt": {
         "get": {
-            "security": [
-                {
-                    "bearerAuth": []
-                }
-            ],
             "tags": [
                 "Post controllers"
             ],
