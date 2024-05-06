@@ -42,116 +42,55 @@ exports.getPosts = async (req, res) => {
     try {
         res.status(200).json(await post.getPosts(req.id));
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 
-exports.getFilterPostGender = async (req, res) => {
+exports.filterPosts = async (req, res) => {
     try {
-        res.status(200).json(await post.getFilterPostGender(req.id, req.query.value));
+        if (req.query?.gender) {
+            res.status(200).json(await post.getFilterPostGender(req.id, req.query.gender));
+        }
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
+        else if (req.query?.breed) {
+            res.status(200).json(await post.getFilterPostBreed(req.id, req.query.breed));
+        }
 
-exports.getFilterPostBreed = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostBreed(req.id, req.query.value));
+        else if (req.query?.size) {
+            res.status(200).json(await post.getFilterPostSize(req.id, req.query.size));
+        }
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
+        else if (req.query?.owner) {
+            res.status(200).json(await post.getFilterPostOwner(req.id, req.query.owner));
+        }
 
-exports.getFilterPostSize = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostSize(req.id, req.query.value));
+        else if (req.query?.found) {
+            res.status(200).json(await post.getFilterPostFound(req.id, req.query.found));
+        }
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
+        else if (req.query?.specie) {
+            res.status(200).json(await post.getFilterPostSpecie(req.id, req.query.specie));
+        }
 
-exports.getFilterPostOwner = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostOwner(req.id, req.query.value));
+        else if (req.query?.date) {
+            res.status(200).json(await post.getFilterPostLostDate(req.id, req.query.date));
+        }
 
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
+        else if (req.query?.year) {
+            res.status(200).json(await post.getFilterPostYear(req.id, req.query.year));
+        }
 
-exports.getFilterPostFound = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostFound(req.id, req.query.value));
-
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
-
-exports.getFilterPostSpecie = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostSpecie(req.id, req.query.value));
-
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
-
-exports.getFilterPostLostDate = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostLostDate(req.id, req.query.value));
-
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
-    }
-};
-
-exports.getFilterPostYear = async (req, res) => {
-    try {
-        res.status(200).json(await post.getFilterPostYear(req.id, req.query.value));
-
-    } catch (error) {
-        res.status(500).json({
-            status: "Failed",
-            message: error.message,
-            status_code: 500
-        });
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
     }
 };
 

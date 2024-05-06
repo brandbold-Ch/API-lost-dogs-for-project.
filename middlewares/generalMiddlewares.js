@@ -4,7 +4,7 @@
  * @file This module is for user middleware.
  */
 
-const {post, auth, admin, bulletin, user} = require('../utils/instances');
+const {post, auth, admin, bulletin} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 /**
@@ -215,8 +215,8 @@ const checkPostExists = async (req, res, next) => {
 
 const checkQueryParameters = async (req, res, next) => {
     try {
-        const link = req.query.value;
-        const value = req.path.split('/').pop();
+        const keys = Object.keys(req.query);
+        const values = Object.values(req.query);
 
         const choices = {
             size: ['Chico', 'Mediano', 'Grande'],
@@ -228,13 +228,23 @@ const checkQueryParameters = async (req, res, next) => {
             specie: ['Perro', 'Gato', 'Ave']
         }
 
-        if (link && choices[value].includes(link) || choices[value].length === 0) {
-            next();
+        if (keys.length) {
+            if (choices[keys[0]].includes(values[0]) || choices[keys[0]].length === 0) {
+                next();
+
+            } else {
+                res.status(400).json(
+                    HandlerHttpVerbs.badRequest(
+                        `The parameters must be 👉 ${choices[keys[0]]} 👈`,
+                        {url: req.baseUrl, verb: req.method}
+                    )
+                );
+            }
 
         } else {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    `The parameters must be 👉 ${choices[value]} 👈`,
+                    `You did not define any filter. The parameters must be 👉 ${choices[values]} 👈`,
                     {url: req.baseUrl, verb: req.method}
                 )
             );

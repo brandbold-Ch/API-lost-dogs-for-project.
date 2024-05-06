@@ -14,6 +14,6 @@ bulletinRouter.get("/bulletins", bulletinControllers.getBulletins);
 bulletinRouter.get("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.getBulletin);
 bulletinRouter.delete("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.deleteBulletin);
 bulletinRouter.put("/bulletins/:bulletin_id", checkBulletinExists, processFormData, validateBulletinData, bulletinControllers.updateBulletin);
-bulletinRouter.delete("/bulletins/images/:bulletin_id", checkBulletinExists, validateQueryDeleteImage, bulletinControllers.deleteImage);
+bulletinRouter.delete("/bulletins/:bulletin_id/images/", checkBulletinExists, validateQueryDeleteImage, bulletinControllers.deleteImage);
 
 module.exports = {bulletinRouter};

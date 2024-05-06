@@ -15,8 +15,13 @@ const setBulletinsSchema = Joi.object({
         .optional(),
 
     te_number: Joi.string()
+        .regex(new RegExp(/^\d{10}$/))
         .max(10)
+        .min(10)
         .optional()
-});
+        .messages({
+            "string.pattern.base": "Invalid number. Must be a numeric string"
+        })
+}).options({allowUnknown: true});
 
 module.exports = {setBulletinsSchema}

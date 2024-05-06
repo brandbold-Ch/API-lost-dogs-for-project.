@@ -11,8 +11,13 @@ const setUserSchema = Joi.object({
         .required(),
 
     cellphone: Joi.string()
+        .regex(new RegExp(/^\d{10}$/))
+        .max(10)
+        .min(10)
         .optional()
-        .max(10),
+        .messages({
+            "string.pattern.base": "Invalid number. Must be a numeric string"
+        }),
 
     social_networks: Joi.object()
         .pattern(

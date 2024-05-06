@@ -8,10 +8,10 @@ const { connection } = require("./configurations/connections");
 const { useTreblle } = require("treblle");
 const { userRouter } = require("./routes/userRoutes");
 const { authRouter } = require("./routes/authRoutes");
-const { postsRouter, bulletinsRouter } = require("./routes/guestRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
 const {HandlerHttpVerbs} = require("./errors/handlerHttpVerbs");
+const mainDocs = require("./swagger/mainDocs");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const morgan = require("morgan");
@@ -20,35 +20,6 @@ require("dotenv").config();
 const  express = require("express");
 const app = express();
 
-
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'PET (Perdidos en Tapachula)',
-            version: '2.0',
-            description: 'API pets lost',
-        },
-        servers: [
-            {
-                url: 'http://localhost:5000'
-            },
-            {
-                url: 'https://pabed-api-xi.vercel.app/'
-            }
-        ],
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
-                },
-            },
-        }
-    },
-    apis: ['./routes/*.js']
-}
 
 app.use(express.json());
 
@@ -60,7 +31,7 @@ useTreblle(app, {
 app.use(
     "/api-docs",
     swaggerUi.serve,
-    swaggerUi.setup(swaggerJsDoc(options), {
+    swaggerUi.setup(mainDocs, {
             customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
             customCss: ".swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }"
         }
@@ -100,8 +71,6 @@ app.use((req, res, next) => {
 
 app.use("/api/v2/users", userRouter);
 app.use("/api/v2/auth", authRouter);
-app.use("/api/v2/bulletins", bulletinsRouter);
-app.use("/api/v2/posts", postsRouter);
 app.use("/api/v2/admins", adminRouter);
 app.use("/api/v2/rescuers", rescuerRouter);
 
