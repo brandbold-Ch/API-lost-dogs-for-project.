@@ -40,10 +40,6 @@ class AuthServices {
         return Auth.findOne({email: email});
     };
 
-    async getUser(user) {
-        return Auth.findOne({user: user});
-    };
-
     /**
      * Updates a user's credentials by their ID.
      * @async
@@ -84,25 +80,63 @@ class AuthServices {
 
     async detailToken(token) {
         try {
-            const data = jwt.verify(token, process.env.SECRET_KEY);
+            const data = jwt.verify(token.substring(7), process.env.SECRET_KEY);
+
             return {
-                start: data.iat,
-                end: data.exp,
+                start: data["iat"],
+                end: data["exp"],
                 expired: false
             }
 
-        } catch (error) {
-            if (error.name === 'TokenExpiredError') {
+        } catch (err) {
+            if (err["name"] === "TokenExpiredError") {
                 return {
                     start: null,
                     end: null,
                     expired: true
                 };
+
             } else {
-                return error;
+                throw err;
             }
         }
     };
+    
+    async refreshToken(dataSession) {
+        try {
+            if (dataSession) {
+                const details = await this.detailToken(dataSession);
+
+                if (details["expired"]) {
+                    const tokenDecrypted = jwt.decode(dataSession.substring(7), process.env.SECRET_KEY);
+                    const newToken = jwt.sign({
+                            user: tokenDecrypted["user"],
+                            role: tokenDecrypted["role"]
+                        }, process.env.SECRET_KEY,
+                        {expiresIn: process.env.EXPIRE});
+                    const newTokenDecrypted = jwt.decode(newToken, process.env.SECRET_KEY);
+
+                    return [200, {
+                        token: newToken,
+                        role: tokenDecrypted["role"],
+                        details: {
+                            start: newTokenDecrypted["iat"],
+                            end: newTokenDecrypted["exp"]
+                        }
+                    }]
+
+                } else {
+                    return [100, "Your session is still active"];
+                }
+
+            } else {
+                return null;
+            }
+            
+        } catch (err) {
+            throw err
+        }
+    }
 }
 
 module.exports = {AuthServices};

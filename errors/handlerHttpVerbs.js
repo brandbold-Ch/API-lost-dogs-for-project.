@@ -109,6 +109,15 @@ class HandlerHttpVerbs {
         });
     }
 
+    static continue(message, bodyParam) {
+
+        return HandlerHttpVerbs.templateForSuccess(message, {
+            status: "Continue ⏭️",
+            code: 100,
+            ...bodyParam
+        });
+    }
+
     static automaticClientErrorSelection(message, bodyParam, withHttpCode) {
 
         switch (withHttpCode) {

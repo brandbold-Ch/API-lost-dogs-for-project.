@@ -132,22 +132,18 @@ const validatePassword = (data) => {
         if (match) {
 
             const token = jwt.sign(
-                {
-                    user: data[1].user,
-                    role: data[1].role
-                },
+                {user: data[1]["user"], role: data[1]["role"]},
                 process.env.SECRET_KEY,
                 {expiresIn: process.env.EXPIRE}
             );
-
-            const decompile = jwt.verify(token, process.env.SECRET_KEY);
+            const decompile = jwt.decode(token, process.env.SECRET_KEY);
 
             resolve({
                 token: token,
                 role: data[1]["role"],
                 details: {
-                    start: decompile.iat,
-                    end: decompile.exp
+                    start: decompile["iat"],
+                    end: decompile["exp"]
                 }
             });
 
@@ -187,7 +183,19 @@ exports.login = async (req, res) => {
 
 exports.statusToken = async (req, res) => {
     try {
-        res.status(200).json(await auth.detailToken(req.body.token));
+        const token = req.headers.authorization;
+
+        if (token) {
+            res.status(200).json(await auth.detailToken(token));
+
+        } else {
+            res.status(400).json(
+                HandlerHttpVerbs.badRequest(
+                    "You didn't send the token 🙄",
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
 
     } catch (err) {
         res.status(500).json(
@@ -196,4 +204,43 @@ exports.statusToken = async (req, res) => {
             )
         );
     }
-};
+}
+
+exports.refreshToken = async (req, res) => {
+    try {
+        const token = await auth.refreshToken(req.headers.authorization);
+
+        if (token) {
+            if (token[0] === 200) {
+                res.status(200).json(token[1]);
+
+            } else if (token[0] === 100) {
+                res.status(201).json(
+                    HandlerHttpVerbs.continue(
+                        "Your session is still active 🏋️‍♂️", {
+                            url: req.baseUrl,
+                            verb: req.method
+                        }
+                    )
+                );
+            }
+
+        } else {
+            res.status(201).json(
+                HandlerHttpVerbs.unauthorized(
+                    "You need to have had a session previously ✅", {
+                        url: req.baseUrl,
+                        verb: req.method
+                    }
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}

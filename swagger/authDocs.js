@@ -48,5 +48,67 @@ module.exports = {
                 }
             }
         }
+    },
+    "/api/v2/auth/token/status": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Auth controllers"
+            ],
+            "summary": "Ver estado del token.",
+            "description": "Ver si el token ya caducó.",
+            "responses": {
+                "200": {
+                    "description": "Estado del token."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "401": {
+                    "description": "El token expiró."
+                },
+                "404": {
+                    "description": "La entidad no existe."
+                }
+            }
+        }
+    },
+    "/api/v2/auth/token/gen": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Auth controllers"
+            ],
+            "summary": "Generar nuevo token.",
+            "description": "Generación de nuevo token.",
+            "responses": {
+                "200": {
+                    "description": "Token nuevo."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "401": {
+                    "description": "Sin permisos suficientes."
+                },
+                "404": {
+                    "description": "La entidad no existe."
+                }
+            }
+        }
     }
 }
