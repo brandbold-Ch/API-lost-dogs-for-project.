@@ -10,6 +10,9 @@ const deleteImageSchema = Joi.object({
     tag: Joi.string()
         .valid("image", "images")
         .required()
+
+}).options({
+    abortEarly: true
 });
 
 const checkQueryStatus = Joi.object({
@@ -20,6 +23,9 @@ const checkQueryStatus = Joi.object({
             "reject"
         )
         .required()
+
+}).options({
+    abortEarly: true
 })
 
 module.exports = {

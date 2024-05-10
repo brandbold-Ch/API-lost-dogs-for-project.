@@ -13,6 +13,9 @@ const setRescuerSchema = Joi.object({
 
     description: Joi.string()
         .required()
+
+}).options({
+    abortEarly: true
 });
 
 module.exports = {setRescuerSchema}

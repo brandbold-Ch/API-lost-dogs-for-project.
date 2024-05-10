@@ -14,7 +14,8 @@ exports.setUser = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added user ✅", {
+                "Added user ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -90,7 +91,8 @@ exports.updateUser = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Updated user ✅", {
+                "Updated user ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -127,7 +129,8 @@ exports.makeRescuer = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Request sent successfully ✅", {
+                "Request sent successfully ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method

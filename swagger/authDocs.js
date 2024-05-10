@@ -94,7 +94,7 @@ module.exports = {
             "description": "Generación de nuevo token.",
             "responses": {
                 "200": {
-                    "description": "Token nuevo."
+                    "description": "Token nuevo generado o el token aún no caduca."
                 },
                 "500": {
                     "description": "Error interno del servidor."

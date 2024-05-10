@@ -45,7 +45,7 @@ module.exports = {
                             "example": {
                                 "name": "John",
                                 "lastname": "Doe",
-                                "cellphone": "123456789",
+                                "cellphone": "1234567890",
                                 "social_networks": {
                                     "facebook": "john.doe",
                                     "twitter": "@john_doe"

@@ -12,7 +12,8 @@ exports.setBulletin = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added bulletin ✅", {
+                "Added bulletin ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -65,7 +66,8 @@ exports.updateBulletin = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Updated bulletin ✅", {
+                "Updated bulletin ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method

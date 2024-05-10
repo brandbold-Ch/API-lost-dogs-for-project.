@@ -18,6 +18,7 @@ const cors = require("cors");
 require("dotenv").config();
 const  express = require("express");
 const {postsRouter, bulletinsRouter} = require("./routes/guestRoutes");
+const {errorsCodes} = require("./utils/codes");
 const app = express();
 
 
@@ -46,7 +47,8 @@ app.use(morgan('dev'));
 app.get("/", (req, res) => {
     res.status(200).json(
         HandlerHttpVerbs.ok(
-            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.0 🦮🐩🐈🦜", {
+            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.0 🦮🐩🐈🦜",
+            undefined, {
                 url: req.baseUrl,
                 verb: req.method
             }
@@ -73,6 +75,7 @@ app.use((req, res) => {
     res.status(404).json(
         HandlerHttpVerbs.notFound(
             "This route not available 🚧",
+            errorsCodes.ROUTE_NOT_FOUND,
             {url: req.baseUrl, verb: req.method}
         )
     );

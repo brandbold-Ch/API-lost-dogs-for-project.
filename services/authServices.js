@@ -123,18 +123,18 @@ class AuthServices {
                             start: newTokenDecrypted["iat"],
                             end: newTokenDecrypted["exp"]
                         }
-                    }]
+                    }];
 
                 } else {
-                    return [100, "Your session is still active"];
+                    return [200, "Your session is still active 🏋️‍♂️"];
                 }
 
             } else {
-                return null;
+                return [];
             }
             
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 }

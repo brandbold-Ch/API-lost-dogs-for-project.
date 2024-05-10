@@ -4,7 +4,7 @@
  * @file This module is for creating application services.
  */
 
-const { guest, post} = require('../utils/instances');
+const {guest} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
@@ -102,4 +102,3 @@ exports.getBulletin = async (req, res) => {
         );
     }
 }
-

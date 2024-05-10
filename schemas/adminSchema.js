@@ -17,6 +17,9 @@ const setAdminSchema = Joi.object({
         .messages({
             "any.only": "Invalid access token"
         })
+
+}).options({
+    abortEarly: true
 });
 
 module.exports = {setAdminSchema}

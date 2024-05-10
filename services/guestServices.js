@@ -23,7 +23,7 @@ class GuestServices {
         return Post.findById(pet_id, {_id: 0})
             .populate({
                 path: "user",
-                select: {posts: 0, bulletins: 0},
+                select: {posts: 0, bulletins: 0, _id: 0},
                 populate: {
                     path: "auth",
                     select: {email: 1, _id: 0}
@@ -42,7 +42,7 @@ class GuestServices {
         return Post.find({})
             .populate({
                 path: "user",
-                select: {posts: 0, bulletins: 0},
+                select: {posts: 0, bulletins: 0, _id: 0},
                 populate: {
                     path: "auth",
                     select: {email: 1, _id: 0}
@@ -108,7 +108,7 @@ class GuestServices {
         return Rescuer.find({}, {user: 0, posts: 0})
             .populate({
                 path: "bulletins",
-                select: {user: 0, _id: 0},
+                select: {user: 0},
                 options: {
                     sort: {"identify.timestmap": -1}
                 }

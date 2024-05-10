@@ -9,10 +9,8 @@ const {
     checkEntityExists,
     checkAccountExists,
     checkRequestExistsForUser,
-    seeRequest, checkQueryParameters
-} = require('../middlewares/generalMiddlewares');
-const postControllers = require("../controllers/postControllers");
-
+    seeRequest
+} = require('../middlewares/anyMiddlewares');
 
 userRouter.post("/", express.urlencoded({extended: true}), validateUserData, checkAccountExists, userControllers.setUser);
 

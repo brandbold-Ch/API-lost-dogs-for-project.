@@ -6,6 +6,8 @@
 
 const {post, auth, admin, bulletin} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const {errorsCodes} = require("../utils/codes");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -14,7 +16,6 @@ const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
  * @param {Function} next - Express next middleware function.
  * @returns {void}
  */
-
 
 const checkEntityExists = async (req, res, next) => {
     try {
@@ -27,6 +28,7 @@ const checkEntityExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found account 🚫",
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -55,6 +57,7 @@ const entityExists = async (req, res, next) => {
                 res.status(404).json(
                     HandlerHttpVerbs.notFound(
                         "Not found user 🚫",
+                        errorsCodes.DB_NOT_FOUND,
                         {url: req.baseUrl, verb: req.method}
                     )
                 );
@@ -68,6 +71,7 @@ const entityExists = async (req, res, next) => {
                 res.status(404).json(
                     HandlerHttpVerbs.notFound(
                         "Not found rescuer 🚫",
+                        errorsCodes.DB_NOT_FOUND,
                         {url: req.baseUrl, verb: req.method}
                     )
                 );
@@ -96,6 +100,7 @@ const verifyUpdateAuth = async (req, res, next) => {
                 res.status(400).json(
                     HandlerHttpVerbs.badRequest(
                         "Account already exists 🤪",
+                        errorsCodes.DB_DUPLICATED_KEY,
                         {url: req.baseUrl, verb: req.method}
                     )
                 );
@@ -125,6 +130,7 @@ const checkAccountExists = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     "Account already exists 🤪",
+                    errorsCodes.DB_DUPLICATED_KEY,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -147,6 +153,7 @@ const checkRequestExistsForUser = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     "Only one request can be made 🤪",
+                    errorsCodes.DB_DUPLICATED_KEY,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -175,6 +182,7 @@ const checkBulletinExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found bulletin 🚫",
+                    errorsCodes.DB_DUPLICATED_KEY,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -200,6 +208,7 @@ const checkBulletinExistsForGuest = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found bulletin 🚫",
+                    errorsCodes.DB_DUPLICATED_KEY,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -225,6 +234,7 @@ const checkPostExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found post 🚫",
+                    errorsCodes.DB_DUPLICATED_KEY,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -250,6 +260,7 @@ const checkPostExistsForGuest = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found post 🚫",
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -287,7 +298,7 @@ const checkQueryParameters = async (req, res, next) => {
                 res.status(400).json(
                     HandlerHttpVerbs.badRequest(
                         `The parameters must be 👉 ${choices[keys[0]]} 👈`,
-                        {url: req.baseUrl, verb: req.method}
+                        undefined, {url: req.baseUrl, verb: req.method}
                     )
                 );
             }
@@ -296,7 +307,7 @@ const checkQueryParameters = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     `You did not define any filter. The parameters must be 👉 ${choices[values]} 👈`,
-                    {url: req.baseUrl, verb: req.method}
+                    undefined, {url: req.baseUrl, verb: req.method}
                 )
             );
         }
@@ -319,6 +330,7 @@ const userRolePermission = async (req, res, next) => {
             res.status(401).json(
                 HandlerHttpVerbs.unauthorized(
                     "You don´t have access to this route 🚫",
+                    undefined,
                     {url: req.baseUrl, verb: req.method, role: ["USER"]}
                 )
             );
@@ -344,6 +356,7 @@ const rescuerRolePermission = async (req, res, next) => {
                     HandlerHttpVerbs.forbidden(
                         "You are in a waiting process, " +
                         "the administrator must activate your account ⏳",
+                        undefined,
                         {url: req.baseUrl, verb: req.method, role: req.role}
                     )
                 );
@@ -352,6 +365,7 @@ const rescuerRolePermission = async (req, res, next) => {
                 res.status(401).json(
                     HandlerHttpVerbs.unauthorized(
                         "Your request was rejected by the administrator 🚫",
+                        undefined,
                         {url: req.baseUrl, verb: req.method, role: req.role}
                     )
                 );
@@ -363,6 +377,7 @@ const rescuerRolePermission = async (req, res, next) => {
                 res.status(403).json(
                     HandlerHttpVerbs.forbidden(
                         "Your account is deactivated 📴",
+                        undefined,
                         {url: req.baseUrl, verb: req.method, role: req.role}
                     )
                 );
@@ -372,6 +387,7 @@ const rescuerRolePermission = async (req, res, next) => {
             res.status(401).json(
                 HandlerHttpVerbs.unauthorized(
                     "You don´t have access to this route 🚫",
+                    undefined,
                     {url: req.baseUrl, verb: req.method, role: ["RESCUER"]}
                 )
             );
@@ -397,6 +413,7 @@ const checkRequestExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found request 🚫",
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -427,6 +444,7 @@ const checkQueryStatus = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     `The parameters must be 👉 ${choices} 👈`,
+                    undefined,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -452,7 +470,7 @@ const seeRequest = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "You have no request, you must make one if you want to be a rescuer. 🚫",
-                    {url: req.baseUrl, verb: req.method}
+                    undefined, {url: req.baseUrl, verb: req.method}
                 )
             );
         }

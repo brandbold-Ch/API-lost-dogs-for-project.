@@ -21,7 +21,7 @@ exports.setPost = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added post ✅", {
+                "Added post ✅", undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -36,7 +36,7 @@ exports.setPost = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.getPosts = async (req, res) => {
     try {
@@ -49,7 +49,7 @@ exports.getPosts = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.filterPosts = async (req, res) => {
     try {
@@ -92,7 +92,7 @@ exports.filterPosts = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.getPost = async (req, res) => {
     try {
@@ -105,7 +105,7 @@ exports.getPost = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.updatePost = async (req, res) => {
     try {
@@ -120,7 +120,8 @@ exports.updatePost = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Updated post ✅", {
+                "Updated post ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -135,7 +136,7 @@ exports.updatePost = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.deletePost = async (req, res) => {
     try {
@@ -149,7 +150,7 @@ exports.deletePost = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.deleteImage = async (req, res) => {
     try {
@@ -171,7 +172,8 @@ exports.insertComment = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added comment ✅", {
+                "Added comment ✅",
+                undefined, {
                     data: comment,
                     url: req.baseUrl,
                     verb: req.method
@@ -186,4 +188,4 @@ exports.insertComment = async (req, res) => {
             )
         );
     }
-};
+}

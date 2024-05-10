@@ -1,4 +1,4 @@
-const {checkPostExists, checkQueryParameters, userRolePermission} = require("../middlewares/generalMiddlewares");
+const {checkPostExists, checkQueryParameters, userRolePermission} = require("../middlewares/anyMiddlewares");
 const postControllers = require("../controllers/postControllers");
 const express = require("express");
 const postRouter = express.Router();

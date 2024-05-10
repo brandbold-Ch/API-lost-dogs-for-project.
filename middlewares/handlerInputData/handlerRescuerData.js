@@ -1,31 +1,26 @@
-const {setRescuerSchema} = require("../../models/schemaValidator/rescuerSchema");
+const {setRescuerSchema} = require("../../schemas/rescuerSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
-const {setAuthSchema} = require("../../models/schemaValidator/authSchema");
+const {setAuthSchema} = require("../../schemas/authSchema");
+const {patternSelector} = require("./patternSelector");
 
 
 const validateRescuerData = async (req, res, next) => {
     try {
         const {name, address, identifier, description, email, password} = req.body;
 
-        await setRescuerSchema.validateAsync(
-            {
-                name: name,
-                address: address,
-                identifier: identifier,
-                description: description
-            },
-            {abortEarly: false}
-        );
+        await setRescuerSchema.validateAsync({
+            name: name,
+            address: address,
+            identifier: identifier,
+            description: description
+        });
 
         if (req.method === "POST") {
-            await setAuthSchema.validateAsync(
-                {
-                    email: email,
-                    password: password
-                },
-                {abortEarly: false}
-            );
+            await setAuthSchema.validateAsync({
+                email: email,
+                password: password
+            });
         }
 
         next();
@@ -35,7 +30,9 @@ const validateRescuerData = async (req, res, next) => {
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message,
+                    patternSelector(err),
+                    {url: req.baseUrl, verb: req.method}
                 )
             );
 

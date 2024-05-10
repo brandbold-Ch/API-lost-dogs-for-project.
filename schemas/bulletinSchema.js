@@ -22,6 +22,10 @@ const setBulletinsSchema = Joi.object({
         .messages({
             "string.pattern.base": "Invalid number. Must be a numeric string"
         })
-}).options({allowUnknown: true});
+
+}).options({
+    allowUnknown: true,
+    abortEarly: true
+});
 
 module.exports = {setBulletinsSchema}

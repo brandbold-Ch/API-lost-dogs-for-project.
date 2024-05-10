@@ -1,29 +1,24 @@
-const {setAdminSchema} = require("../../models/schemaValidator/adminSchema");
-const {setAuthSchema} = require("../../models/schemaValidator/authSchema");
+const {setAdminSchema} = require("../../schemas/adminSchema");
+const {setAuthSchema} = require("../../schemas/authSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
+const {patternSelector} = require("./patternSelector");
 
 
 const validateSetAdminData = async (req, res, next) => {
     try {
         const {name, lastname, token, email, password} = req.body;
 
-        await setAdminSchema.validateAsync(
-            {
-                name: name,
-                lastname: lastname,
-                token: token
-            },
-            {abortEarly: false}
-        );
+        await setAdminSchema.validateAsync({
+            name: name,
+            lastname: lastname,
+            token: token
+        });
 
-        await setAuthSchema.validateAsync(
-            {
-                email: email,
-                password: password
-            },
-            {abortEarly: false}
-        );
+        await setAuthSchema.validateAsync({
+            email: email,
+            password: password
+        });
 
         next();
 
@@ -32,7 +27,9 @@ const validateSetAdminData = async (req, res, next) => {
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message,
+                    patternSelector(err),
+                    {url: req.baseUrl, verb: req.method}
                 )
             );
 

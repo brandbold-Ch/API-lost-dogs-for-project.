@@ -9,6 +9,7 @@ const {Request} = require("../models/rescuer");
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {errorsCodes} = require("../utils/codes");
 
 
 exports.getAuth = async (req, res) => {
@@ -30,7 +31,8 @@ exports.updateAuth = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Updated credentials ✅", {
+                "Updated credentials ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -43,7 +45,8 @@ exports.updateAuth = async (req, res) => {
         if (err.message === "Incorrect") {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    "Passwords do not match 🔐", {
+                    "Passwords do not match 🔐",
+                    undefined, {
                         url: req.baseUrl,
                         verb: req.method
                     }
@@ -80,7 +83,6 @@ const typeUser = (data) => {
                 case "disabled":
                     reject([403, "Your account is deactivated 📴"]);
                     break;
-
             }
         }
         resolve(data);
@@ -120,7 +122,7 @@ const validateUser = (body) => {
             resolve([body, entity]);
 
         } else {
-            reject([404, "Not found account 👻"]);
+            reject([404, "Not found account 👻", errorsCodes.DB_NOT_FOUND]);
         }
     });
 }
@@ -164,10 +166,16 @@ exports.login = async (req, res) => {
         .catch(err => {
 
             if (err instanceof Array) {
+                let errorMsg;
+
+                if (err.length === 3) {
+                    errorMsg = err[2]
+                }
 
                 res.status(err[0]).json(
                     HandlerHttpVerbs.automaticClientErrorSelection(
-                        err[1], {url: req.baseUrl, verb: req.method,}, err[0]
+                        err[1], {url: req.baseUrl, verb: req.method,},
+                        errorMsg, err[0]
                     )
                 );
 
@@ -192,7 +200,10 @@ exports.statusToken = async (req, res) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     "You didn't send the token 🙄",
-                    {url: req.baseUrl, verb: req.method}
+                    undefined, {
+                        url: req.baseUrl,
+                        verb: req.method
+                    }
                 )
             );
         }
@@ -210,14 +221,14 @@ exports.refreshToken = async (req, res) => {
     try {
         const token = await auth.refreshToken(req.headers.authorization);
 
-        if (token) {
-            if (token[0] === 200) {
-                res.status(200).json(token[1]);
+        if (token.length) {
+            if (token[1] instanceof Object) {
+                res.status(token[0]).json(token[1]);
 
-            } else if (token[0] === 100) {
-                res.status(201).json(
-                    HandlerHttpVerbs.continue(
-                        "Your session is still active 🏋️‍♂️", {
+            } else {
+                res.status(token[0]).json(
+                    HandlerHttpVerbs.ok(
+                        token[1], undefined, {
                             url: req.baseUrl,
                             verb: req.method
                         }
@@ -228,7 +239,8 @@ exports.refreshToken = async (req, res) => {
         } else {
             res.status(201).json(
                 HandlerHttpVerbs.unauthorized(
-                    "You need to have had a session previously ✅", {
+                    "You need to have had a session previously ✅",
+                    undefined, {
                         url: req.baseUrl,
                         verb: req.method
                     }

@@ -1,11 +1,12 @@
-const {updateAuthSchema} = require("../../models/schemaValidator/authSchema");
+const {updateAuthSchema} = require("../../schemas/authSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
+const {patternSelector} = require("./patternSelector");
 
 
 const validateUpdateAuthData = async (req, res, next) => {
     try {
-        await updateAuthSchema.validateAsync(req.body, {abortEarly: false});
+        await updateAuthSchema.validateAsync(req.body);
         next();
 
     } catch (err) {
@@ -13,7 +14,9 @@ const validateUpdateAuthData = async (req, res, next) => {
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message,
+                    patternSelector(err),
+                    {url: req.baseUrl, verb: req.method}
                 )
             );
 

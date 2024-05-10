@@ -1,19 +1,22 @@
+const {statusCodes, errorsCodes} = require("../utils/codes");
+
+
 class HandlerHttpVerbs {
 
     constructor() {
     }
 
     static templateForErrors(message, bodyError) {
-        const {status, url, role, code, verb} = bodyError;
+        const {status, url, role, codes, verb} = bodyError;
 
         return {
             status: status,
             error: {
-                status_code: code,
+                codes: codes,
                 message: message,
                 details: {
-                    base_url: url,
-                    allowed_role: role,
+                    baseUrl: url,
+                    allowedRole: role,
                     method: verb
                 }
             }
@@ -21,27 +24,30 @@ class HandlerHttpVerbs {
     }
 
     static templateForSuccess(message, bodySuccess) {
-        const {data, status, code, url, verb} = bodySuccess;
+        const {data, status, codes, url, verb} = bodySuccess;
 
         return {
             status: status,
             data: data,
             description: {
-                status_code: code,
+                codes: codes,
                 message: message,
                 details: {
-                    base_url: url,
+                    baseUrl: url,
                     method: verb
                 }
             }
         }
     }
 
-    static forbidden(message, bodyParam) {
+    static forbidden(message, extraError=undefined, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.templateForErrors(message, extraError, {
             status: "Forbidden 💥",
-            code: 403,
+            codes: {
+                statusCode: statusCodes.FORBIDDEN,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
@@ -50,89 +56,113 @@ class HandlerHttpVerbs {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Internal server error 💀",
-            code: 500,
+            codes: {
+                statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+                errorCode: errorsCodes.SERVER_UNKNOWN_ERROR
+            },
             ...bodyParam
         });
     }
 
-    static notFound(message, bodyParam) {
+    static notFound(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Not found 🤷‍♂️",
-            code: 404,
+            codes: {
+                statusCode: statusCodes.NOT_FOUND,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static badRequest(message, bodyParam) {
+    static badRequest(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Bad request 🤨",
-            code: 400,
+            codes: {
+                statusCode: statusCodes.BAD_REQUEST,
+                errorCode: extraError
+            } ,
             ...bodyParam
         });
     }
 
-    static unauthorized(message, bodyParam) {
+    static unauthorized(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Unauthorized 🔒",
-            code: 401,
+            codes: {
+                statusCode: statusCodes.UNAUTHORIZED,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static ok(message, bodyParam) {
+    static ok(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Ok 👍",
-            code: 200,
+            codes: {
+                statusCode: statusCodes.OK,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static created(message, bodyParam) {
+    static created(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Created 🎊",
-            code: 201,
+            codes: {
+                statusCode: statusCodes.CREATED,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static accepted(message, bodyParam) {
+    static accepted(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Accepted 🤝",
-            code: 202,
+            codes: {
+                statusCode: statusCodes.ACCEPTED,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static continue(message, bodyParam) {
+    static continue(message, extraError=undefined, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Continue ⏭️",
-            code: 100,
+            codes: {
+                statusCode: statusCodes.CONTINUE,
+                errorCode: extraError
+            },
             ...bodyParam
         });
     }
 
-    static automaticClientErrorSelection(message, bodyParam, withHttpCode) {
+    static automaticClientErrorSelection(message, bodyParam, extraError, withHttpCode) {
 
         switch (withHttpCode) {
 
             case 400:
-                return HandlerHttpVerbs.badRequest(message, bodyParam);
+                return HandlerHttpVerbs.badRequest(message, extraError, bodyParam);
 
             case 401:
-                return HandlerHttpVerbs.unauthorized(message, bodyParam);
+                return HandlerHttpVerbs.unauthorized(message, extraError, bodyParam);
 
             case 403:
-                return HandlerHttpVerbs.forbidden(message, bodyParam);
+                return HandlerHttpVerbs.forbidden(message, extraError, bodyParam);
 
             case 404:
-                return HandlerHttpVerbs.notFound(message, bodyParam);
+                return HandlerHttpVerbs.notFound(message, extraError, bodyParam);
         }
     }
 }

@@ -8,7 +8,8 @@ exports.setAdmin = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added admin ✅", {
+                "Added admin ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -44,7 +45,8 @@ exports.updateAdmin = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Update admin ✅", {
+                "Update admin ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -112,7 +114,7 @@ exports.actionRequest = async (req, res) => {
 
         res.status(200).json(
             HandlerHttpVerbs.ok(
-                message, {
+                message, undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -185,7 +187,6 @@ exports.getRescuer = async (req, res) => {
 exports.deleteRescuer = async (req, res) => {
     try {
         await admin.deleteRescuer(req.params.rescuer_id);
-
         res.status(204).end();
 
     } catch (err) {

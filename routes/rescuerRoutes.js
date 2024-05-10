@@ -10,7 +10,7 @@ const {
     checkEntityExists,
     checkAccountExists,
     rescuerRolePermission,
-} = require("../middlewares/generalMiddlewares");
+} = require("../middlewares/anyMiddlewares");
 
 
 rescuerRouter.post("/", express.urlencoded({extended: true}), validateRescuerData, checkAccountExists, rescuerControllers.setRescuer);

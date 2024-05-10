@@ -1,4 +1,4 @@
-const {checkBulletinExists, rescuerRolePermission} = require("../middlewares/generalMiddlewares");
+const {checkBulletinExists, rescuerRolePermission} = require("../middlewares/anyMiddlewares");
 const bulletinControllers = require("../controllers/bulletinControllers");
 const express = require("express");
 const bulletinRouter = express.Router();

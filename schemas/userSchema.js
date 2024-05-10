@@ -22,12 +22,16 @@ const setUserSchema = Joi.object({
     social_networks: Joi.object()
         .pattern(
             Joi.string()
-                .pattern(new RegExp("^[a-zA-Z0-9_]+$")).required(),
+                .pattern(new RegExp("^[a-zA-Z0-9_]+$"))
+                .required(),
 
             Joi.string()
                 .required()
         )
         .required()
+
+}).options({
+    abortEarly: true
 });
 
 module.exports = {setUserSchema};

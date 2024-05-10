@@ -17,7 +17,8 @@ class RescuerServices {
     }
 
     async getRescuers() {
-        return Rescuer.find({});
+        return Rescuer.find({}, {posts: 0, bulletins: 0})
+            .populate("auth",  {email: 1, password: 1, _id: 0});
     }
 
     async setRescuer(data) {

@@ -89,7 +89,8 @@ class UserServices {
      */
 
     async getUsers() {
-        return User.find({});
+        return User.find({}, {posts: 0, bulletins: 0})
+            .populate("auth", {email: 1, password: 1, _id: 0});
     };
 
     /**

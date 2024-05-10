@@ -1,11 +1,12 @@
-const {deleteImageSchema, checkQueryStatus} = require("../../models/schemaValidator/anySchema");
+const {deleteImageSchema, checkQueryStatus} = require("../../schemas/anySchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
+const {patternSelector} = require("./patternSelector");
 
 
 const validateQueryDeleteImage = async (req, res, next) => {
     try {
-        await deleteImageSchema.validateAsync(req.query, {abortEarly: false});
+        await deleteImageSchema.validateAsync(req.query);
         next();
 
     } catch (err) {
@@ -13,7 +14,9 @@ const validateQueryDeleteImage = async (req, res, next) => {
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message,
+                    patternSelector(err),
+                    {url: req.baseUrl, verb: req.method}
                 )
             );
 
@@ -29,7 +32,7 @@ const validateQueryDeleteImage = async (req, res, next) => {
 
 const validateQueryAction = async (req, res, next) => {
     try {
-        await checkQueryStatus.validateAsync(req.query, {abortEarly: false});
+        await checkQueryStatus.validateAsync(req.query);
         next();
 
     } catch (err) {
@@ -37,7 +40,9 @@ const validateQueryAction = async (req, res, next) => {
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message,
+                    patternSelector(err),
+                    {url: req.baseUrl, verb: req.method}
                 )
             );
 

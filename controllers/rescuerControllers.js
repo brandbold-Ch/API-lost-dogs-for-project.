@@ -7,7 +7,8 @@ exports.setRescuer = async (req, res) => {
 
         res.status(201).json(
             HandlerHttpVerbs.created(
-                "Added rescuer ✅", {
+                "Added rescuer ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method
@@ -57,7 +58,8 @@ exports.updateRescuer = async (req, res) => {
 
         res.status(202).json(
             HandlerHttpVerbs.accepted(
-                "Updated rescuer ✅", {
+                "Updated rescuer ✅",
+                undefined, {
                     data: response_body,
                     url: req.baseUrl,
                     verb: req.method

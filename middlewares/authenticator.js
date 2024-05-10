@@ -91,7 +91,6 @@ const verifyToken = (token) => {
                 } else {
                     reject(err);
                 }
-
             }
 
         } else {
@@ -132,6 +131,7 @@ const Authenticate = (req, res, next) => {
                             verb: req.method,
                             role: rolePermissions(req.baseUrl)
                         },
+                        undefined,
                         err[0]
                     )
                 );

@@ -1,5 +1,5 @@
 const guestControllers = require('../controllers/guestControllers');
-const {checkPostExistsForGuest, checkQueryParameters, checkBulletinExistsForGuest} = require('../middlewares/generalMiddlewares');
+const {checkPostExistsForGuest, checkQueryParameters, checkBulletinExistsForGuest} = require('../middlewares/anyMiddlewares');
 const express = require('express');
 const postControllers = require("../controllers/postControllers");
 const postsRouter = express.Router();

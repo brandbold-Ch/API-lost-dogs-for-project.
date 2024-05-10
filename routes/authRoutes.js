@@ -1,9 +1,8 @@
 const authControllers = require('../controllers/authControllers');
 const express = require('express');
 const {validateUpdateAuthData} = require("../middlewares/handlerInputData/handlerAuthData");
-const {verifyUpdateAuth} = require("../middlewares/generalMiddlewares");
+const {verifyUpdateAuth} = require("../middlewares/anyMiddlewares");
 const authRouter = express.Router();
-const {Authenticate} = require("../middlewares/authenticator");
 
 
 authRouter.post("/login", express.urlencoded({extended: true}), authControllers.login);

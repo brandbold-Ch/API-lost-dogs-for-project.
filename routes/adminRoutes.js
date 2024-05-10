@@ -11,7 +11,7 @@ const {
     checkQueryStatus,
     checkAccountExists,
     entityExists
-} = require("../middlewares/generalMiddlewares");
+} = require("../middlewares/anyMiddlewares");
 
 
 adminRouter.post("/", express.urlencoded({extended: true}), validateSetAdminData, checkAccountExists, adminControllers.setAdmin);
