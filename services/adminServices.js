@@ -172,12 +172,12 @@ class AdminServices {
         return await this.rescuer.getRescuers();
     }
 
-    async getRescuer(collab_id) {
-        return await this.rescuer.getRescuer(collab_id);
+    async getRescuer(rescuer_id) {
+        return await this.rescuer.getRescuer(rescuer_id);
     }
 
-    async deleteRescuer(collab_id) {
-        await this.rescuer.deleteRescuer(collab_id);
+    async deleteRescuer(rescuer_id) {
+        await this.rescuer.deleteRescuer(rescuer_id);
     }
 
     async getUsers() {

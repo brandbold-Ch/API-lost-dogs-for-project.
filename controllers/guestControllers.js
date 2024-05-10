@@ -4,7 +4,7 @@
  * @file This module is for creating application services.
  */
 
-const {guest} = require('../utils/instances');
+const {guest, post} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
@@ -66,6 +66,10 @@ exports.filterAllPosts = async (req, res) => {
 
         else if (req.query?.year) {
             res.status(200).json(await guest.getFilterPostYear(req.query.year));
+        }
+
+        else if (req.query?.lost_date) {
+            res.status(200).json(await guest.getFilterPostLostDate(req.query.lost_date));
         }
 
     } catch (err) {

@@ -29,7 +29,7 @@ class GuestServices {
                     select: {email: 1, _id: 0}
                 }
             });
-    };
+    }
 
     /**
      * Get information about all lost dogs based on ownership.
@@ -49,42 +49,37 @@ class GuestServices {
                 }
             })
             .sort({"publication.lost_date": -1});
-    };
+    }
 
     async getFilterPostGender(gender) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.details.gender === gender);
-    };
+    }
 
     async getFilterPostBreed(breed) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.details.breed === breed);
-    };
+    }
 
     async getFilterPostSize(size) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.details.size === size);
-    };
+    }
 
     async getFilterPostOwner(owner) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.status.owner === JSON.parse(owner));
-    };
+    }
 
     async getFilterPostFound(found) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.status.found === JSON.parse(found));
-    };
-
-    async getFilterPostById(id) {
-        const array = await this.getAllLostPets();
-        return array.filter(key => key._id.toString() === id);
-    };
+    }
 
     async getFilterPostSpecie(specie) {
         const array = await this.getAllLostPets();
         return array.filter(key => key.details.specie === specie);
-    };
+    }
 
     async getFilterPostLostDate(lost_date) {
         const array = await this.getAllLostPets();
@@ -110,7 +105,7 @@ class GuestServices {
                 path: "bulletins",
                 select: {user: 0},
                 options: {
-                    sort: {"identify.timestmap": -1}
+                    sort: {"identify.timestamp": -1}
                 }
             })
             .populate("auth", {email: 1, _id: 0})

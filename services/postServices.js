@@ -55,9 +55,9 @@ class PostServices {
 
             await Post.updateOne({_id: pet_id, user: id}, selector);
         }));
-    };
+    }
 
-    async postsAll(id) {
+    async allPosts(id) {
         return Post.find({user: id}).sort({"publication.lost_date": -1});
     }
 
@@ -125,44 +125,44 @@ class PostServices {
 
         await session.endSession();
         return output_post;
-    };
+    }
 
     async getPosts(id) {
-        return await this.postsAll(id);
-    };
+        return await this.allPosts(id);
+    }
 
     async getFilterPostGender(id, gender) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.details.gender === gender);
-    };
+    }
 
     async getFilterPostBreed(id, breed) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.details.breed === breed);
-    };
+    }
 
     async getFilterPostSize(id, size) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.details.size === size);
-    };
+    }
 
     async getFilterPostOwner(id, owner) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.status.owner === JSON.parse(owner));
-    };
+    }
 
     async getFilterPostFound(id, found) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.status.found === JSON.parse(found));
-    };
+    }
 
     async getFilterPostSpecie(id, specie) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
         return array.filter(key => key.details.specie === specie);
-    };
+    }
 
     async getFilterPostLostDate(id, lost_date) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
 
         return array.filter(key => {
             const date = key.publication.lost_date
@@ -171,7 +171,7 @@ class PostServices {
     }
 
     async getFilterPostYear(id, year) {
-        const array = await this.postsAll(id);
+        const array = await this.allPosts(id);
 
         return array.filter(key => {
             const date = key.publication.lost_date
@@ -265,12 +265,12 @@ class PostServices {
                 }
 
                 if (output_post["identify"]["gallery"].length) {
-                    await this.imageTools.deleteGallery(output_post["identify"]["gallery"])
+                    await this.imageTools.deleteGallery(output_post["identify"]["gallery"]);
                 }
             })
 
         await session.endSession();
-    };
+    }
 
     async updatePost(id, pet_id, pet_data) {
         const context_post = await this.getPost(id, pet_id);
@@ -355,7 +355,7 @@ class PostServices {
         );
 
         return comment;
-    };
+    }
 
     async getUrlsImages(id) {
         return Post.aggregate([

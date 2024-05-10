@@ -85,6 +85,10 @@ exports.filterPosts = async (req, res) => {
             res.status(200).json(await post.getFilterPostYear(req.id, req.query.year));
         }
 
+        else if (req.query?.lost_date) {
+            res.status(200).json(await post.getFilterPostLostDate(req.id, req.query.lost_date));
+        }
+
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
