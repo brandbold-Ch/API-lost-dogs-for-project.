@@ -45,18 +45,19 @@ class AuthServices {
      * @async
      * @function
      * @param {string} id - User ID.
-     * @param {Object} data - New credential data.
-     * @param {string} data.email - New email for the user.
-     * @param {string} data.password - New password for the user.
+     * @param {Object} auth_data - New credential data.
+     * @param {string} auth_data.email - New email for the user.
+     * @param {string} auth_data.password - New password for the user.
      * @returns {Promise<void>} A Promise that will be resolved once the credentials update is complete.
      */
 
-    async updateAuth(id, data) {
-        let {email, new_password, old_password} = data;
+    async updateAuth(id, auth_data) {
+        let {email, new_password, old_password} = auth_data;
         const user = await Auth.findOne({user: id});
 
         if (bcrypt.compareSync(old_password, user["password"])) {
             new_password = await bcrypt.hash(new_password, 10);
+
         } else {
             throw Error('Incorrect');
         }

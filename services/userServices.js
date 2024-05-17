@@ -29,8 +29,8 @@ class UserServices {
         this.imageTools = new ImageTools();
     }
 
-    async setUser(data) {
-        const {name, lastname, cellphone, email, password} = data;
+    async setUser(user_data) {
+        const {name, lastname, cellphone, email, password} = user_data;
         const session = await connection.startSession();
         let output_user, output_auth;
 
@@ -41,7 +41,7 @@ class UserServices {
                     name: name,
                     lastname: lastname,
                     cellphone: cellphone,
-                    social_networks: data["social_networks"]
+                    social_networks: user_data["social_networks"]
                 }
             ], {session})
                 .then((user) => {
@@ -79,7 +79,7 @@ class UserServices {
 
         await session.endSession();
         return output_user;
-    };
+    }
 
     /**
      * Gets all users.
@@ -91,7 +91,7 @@ class UserServices {
     async getUsers() {
         return User.find({}, {posts: 0, bulletins: 0})
             .populate("auth", {email: 1, password: 1, _id: 0});
-    };
+    }
 
     /**
      * Obtains information about a user by their ID.
@@ -122,7 +122,7 @@ class UserServices {
                     }
                 }
             });
-    };
+    }
 
     /**
      * Delete a user by their ID and also delete their credentials.
@@ -165,12 +165,12 @@ class UserServices {
      * @async
      * @function
      * @param {string} id - User ID.
-     * @param {Object} data - New user data.
+     * @param {Object} user_data - New user data.
      * @returns {Promise<void>} A Promise that will be resolved once the user update is complete.
      */
 
-    async updateUser(id, data) {
-        const {name, lastname, cellphone, social_networks} = data;
+    async updateUser(id, user_data) {
+        const {name, lastname, cellphone, social_networks} = user_data;
         const socials = [];
 
         for (const key in social_networks) {

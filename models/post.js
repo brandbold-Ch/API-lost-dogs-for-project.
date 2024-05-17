@@ -153,4 +153,4 @@ const postSchema = new Schema({
 postSchema.index({user: 1});
 
 const Post = mongoose.model("Post", postSchema);
-module.exports = {Post};
+module.exports = {Post}

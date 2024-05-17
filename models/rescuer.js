@@ -36,6 +36,10 @@ const rescuerSchema = new Schema({
     bulletins: [{
         type: Schema.Types.ObjectId,
         ref: "Bulletin"
+    }],
+    blogs: [{
+        type: Schema.Types.ObjectId,
+        ref: "Blog"
     }]
 }, {
     versionKey: false
@@ -92,4 +96,4 @@ const Rescuer = mongoose.model("Rescuer", rescuerSchema);
 module.exports = {
     Rescuer,
     Request
-};
+}

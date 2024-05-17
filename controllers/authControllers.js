@@ -23,7 +23,7 @@ exports.getAuth = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.updateAuth = async (req, res) => {
     try {
@@ -61,7 +61,7 @@ exports.updateAuth = async (req, res) => {
             );
         }
     }
-};
+}
 
 const typeUser = (data) => {
     return new Promise(async (resolve, reject) => {
@@ -169,7 +169,7 @@ exports.login = async (req, res) => {
                 let errorMsg;
 
                 if (err.length === 3) {
-                    errorMsg = err[2]
+                    errorMsg = err[2];
                 }
 
                 res.status(err[0]).json(

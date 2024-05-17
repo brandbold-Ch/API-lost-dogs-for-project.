@@ -13,8 +13,8 @@ class AdminServices {
         this.users = new UserServices();
     }
 
-    async setAdmin(data) {
-        const {name, lastname, email, password} = data;
+    async setAdmin(admin_data) {
+        const {name, lastname, email, password} = admin_data;
         const session = await connection.startSession();
         let output_admin, output_auth;
 
@@ -63,8 +63,8 @@ class AdminServices {
         return Admin.findById(id).populate("auth", {email: 1, password: 1, _id: 0});
     }
 
-    async updateAdmin(id, data) {
-        return Admin.findByIdAndUpdate(id, {$set: data}, {runValidators: true, new: true});
+    async updateAdmin(id, admin_data) {
+        return Admin.findByIdAndUpdate(id, {$set: admin_data}, {runValidators: true, new: true});
     }
 
     async deleteAdmin(id) {
@@ -165,7 +165,7 @@ class AdminServices {
     }
 
     async filterRequests(filter) {
-        return Request.find({status: filter})
+        return Request.find({status: filter});
     }
 
     async getRescuers() {

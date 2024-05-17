@@ -245,12 +245,12 @@ class BulletinServices {
         })
             .then(async () => {
                 if (array_images.length) {
-                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images)
+                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images);
                 }
             })
 
         await session.endSession();
-        return output_bulletin
+        return output_bulletin;
     }
 
     async getUrlsImages(id) {

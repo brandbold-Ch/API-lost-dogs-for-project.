@@ -85,7 +85,7 @@ class GuestServices {
         const array = await this.getAllLostPets();
 
         return array.filter(key => {
-            const date = key.publication.lost_date
+            const date = key.publication.lost_date;
             return date.toISOString() === lost_date.substring(0, 23) + "Z";
         });
     }
@@ -94,7 +94,7 @@ class GuestServices {
         const array = await this.getAllLostPets();
 
         return array.filter(key => {
-            const date = key.publication.lost_date
+            const date = key.publication.lost_date;
             return date.getFullYear() === parseInt(year);
         });
     }

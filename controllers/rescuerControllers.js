@@ -1,6 +1,7 @@
 const { rescuer } = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
+
 exports.setRescuer = async (req, res) => {
     try {
         const response_body = await rescuer.setRescuer(req.body);

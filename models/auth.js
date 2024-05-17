@@ -99,4 +99,4 @@ authSchema.pre("save", async function (next) {
 authSchema.index({user: 1}, {unique: true});
 
 const Auth = mongoose.model("Auth", authSchema);
-module.exports = {Auth};
+module.exports = {Auth}

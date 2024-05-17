@@ -58,6 +58,10 @@ const userSchema = new Schema({
     bulletins: [{
         type: Schema.Types.ObjectId,
         ref: "Bulletin"
+    }],
+    blogs: [{
+        type: Schema.Types.ObjectId,
+        ref: "Blog"
     }]
 }, {
     versionKey: false
@@ -85,4 +89,4 @@ userSchema.pre("save", function (next) {
  */
 
 const User = mongoose.model("User", userSchema);
-module.exports = { User };
+module.exports = { User }

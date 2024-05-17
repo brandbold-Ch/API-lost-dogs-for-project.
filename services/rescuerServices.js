@@ -21,8 +21,8 @@ class RescuerServices {
             .populate("auth",  {email: 1, password: 1, _id: 0});
     }
 
-    async setRescuer(data) {
-        const {name, email, password, address, identifier, description} = data;
+    async setRescuer(rescuer_data) {
+        const {name, email, password, address, identifier, description} = rescuer_data;
         const session = await connection.startSession();
         let output_rescuer, output_auth;
 
@@ -102,10 +102,10 @@ class RescuerServices {
             });
     }
 
-    async updateRescuer(id, data) {
+    async updateRescuer(id, rescuer_data) {
         return Rescuer.findByIdAndUpdate(id,
             {
-                $set: data
+                $set: rescuer_data
             },
             {
                 runValidators: true,

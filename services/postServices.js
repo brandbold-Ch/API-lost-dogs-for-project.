@@ -33,7 +33,7 @@ class PostServices {
         }
     }
 
-    async addGalleryToAPost(id, pet_id, images) {
+    async addGalleryToAPost(id, post_id, images) {
         await Promise.all(images.map(async (key) => {
             let new_image = await this.imageTools.uploadImage(key["buffer"]);
             let selector;
@@ -53,7 +53,7 @@ class PostServices {
                 }
             }
 
-            await Post.updateOne({_id: pet_id, user: id}, selector);
+            await Post.updateOne({_id: post_id, user: id}, selector);
         }));
     }
 
@@ -61,19 +61,19 @@ class PostServices {
         return Post.find({user: id}).sort({"publication.lost_date": -1});
     }
 
-    async getPost(id, pet_id) {
-        return Post.findOne({_id: pet_id, user: id});
+    async getPost(id, post_id) {
+        return Post.findOne({_id: post_id, user: id});
     }
 
     async getPostForGuest(id) {
         return Post.findById(id);
     }
 
-    async setPost(id, pet_data, role) {
+    async setPost(id, post_data, role) {
         const session = await connection.startSession();
         const collection = this.modelDetector(role);
-        const obj_data = pet_data[0];
-        const array_images = pet_data[1];
+        const obj_data = post_data[0];
+        const array_images = post_data[1];
         let output_post;
 
         await session.withTransaction(async () => {
@@ -179,7 +179,7 @@ class PostServices {
         });
     }
 
-    async deletePartialGallery(id, pet_id, queries) {
+    async deletePartialGallery(id, post_id, queries) {
         const session = await connection.startSession();
         let output_update, chunk, selector;
 
@@ -210,7 +210,7 @@ class PostServices {
 
             await Post.updateOne(
                 {
-                    _id: pet_id,
+                    _id: post_id,
                     user: id,
                     ...selector
                 },
@@ -230,7 +230,7 @@ class PostServices {
         await session.endSession();
     }
 
-    async deletePost(id, pet_id, role) {
+    async deletePost(id, post_id, role) {
         const session = await connection.startSession();
         const collection = this.modelDetector(role);
         let output_post;
@@ -239,7 +239,7 @@ class PostServices {
 
             await Post.findOneAndDelete(
                 {
-                    _id: pet_id,
+                    _id: post_id,
                     user: id
                 },
                 {session}
@@ -254,7 +254,7 @@ class PostServices {
                 },
                 {
                     $pull: {
-                        posts: pet_id
+                        posts: post_id
                     }
                 }, {session}
             );
@@ -272,18 +272,18 @@ class PostServices {
         await session.endSession();
     }
 
-    async updatePost(id, pet_id, pet_data) {
-        const context_post = await this.getPost(id, pet_id);
+    async updatePost(id, post_id, post_data) {
+        const context_post = await this.getPost(id, post_id);
         const session = await connection.startSession();
-        const obj_data = pet_data[0];
-        const array_images = pet_data[1];
+        const obj_data = post_data[0];
+        const array_images = post_data[1];
         let output_post;
 
         await session.withTransaction(async () => {
 
             await Post.findOneAndUpdate(
                 {
-                    _id: pet_id,
+                    _id: post_id,
                     user: id
                 },
                 {
@@ -330,7 +330,7 @@ class PostServices {
         })
             .then(async () => {
                 if (array_images.length) {
-                    await this.addGalleryToAPost(id, pet_id, array_images);
+                    await this.addGalleryToAPost(id, post_id, array_images);
                 }
             })
 
@@ -338,14 +338,14 @@ class PostServices {
         return output_post;
     }
 
-    async insertComment(id, pet_id, data, role) {
+    async insertComment(id, post_id, data, role) {
         const collection = this.modelDetector(role);
         const entity = await collection[1].findById(id, {name: 1});
         const comment = {title: data, timestamp: Date.now(), user: entity}
 
         await Post.updateOne(
             {
-                _id: pet_id
+                _id: post_id
             },
             {
                 $push: {
