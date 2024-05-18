@@ -3,6 +3,7 @@ const {validateRescuerData} = require("../middlewares/handlerInputData/handlerRe
 const {Authenticate} = require('../middlewares/authenticator');
 const {postRouter} = require("./postRoutes");
 const {bulletinRouter} = require("./bulletinRoutes");
+const {blogRouter} = require("./blogRoutes");
 const {authRouter} = require("./authRoutes");
 const express = require("express");
 const rescuerRouter = express.Router();
@@ -28,7 +29,8 @@ rescuerRouter.put("/", express.urlencoded({extended: true}), validateRescuerData
 rescuerRouter.use([
     authRouter,
     postRouter,
-    bulletinRouter
+    bulletinRouter,
+    blogRouter
 ]);
 
 module.exports = {rescuerRouter};

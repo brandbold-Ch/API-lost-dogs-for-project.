@@ -2,6 +2,7 @@ const userControllers = require('../controllers/userControllers');
 const {postRouter} = require("./postRoutes");
 const {bulletinRouter} = require("./bulletinRoutes");const {Authenticate} = require('../middlewares/authenticator');
 const {authRouter} = require("./authRoutes");
+const {blogRouter} = require("./blogRoutes");
 const {validateUserData} = require("../middlewares/handlerInputData/handlerUserData");
 const express = require('express');
 const userRouter = express.Router();
@@ -29,7 +30,8 @@ userRouter.get("/requests", seeRequest, userControllers.getRequests);
 userRouter.use([
     authRouter,
     postRouter,
-    bulletinRouter
+    bulletinRouter,
+    blogRouter
 ]);
 
 module.exports = {userRouter};

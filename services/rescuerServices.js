@@ -2,10 +2,12 @@ const {Request, Rescuer} = require('../models/rescuer');
 const {Auth} = require('../models/auth');
 const {Bulletin} = require("../models/bulletin");
 const {Post} = require("../models/post");
+const {Blog} = require("../models/blog");
 const {PostServices} = require("../services/postServices");
 const {BulletinServices} = require("../services/bulletinServices");
 const {ImageTools} = require("../utils/imageTools");
 const {connection} = require("../configurations/connections");
+const {BlogServices} = require("./blogServices");
 
 
 class RescuerServices {
@@ -13,6 +15,7 @@ class RescuerServices {
     constructor() {
         this.posts = new PostServices();
         this.bulletins = new BulletinServices();
+        this.blogs = new BlogServices();
         this.imageTools = new ImageTools();
     }
 
@@ -99,6 +102,14 @@ class RescuerServices {
                         "identify.timestamp": -1
                     }
                 }
+            })
+            .populate({
+                path: "blogs",
+                options: {
+                    sort: {
+                        "markers.timestamp": -1
+                    }
+                }
             });
     }
 
@@ -118,6 +129,7 @@ class RescuerServices {
         const session = await connection.startSession();
         const array_urls_posts = await this.posts.getUrlsImages(id);
         const array_urls_bulletins = await this.bulletins.getUrlsImages(id);
+        const array_urls_blogs = await this.blogs.getUrlsImages(id);
 
         await session.withTransaction(async () => {
 
@@ -126,7 +138,8 @@ class RescuerServices {
                 Auth.deleteOne({user: id}, {session}),
                 Rescuer.deleteOne({_id: id}, {session}),
                 Bulletin.deleteMany({user: id}, {session}),
-                Post.deleteMany({user: id}, {session})
+                Post.deleteMany({user: id}, {session}),
+                Blog.deleteMany({user: id}, {session})
             ]);
         })
             .then(async () => {
@@ -136,6 +149,10 @@ class RescuerServices {
                 
                 if (array_urls_posts.length) {
                     await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
+                }
+
+                if (array_urls_blogs.length) {
+                    await this.imageTools.deleteImages(array_urls_blogs[0]["allIds"]);
                 }
             })
 

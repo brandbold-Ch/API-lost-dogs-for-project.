@@ -126,5 +126,53 @@ module.exports = {
                 }
             }
         }
+    },
+    "/api/v2/blogs": {
+        "get": {
+            "summary": "Ver todos los blogs",
+            "description": "Ver todos los blogs de rescatistas",
+            "tags": [
+                "Blog controllers"
+            ],
+            "responses": {
+                "200": {
+                    "description": "Todos los blogs."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                }
+            }
+        }
+    },
+    "/api/v2/blogs/search": {
+        "get": {
+            "summary": "Ver blog con su dueño",
+            "description": "Ver blog con su dueño",
+            "tags": [
+                "Blog controllers"
+            ],
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "ad",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Blog con la info de su publicador."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                }
+            }
+        }
     }
 }

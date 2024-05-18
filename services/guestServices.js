@@ -6,6 +6,7 @@
  */
 
 const {Post} = require('../models/post');
+const {Blog} = require('../models/blog');
 const {Bulletin} = require('../models/bulletin');
 const {Rescuer} = require('../models/rescuer');
 
@@ -100,7 +101,7 @@ class GuestServices {
     }
 
     async getBulletins() {
-        return Rescuer.find({}, {user: 0, posts: 0})
+        return Rescuer.find({}, {user: 0, posts: 0, blogs: 0})
             .populate({
                 path: "bulletins",
                 select: {user: 0},
@@ -115,7 +116,31 @@ class GuestServices {
         return Bulletin.findById(id)
             .populate({
                 path: "user",
-                select: {posts: 0, _id: 0, bulletins: 0},
+                select: {posts: 0, _id: 0, bulletins: 0, blogs: 0},
+                populate: {
+                    path: "auth",
+                    select: {email: 1, _id: 0}
+                }
+            });
+    }
+
+    async getBlogs() {
+        return Rescuer.find({}, {user: 0, posts: 0, bulletins: 0})
+            .populate({
+                path: "blogs",
+                select: {user: 0},
+                options: {
+                    sort: {"markers.timestamp": -1}
+                }
+            })
+            .populate("auth", {email: 1, _id: 0})
+    }
+
+    async getBlog(id) {
+        return Blog.findById(id)
+            .populate({
+                path: "user",
+                select: {posts: 0, _id: 0, bulletins: 0, blogs: 0},
                 populate: {
                     path: "auth",
                     select: {email: 1, _id: 0}

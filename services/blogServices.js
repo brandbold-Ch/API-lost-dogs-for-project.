@@ -3,12 +3,14 @@ const {Blog} = require("../models/blog");
 const {connection} = require("../configurations/connections");
 const {User} = require("../models/user");
 const {Rescuer} = require("../models/rescuer");
+const mongoose = require("mongoose");
+const {Bulletin} = require("../models/bulletin");
 
 
 class BlogServices {
 
     constructor() {
-        this.imageTools = ImageTools();
+        this.imageTools = new ImageTools();
     }
 
     async addGalleryToABlog(id, blog_id, images) {
@@ -50,7 +52,8 @@ class BlogServices {
             await Blog.create([
                 {
                     markdown_text: obj_data["markdown_text"],
-                    doc_model: collection[0]
+                    doc_model: collection[0],
+                    user: id
                 }
             ], {session})
                 .then((blog) => {
@@ -118,8 +121,107 @@ class BlogServices {
         let output_blog;
 
         await session.withTransaction(async () => {
-
+            await Blog.findOneAndUpdate(
+                {
+                    _id: blog_id,
+                    user: id
+                },
+                {
+                    $set: {
+                        markdown_text: obj_data["markdown_text"],
+                        markers: {
+                            update: Date.now()
+                        }
+                    }
+                },
+                {
+                    new: true
+                }
+            ).session(session)
+                .then((blog) => {
+                    output_blog = blog;
+                })
         })
+            .then(() => {
+                if (array_images.length) {
+                    this.addGalleryToABlog(id, output_blog["_id"], array_images);
+                }
+            });
 
+        await session.endSession();
+        return output_blog;
+    }
+
+    async getBlogForGuest(blog_id) {
+        return Blog.findById(blog_id);
+    }
+
+    async getBlog(id, blog_id) {
+        return Blog.findOne({_id: blog_id, user: id});
+    }
+
+    async getBlogs(id) {
+        return Blog.find({user: id}, {user: 0}).sort({"markers.timestamp": -1});
+    }
+
+    async deleteBlog(id, blog_id, role) {
+        const session = await connection.startSession();
+        const collection = this.modelDetector(role);
+        let output_blog;
+
+        await session.withTransaction(async () => {
+            await Blog.findOneAndDelete(
+                {
+                    _id: blog_id,
+                    user: id
+                }, {session}
+            )
+                .then((blog) => {
+                    output_blog = blog;
+                })
+
+            await collection[1].updateOne(
+                {
+                    _id: id
+                },
+                {
+                    $pull: {
+                        blogs: blog_id
+                    }
+                }, {session}
+            );
+        })
+            .then(async () => {
+                if (output_blog["images"].length) {
+                    await this.imageTools.deleteGallery(output_blog["images"]);
+                }
+            });
+
+        await session.endSession();
+    }
+
+    async getUrlsImages(id) {
+        return Blog.aggregate([
+            {
+                $match: { user: new mongoose.Types.ObjectId(id) }
+            },
+            {
+                $unwind: "$images"
+            },
+            {
+                $group: {
+                    _id: null,
+                    allIds: { $push: "$images.id" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    allIds: 1
+                }
+            }
+        ]);
     }
 }
+
+module.exports = {BlogServices}

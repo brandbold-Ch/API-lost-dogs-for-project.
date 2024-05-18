@@ -36,6 +36,8 @@ const blogSchema = new Schema({
             "Rescuer"
         ]
     }
+},{
+    versionKey: false
 });
 
 const Blog = mongoose.model("Blog", blogSchema);

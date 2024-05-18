@@ -7,10 +7,12 @@
 
 const {User} = require("../models/user");
 const {Post} = require("../models/post");
+const {Blog} = require("../models/blog");
 const {Auth} = require("../models/auth");
 const {Request} = require("../models/rescuer");
 const {PostServices} = require("../services/postServices");
 const {BulletinServices} = require("../services/bulletinServices");
+const {BlogServices} = require("../services/blogServices");
 const {connection} = require("../configurations/connections");
 const {ImageTools} = require("../utils/imageTools");
 const {Bulletin} = require("../models/bulletin");
@@ -26,6 +28,7 @@ class UserServices {
     constructor() {
         this.posts = new PostServices();
         this.bulletins = new BulletinServices();
+        this.blogs = new BlogServices();
         this.imageTools = new ImageTools();
     }
 
@@ -121,6 +124,14 @@ class UserServices {
                         "identify.timestamp": -1
                     }
                 }
+            })
+            .populate({
+                path: "blogs",
+                options: {
+                    sort: {
+                        "markers.timestamp": -1
+                    }
+                }
             });
     }
 
@@ -136,6 +147,7 @@ class UserServices {
         const session = await connection.startSession();
         const array_urls_posts = await this.posts.getUrlsImages(id);
         const array_urls_bulletins = await this.bulletins.getUrlsImages(id);
+        const array_urls_blogs = await this.blogs.getUrlsImages(id);
 
         await session.withTransaction(async () => {
 
@@ -144,7 +156,8 @@ class UserServices {
                 User.deleteOne({_id: id}, {session}),
                 Post.deleteMany({user: id}, {session}),
                 Request.deleteMany({user: id}, {session}),
-                Bulletin.deleteMany({user: id}, {session})
+                Bulletin.deleteMany({user: id}, {session}),
+                Blog.deleteMany({user: id}, {session})
             ]);
         })
             .then(async () => {
@@ -154,6 +167,10 @@ class UserServices {
 
                 if (array_urls_posts.length) {
                     await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
+                }
+
+                if (array_urls_blogs.length) {
+                    await this.imageTools.deleteImages(array_urls_blogs[0]["allIds"]);
                 }
             })
 

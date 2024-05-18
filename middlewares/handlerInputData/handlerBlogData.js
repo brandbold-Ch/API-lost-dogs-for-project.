@@ -1,16 +1,15 @@
-const {setBulletinsSchema} = require("../../schemas/bulletinSchema");
+const {setBlogSchema} = require("../../schemas/blogSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 const {patternSelector} = require("./patternSelector");
 
 
-const validateBulletinData = async (req, res, next) => {
+const validateBlogData = async (req, res, next) => {
     try {
-        await setBulletinsSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
+        await setBlogSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
         next();
 
     } catch (err) {
-
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
@@ -30,4 +29,4 @@ const validateBulletinData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateBulletinData}
+module.exports = {validateBlogData}

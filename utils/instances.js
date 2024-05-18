@@ -1,10 +1,11 @@
-const {UserServices} = require('../services/userServices');
-const {PostServices} = require('../services/postServices');
-const {AuthServices} = require('../services/authServices');
-const {GuestServices} = require('../services/guestServices');
-const {AdminServices} = require('../services/adminServices');
-const {RescuerServices} = require('../services/rescuerServices');
-const {BulletinServices} = require('../services/bulletinServices');
+const {UserServices} = require("../services/userServices");
+const {PostServices} = require("../services/postServices");
+const {AuthServices} = require("../services/authServices");
+const {GuestServices} = require("../services/guestServices");
+const {AdminServices} = require("../services/adminServices");
+const {RescuerServices} = require("../services/rescuerServices");
+const {BulletinServices} = require("../services/bulletinServices");
+const {BlogServices} = require("../services/blogServices");
 
 
 const user = new UserServices();
@@ -14,6 +15,7 @@ const guest = new GuestServices();
 const admin = new AdminServices();
 const bulletin = new BulletinServices();
 const rescuer = new RescuerServices();
+const blog = new BlogServices();
 
 module.exports = {
     user,
@@ -22,5 +24,6 @@ module.exports = {
     post,
     bulletin,
     auth,
-    rescuer
+    rescuer,
+    blog
 }

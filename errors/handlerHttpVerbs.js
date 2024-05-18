@@ -40,9 +40,9 @@ class HandlerHttpVerbs {
         }
     }
 
-    static forbidden(message, extraError=undefined, bodyParam) {
+    static forbidden(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, extraError, {
+        return HandlerHttpVerbs.templateForErrors(message, {
             status: "Forbidden 💥",
             codes: {
                 statusCode: statusCodes.FORBIDDEN,
@@ -64,7 +64,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static notFound(message, extraError=undefined, bodyParam) {
+    static notFound(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Not found 🤷‍♂️",
@@ -88,7 +88,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static unauthorized(message, extraError=undefined, bodyParam) {
+    static unauthorized(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForErrors(message, {
             status: "Unauthorized 🔒",
@@ -100,7 +100,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static ok(message, extraError=undefined, bodyParam) {
+    static ok(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Ok 👍",
@@ -112,7 +112,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static created(message, extraError=undefined, bodyParam) {
+    static created(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Created 🎊",
@@ -124,7 +124,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static accepted(message, extraError=undefined, bodyParam) {
+    static accepted(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Accepted 🤝",
@@ -136,7 +136,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static continue(message, extraError=undefined, bodyParam) {
+    static continue(message, extraError, bodyParam) {
 
         return HandlerHttpVerbs.templateForSuccess(message, {
             status: "Continue ⏭️",

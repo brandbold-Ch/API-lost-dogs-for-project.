@@ -234,10 +234,10 @@ class BulletinServices {
                     }
                 },
                 {
-                    runValidators: true
-                },
-                {session}
-            )
+                    runValidators: true,
+                    new: true
+                }
+            ).session(session)
                 .then((bulletin) => {
                     output_bulletin = bulletin;
                 })

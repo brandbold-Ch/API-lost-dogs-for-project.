@@ -17,7 +17,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
 const  express = require("express");
-const {postsRouter, bulletinsRouter} = require("./routes/guestRoutes");
+const {postsRouter, bulletinsRouter, blogsRouter} = require("./routes/guestRoutes");
 const {errorsCodes} = require("./utils/codes");
 const app = express();
 
@@ -70,6 +70,7 @@ app.use("/api/v2/auth", authRouter);
 app.use("/api/v2/admins", adminRouter);
 app.use("/api/v2/rescuers", rescuerRouter);
 app.use("/api/v2/posts", postsRouter);
+app.use("/api/v2/blogs", blogsRouter);
 app.use("/api/v2/bulletins", bulletinsRouter);
 app.use((req, res) => {
     res.status(404).json(

@@ -4,10 +4,9 @@
  * @file This module is for user middleware.
  */
 
-const {post, auth, admin, bulletin} = require('../utils/instances');
+const {post, auth, admin, bulletin, blog} = require('../utils/instances');
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 const {errorsCodes} = require("../utils/codes");
-const ObjectId = require("mongoose").Types.ObjectId;
 
 /**
  * Middleware to check if a user with the specified ID exists.
@@ -16,6 +15,33 @@ const ObjectId = require("mongoose").Types.ObjectId;
  * @param {Function} next - Express next middleware function.
  * @returns {void}
  */
+
+
+const checkBlogExists = async (req, res, next) => {
+    try {
+        const entity = await blog.getBlog(req.id, req.params.blog_id);
+
+        if (entity) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found blog 🚫",
+                    errorsCodes.DB_NOT_FOUND,
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
 
 const checkEntityExists = async (req, res, next) => {
     try {
@@ -182,7 +208,7 @@ const checkBulletinExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found bulletin 🚫",
-                    errorsCodes.DB_DUPLICATED_KEY,
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -208,7 +234,33 @@ const checkBulletinExistsForGuest = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found bulletin 🚫",
-                    errorsCodes.DB_DUPLICATED_KEY,
+                    errorsCodes.DB_NOT_FOUND,
+                    {url: req.baseUrl, verb: req.method}
+                )
+            );
+        }
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+const checkBlogExistsForGuest = async (req, res, next) => {
+    try {
+        const data = await blog.getBlogForGuest(req.query.ad);
+
+        if (data) {
+            next();
+
+        } else {
+            res.status(404).json(
+                HandlerHttpVerbs.notFound(
+                    "Not found blog 🚫",
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -234,7 +286,7 @@ const checkPostExists = async (req, res, next) => {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
                     "Not found post 🚫",
-                    errorsCodes.DB_DUPLICATED_KEY,
+                    errorsCodes.DB_NOT_FOUND,
                     {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -347,7 +399,6 @@ const userRolePermission = async (req, res, next) => {
 
 const rescuerRolePermission = async (req, res, next) => {
     try {
-
         if (req.role.includes("RESCUER")) {
             const request = await admin.getRequestByUser(req.id);
 
@@ -496,9 +547,11 @@ module.exports = {
     checkQueryStatus,
     checkBulletinExists,
     checkBulletinExistsForGuest,
+    checkBlogExistsForGuest,
     checkEntityExists,
     checkAccountExists,
     verifyUpdateAuth,
     seeRequest,
-    entityExists
+    entityExists,
+    checkBlogExists
 }

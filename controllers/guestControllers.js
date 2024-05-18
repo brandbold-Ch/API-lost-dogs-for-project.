@@ -106,3 +106,29 @@ exports.getBulletin = async (req, res) => {
         );
     }
 }
+
+exports.getBlogs = async (req, res) => {
+    try {
+        res.status(200).json(await guest.getBlogs());
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+exports.getBlog = async (req, res) => {
+    try {
+        res.status(200).json(await guest.getBlog(req.query.ad));
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}

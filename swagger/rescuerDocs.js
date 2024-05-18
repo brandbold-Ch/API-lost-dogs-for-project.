@@ -1,5 +1,6 @@
 const {postDocs} = require("./postDocs");
 const {bulletinDocs} = require("./bulletinDocs");
+const {blogDocs} = require("./blogDocs");
 
 
 module.exports = {
@@ -260,5 +261,14 @@ module.exports = {
     },
     "/api/v2/rescuers/bulletins/{bulletin_id}/images": {
         ...bulletinDocs("Rescuer controllers")["/api/v2/bulletins/{bulletin_id}/images"]
+    },
+    "/api/v2/rescuers/blogs": {
+        ...blogDocs("Rescuer controllers")["/api/v2/blogs"]
+    },
+    "/api/v2/rescuers/blogs/{blog_id}": {
+        ...blogDocs("Rescuer controllers")["/api/v2/blogs/{blog_id}"]
+    },
+    "/api/v2/rescuers/blogs/{blog_id}/images": {
+        ...blogDocs("Rescuer controllers")["/api/v2/blogs/{blog_id}/images"]
     }
 }

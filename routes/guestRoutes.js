@@ -1,9 +1,9 @@
 const guestControllers = require('../controllers/guestControllers');
-const {checkPostExistsForGuest, checkQueryParameters, checkBulletinExistsForGuest} = require('../middlewares/anyMiddlewares');
+const {checkPostExistsForGuest, checkQueryParameters, checkBulletinExistsForGuest, checkBlogExistsForGuest} = require('../middlewares/anyMiddlewares');
 const express = require('express');
-const postControllers = require("../controllers/postControllers");
 const postsRouter = express.Router();
 const bulletinsRouter = express.Router();
+const blogsRouter = express.Router();
 
 
 postsRouter.get('/', guestControllers.getLostPets);
@@ -13,7 +13,11 @@ postsRouter.get("/search/chrt", checkQueryParameters, guestControllers.filterAll
 bulletinsRouter.get('/', guestControllers.getBulletins);
 bulletinsRouter.get('/search', checkBulletinExistsForGuest, guestControllers.getBulletin);
 
+blogsRouter.get('/', guestControllers.getBlogs);
+blogsRouter.get('/search', checkBlogExistsForGuest, guestControllers.getBlog);
+
 module.exports = {
     postsRouter,
-    bulletinsRouter
+    bulletinsRouter,
+    blogsRouter
 }

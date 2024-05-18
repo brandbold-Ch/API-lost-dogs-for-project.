@@ -320,9 +320,8 @@ class PostServices {
                 {
                     runValidators: true,
                     new: true
-                },
-                {session}
-            )
+                }
+            ).session(session)
                 .then((post) => {
                     output_post = post;
                 })
