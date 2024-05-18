@@ -28,7 +28,7 @@ const setUserSchema = Joi.object({
             Joi.string()
                 .required()
         )
-        .required()
+        .optional()
 
 }).options({
     abortEarly: true
