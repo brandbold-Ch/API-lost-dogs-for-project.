@@ -26,14 +26,6 @@ module.exports = {
                                     "type": "string",
                                     "description": "Apellido del usuario."
                                 },
-                                "cellphone": {
-                                    "type": "string",
-                                    "description": "Número de celular del usuario."
-                                },
-                                "social_networks": {
-                                    "type": "object",
-                                    "description": "Objeto de redes sociales."
-                                },
                                 "email": {
                                     "type": "string",
                                     "description": "Correo electrónico del usuario."
@@ -46,11 +38,6 @@ module.exports = {
                             "example": {
                                 "name": "John",
                                 "lastname": "Doe",
-                                "cellphone": "1234567890",
-                                "social_networks": {
-                                    "facebook": "john.doe",
-                                    "twitter": "@john_doe"
-                                },
                                 "email": "john@example.com",
                                 "password": "secretpassword"
                             }
