@@ -4,7 +4,6 @@ const {connection} = require("../configurations/connections");
 const {User} = require("../models/user");
 const {Rescuer} = require("../models/rescuer");
 const mongoose = require("mongoose");
-const {Bulletin} = require("../models/bulletin");
 
 
 class BlogServices {
@@ -20,7 +19,7 @@ class BlogServices {
             await Blog.updateOne(
                 {
                     _id: blog_id,
-                    user: id
+                    user_id: id
                 },
                 {
                     $push: {
@@ -53,7 +52,7 @@ class BlogServices {
                 {
                     markdown_text: obj_data["markdown_text"],
                     doc_model: collection[0],
-                    user: id
+                    user_id: id
                 }
             ], {session})
                 .then((blog) => {
@@ -66,7 +65,7 @@ class BlogServices {
                 },
                 {
                     $push: {
-                        blogs: output_blog["_id"]
+                        blogs_id: output_blog["_id"]
                     }
                 }, {session}
             );
@@ -90,7 +89,7 @@ class BlogServices {
             await Blog.updateOne(
                 {
                     _id: blog_id,
-                    user: id
+                    user_id: id
                 },
                 {
                     $pull: {
@@ -124,7 +123,7 @@ class BlogServices {
             await Blog.findOneAndUpdate(
                 {
                     _id: blog_id,
-                    user: id
+                    user_id: id
                 },
                 {
                     $set: {
@@ -157,11 +156,11 @@ class BlogServices {
     }
 
     async getBlog(id, blog_id) {
-        return Blog.findOne({_id: blog_id, user: id});
+        return Blog.findOne({_id: blog_id, user_id: id});
     }
 
     async getBlogs(id) {
-        return Blog.find({user: id}, {user: 0}).sort({"markers.timestamp": -1});
+        return Blog.find({user_id: id}, {user_id: 0}).sort({"markers.timestamp": -1});
     }
 
     async deleteBlog(id, blog_id, role) {
@@ -173,7 +172,7 @@ class BlogServices {
             await Blog.findOneAndDelete(
                 {
                     _id: blog_id,
-                    user: id
+                    user_id: id
                 }, {session}
             )
                 .then((blog) => {
@@ -186,7 +185,7 @@ class BlogServices {
                 },
                 {
                     $pull: {
-                        blogs: blog_id
+                        blogs_id: blog_id
                     }
                 }, {session}
             );
@@ -203,7 +202,7 @@ class BlogServices {
     async getUrlsImages(id) {
         return Blog.aggregate([
             {
-                $match: { user: new mongoose.Types.ObjectId(id) }
+                $match: { user_id: new mongoose.Types.ObjectId(id) }
             },
             {
                 $unwind: "$images"

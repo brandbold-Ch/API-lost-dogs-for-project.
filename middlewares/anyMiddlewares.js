@@ -510,7 +510,7 @@ const checkQueryStatus = async (req, res, next) => {
     }
 }
 
-const seeRequest = async (req, res, next) => {
+const showRequest = async (req, res, next) => {
     try {
         const request = await admin.getRequestByUser(req.id);
 
@@ -520,7 +520,7 @@ const seeRequest = async (req, res, next) => {
         } else {
             res.status(404).json(
                 HandlerHttpVerbs.notFound(
-                    "You have no request, you must make one if you want to be a rescuer. 🚫",
+                    "You have no request, you must make one if you want to be a rescuer or association. 🚫",
                     undefined, {url: req.baseUrl, verb: req.method}
                 )
             );
@@ -551,7 +551,7 @@ module.exports = {
     checkEntityExists,
     checkAccountExists,
     verifyUpdateAuth,
-    seeRequest,
+    showRequest,
     entityExists,
     checkBlogExists
 }

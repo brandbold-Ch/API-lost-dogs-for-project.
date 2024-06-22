@@ -1,12 +1,28 @@
-const {setBlogSchema} = require("../../schemas/blogSchema");
+const {setUserSchema} = require("../../schemas/userSchema");
+const {setAuthSchema} = require("../../schemas/authSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 const {patternSelector} = require("./patternSelector");
 
 
-const validateBlogData = async (req, res, next) => {
+const validateUserData = async (req, res, next) => {
     try {
-        await setBlogSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
+        const {name, lastname, phone_number, social_networks, email, password} = req.body;
+
+        await setUserSchema.validateAsync({
+            name: name,
+            lastname: lastname,
+            phone_number: phone_number,
+            social_networks: social_networks
+        });
+
+        if (req.method === "POST") {
+            await setAuthSchema.validateAsync({
+                email: email,
+                password: password
+            });
+        }
+
         next();
 
     } catch (err) {
@@ -29,4 +45,4 @@ const validateBlogData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateBlogData}
+module.exports = {validateUserData}

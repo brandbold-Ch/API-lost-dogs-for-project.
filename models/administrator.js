@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const adminSchema = new Schema({
+const adminModel = new Schema({
     name: {
         type: String,
         required: false,
@@ -13,7 +13,7 @@ const adminSchema = new Schema({
         required: false,
         default: null
     },
-    auth: {
+    auth_id: {
         type: Schema.Types.ObjectId,
         required: false,
         default: null,
@@ -23,5 +23,5 @@ const adminSchema = new Schema({
     versionKey: false
 });
 
-const Admin = mongoose.model("Admin", adminSchema);
+const Admin = mongoose.model("Admin", adminModel);
 module.exports = { Admin }

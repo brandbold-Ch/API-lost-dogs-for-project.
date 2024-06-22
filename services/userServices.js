@@ -33,17 +33,16 @@ class UserServices {
     }
 
     async setUser(user_data) {
-        const {name, lastname, cellphone, email, password} = user_data;
+        const {name, lastname, phone_number, email, password} = user_data;
         const session = await connection.startSession();
         let output_user, output_auth;
 
         await session.withTransaction(async () => {
-
             await User.create([
                 {
                     name: name,
                     lastname: lastname,
-                    cellphone: cellphone,
+                    phone_number: phone_number,
                     social_networks: user_data["social_networks"]
                 }
             ], {session})
@@ -55,7 +54,7 @@ class UserServices {
                 {
                     email: email,
                     password: password,
-                    user: output_user["_id"],
+                    user_id: output_user["_id"],
                     role: "USER",
                     doc_model: "User"
                 }
@@ -68,7 +67,7 @@ class UserServices {
                 output_user["_id"],
                 {
                     $set: {
-                        auth: output_auth["_id"]
+                        auth_id: output_auth["_id"]
                     }
                 },
                 {
@@ -92,8 +91,8 @@ class UserServices {
      */
 
     async getUsers() {
-        return User.find({}, {posts: 0, bulletins: 0})
-            .populate("auth", {email: 1, password: 1, _id: 0});
+        return User.find({}, {posts_id: 0, bulletins_id: 0})
+            .populate("auth_id", {email: 1, password: 1, _id: 0});
     }
 
     /**
@@ -106,33 +105,9 @@ class UserServices {
 
     async getUser(id) {
         return User.findById(id)
-            .populate("auth",
+            .populate("auth_id",
                 {email: 1, password: 1, _id: 0}
             )
-            .populate({
-                path: "posts",
-                options: {
-                    sort: {
-                        "publication.published": -1
-                    }
-                }
-            })
-            .populate({
-                path: "bulletins",
-                options: {
-                    sort: {
-                        "identify.timestamp": -1
-                    }
-                }
-            })
-            .populate({
-                path: "blogs",
-                options: {
-                    sort: {
-                        "markers.timestamp": -1
-                    }
-                }
-            });
     }
 
     /**
@@ -150,14 +125,13 @@ class UserServices {
         const array_urls_blogs = await this.blogs.getUrlsImages(id);
 
         await session.withTransaction(async () => {
-
             await Promise.all([
-                Auth.deleteOne({user: id}, {session}),
+                Auth.deleteOne({user_id: id}, {session}),
                 User.deleteOne({_id: id}, {session}),
-                Post.deleteMany({user: id}, {session}),
-                Request.deleteMany({user: id}, {session}),
-                Bulletin.deleteMany({user: id}, {session}),
-                Blog.deleteMany({user: id}, {session})
+                Post.deleteMany({user_id: id}, {session}),
+                Request.deleteMany({user_id: id}, {session}),
+                Bulletin.deleteMany({user_id: id}, {session}),
+                Blog.deleteMany({user_id: id}, {session})
             ]);
         })
             .then(async () => {
@@ -187,7 +161,7 @@ class UserServices {
      */
 
     async updateUser(id, user_data) {
-        const {name, lastname, cellphone, social_networks} = user_data;
+        const {name, lastname, phone_number, social_networks} = user_data;
         const socials = [];
 
         for (const key in social_networks) {
@@ -198,7 +172,7 @@ class UserServices {
                 $set: {
                     name: name,
                     lastname: lastname,
-                    cellphone: cellphone,
+                    phone_number: phone_number,
                     social_networks: socials
                 }
             },
@@ -209,33 +183,30 @@ class UserServices {
     }
 
     async deleteSocialMedia(id, key, value) {
-        if (key && value) {
-            await User.updateOne(
-                {
-                    _id: id
-                },
-                {
-                    $pull: {
-                        social_networks: {[key]: value}
-                    }
+        await User.updateOne(
+            {
+                _id: id
+            },
+            {
+                $pull: {
+                    social_networks: {[key]: value}
                 }
-            );
-        }
+            }
+        );
     }
 
-    async getRequests(id) {
-        return Request.find({user: id});
+    async getRequests (id) {
+        return Request.find({user_id: id});
     }
 
-    async makeRescuer(id, role) {
-        const email = await Auth.findOne({user: id});
+    async changeRole(id, role, change) {
         let output_request;
 
         await Request.create([
             {
-                role: role,
-                email: email["email"],
-                user: id,
+                requester_role: role,
+                requested_role: change,
+                user_id: id,
                 doc_model: "User"
             }
         ])

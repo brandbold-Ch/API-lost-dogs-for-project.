@@ -3,14 +3,14 @@ const {postRouter} = require("./postRoutes");
 const {bulletinRouter} = require("./bulletinRoutes");const {Authenticate} = require('../middlewares/authenticator');
 const {authRouter} = require("./authRoutes");
 const {blogRouter} = require("./blogRoutes");
-const {validateUserData} = require("../middlewares/handlerInputData/handlerUserData");
+const {validateUserData} = require("../middlewares/handler/handlerUserData");
 const express = require('express');
 const userRouter = express.Router();
 const {
     checkEntityExists,
     checkAccountExists,
     checkRequestExistsForUser,
-    seeRequest
+    showRequest
 } = require('../middlewares/anyMiddlewares');
 
 userRouter.post("/", express.urlencoded({extended: true}), validateUserData, checkAccountExists, userControllers.setUser);
@@ -24,8 +24,9 @@ userRouter.get("/", userControllers.getUser);
 userRouter.delete("/", userControllers.deleteUser);
 userRouter.put("/", express.urlencoded({extended: true}), validateUserData, userControllers.updateUser);
 userRouter.delete('/networks', userControllers.deleteSocialMedia);
-userRouter.post("/requests", checkRequestExistsForUser, userControllers.makeRescuer);
-userRouter.get("/requests", seeRequest, userControllers.getRequests);
+userRouter.post("/requests/rescuer", checkRequestExistsForUser, userControllers.makeRescuer);
+userRouter.post("/requests/association", checkRequestExistsForUser, userControllers.makeAssociation);
+userRouter.get("/requests", showRequest, userControllers.getRequests);
 
 userRouter.use([
     authRouter,

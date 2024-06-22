@@ -1,6 +1,8 @@
 const {Admin} = require('../models/administrator');
 const {Auth} = require("../models/auth");
-const {Request} = require("../models/rescuer");
+const {User} = require("../models/user");
+const {Request, Rescuer} = require("../models/rescuer");
+const {Association} = require("../models/association");
 const {connection} = require("../configurations/connections");
 const {RescuerServices} = require("./rescuerServices");
 const {UserServices} = require("../services/userServices");
@@ -33,7 +35,7 @@ class AdminServices {
                 {
                     email: email,
                     password: password,
-                    user: output_admin["_id"],
+                    user_id: output_admin["_id"],
                     role: ["ADMINISTRATOR"],
                     doc_model: "Admin"
                 }
@@ -48,19 +50,22 @@ class AdminServices {
                 },
                 {
                     $set: {
-                        auth: output_auth["_id"]
+                        auth_id: output_auth["_id"]
                     }
                 },
                 {session}
             );
         })
-        await session.endSession();
 
+        await session.endSession();
         return output_admin;
     }
 
     async getAdmin(id) {
-        return Admin.findById(id).populate("auth", {email: 1, password: 1, _id: 0});
+        return Admin.findById(id)
+            .populate(
+                "auth_id", {email: 1, password: 1, _id: 0}
+            );
     }
 
     async updateAdmin(id, admin_data) {
@@ -71,7 +76,7 @@ class AdminServices {
         const session = await connection.startSession();
 
         await session.withTransaction(async () => {
-            await Auth.deleteOne({user: id}, {session});
+            await Auth.deleteOne({user_id: id}, {session});
             await Admin.deleteOne({_id: id}, {session});
         });
         await session.endSession();
@@ -82,11 +87,11 @@ class AdminServices {
     }
 
     async getRequestByUser(id) {
-        return Request.findOne({user: id});
+        return Request.findOne({user_id: id});
     }
 
     async getRequests() {
-        return Request.find({}).populate("user", {posts: 0, bulletins: 0, auth: 0});
+        return Request.find({}).populate("user_id", {posts_id: 0, bulletins_id: 0, auth_id: 0});
     }
 
     async deleteRequest(request_id) {
@@ -113,40 +118,92 @@ class AdminServices {
         const request = await Request.findById(id);
         let output_request;
 
-        if ((request["role"].length <= 1) && (request["role"][0] === "USER")) {
+
+        if (request["requester_role"][0] === "USER") {
 
             await session.withTransaction(async () => {
+                const user_data = await User.findById(request["user_id"]["_id"]);
+                await User.deleteOne({_id: user_data["_id"]}, {session});
 
-                await Request.findByIdAndUpdate(id,
-                    {
-                        $set: {
-                            status: "active"
+                if (request["requested_role"] === "RESCUER") {
+                    await Rescuer.create([
+                        {
+                            _id: user_data["_id"],
+                            name: user_data["name"],
+                            social_networks: user_data["social_networks"],
+                            posts_id: user_data["posts_id"],
+                            auth_id: user_data["auth_id"]
+                        }
+                    ], {session});
+
+                    await Request.findByIdAndUpdate(id,
+                        {
+                            $set: {
+                                status: "active",
+                                doc_model: "Rescuer"
+                            }
                         },
-                        $push: {
-                            role: "RESCUER"
+                        {
+                            new: true
                         }
-                    },
-                    {
-                        new: true
-                    },
-                    {session}
-                )
-                    .then((request) => {
-                        output_request = request;
-                    });
+                    ).session(session)
+                        .then((request) => {
+                            output_request = request;
+                        });
 
-                await Auth.findOneAndUpdate(
-                    {
-                        user: request["user"]
-                    },
-                    {
-                        $push: {
-                            role: "RESCUER"
+                    await Auth.findOneAndUpdate(
+                        {
+                            user_id: request["user_id"]
+                        },
+                        {
+                            $set: {
+                                role: ["RESCUER", "USER"],
+                                doc_model: "Rescuer"
+                            }
+                        },
+                        {session}
+                    );
+                }
+                else if (request["requested_role"] === "ASSOCIATION") {
+                    await Association.create([
+                        {
+                            _id: user_data["_id"],
+                            name: user_data["name"],
+                            social_networks: user_data["social_networks"],
+                            posts_id: user_data["posts_id"],
+                            auth_id: user_data["auth_id"]
                         }
-                    },
-                    {session}
-                )
-            });
+                    ], {session});
+
+                    await Request.findByIdAndUpdate(id,
+                        {
+                            $set: {
+                                status: "active",
+                                doc_model: "Association"
+                            }
+                        },
+                        {
+                            new: true
+                        }
+                    ).session(session)
+                        .then((request) => {
+                            output_request = request;
+                        });
+
+                    await Auth.findOneAndUpdate(
+                        {
+                            user_id: request["user_id"]
+                        },
+                        {
+                            $set: {
+                                role: ["ASSOCIATION", "RESCUER", "USER"],
+                                doc_model: "Association"
+                            }
+                        },
+                        {session}
+                    );
+                }
+            })
 
             await session.endSession();
             return output_request;

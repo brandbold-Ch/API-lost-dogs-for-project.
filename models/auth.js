@@ -23,7 +23,7 @@ const bcrypt = require("bcrypt");
  * @param {AuthSchema} authData - User credentials data.
  */
 
-const authSchema = new Schema({
+const authModel = new Schema({
     email: {
         type: String,
         required: true,
@@ -39,7 +39,7 @@ const authSchema = new Schema({
         type: String,
         required: true
     },
-    user: {
+    user_id: {
         type: Schema.Types.ObjectId,
         refPath: "doc_model",
         required: true
@@ -50,7 +50,8 @@ const authSchema = new Schema({
         enum: [
             "USER",
             "RESCUER",
-            "ADMINISTRATOR"
+            "ADMINISTRATOR",
+            "ASSOCIATION"
         ],
         validate: {
             validator: function (role) {
@@ -66,7 +67,8 @@ const authSchema = new Schema({
         enum: [
             "User",
             "Admin",
-            "Rescuer"
+            "Rescuer",
+            "Association"
         ]
     }
 }, {
@@ -81,7 +83,7 @@ const authSchema = new Schema({
  * @throws {error} - Error in case there is a problem encrypting the password.
  */
 
-authSchema.pre("save", async function (next) {
+authModel.pre("save", async function (next) {
     try {
         this.password = await bcrypt.hash(this.password, 10);
         next();
@@ -96,7 +98,6 @@ authSchema.pre("save", async function (next) {
  * @type {mongoose.Model<AuthSchema>}
  */
 
-authSchema.index({user: 1}, {unique: true});
-
-const Auth = mongoose.model("Auth", authSchema);
+authModel.index({user_id: 1}, {unique: true});
+const Auth = mongoose.model("Auth", authModel);
 module.exports = {Auth}

@@ -67,7 +67,7 @@ const typeUser = (data) => {
     return new Promise(async (resolve, reject) => {
 
         if (data[1]["role"][0] === "RESCUER") {
-            const request = await Request.findOne({user: data[1]["user"]});
+            const request = await Request.findOne({user_id: data[1]["user_id"]});
 
             switch (request["status"]) {
                 case "pending":
@@ -134,7 +134,7 @@ const validatePassword = (data) => {
         if (match) {
 
             const token = jwt.sign(
-                {user: data[1]["user"], role: data[1]["role"]},
+                {user_id: data[1]["user_id"], role: data[1]["role"]},
                 process.env.SECRET_KEY,
                 {expiresIn: process.env.EXPIRE}
             );

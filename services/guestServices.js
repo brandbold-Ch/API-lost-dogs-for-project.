@@ -23,10 +23,10 @@ class GuestServices {
     async getUserAndPet(pet_id) {
         return Post.findById(pet_id, {_id: 0})
             .populate({
-                path: "user",
-                select: {posts: 0, bulletins: 0, _id: 0},
+                path: "user_id",
+                select: {posts_id: 0, bulletins_id: 0, _id: 0},
                 populate: {
-                    path: "auth",
+                    path: "auth_id",
                     select: {email: 1, _id: 0}
                 }
             });
@@ -42,10 +42,10 @@ class GuestServices {
     async getAllLostPets() {
         return Post.find({})
             .populate({
-                path: "user",
-                select: {posts: 0, bulletins: 0, _id: 0},
+                path: "user_id",
+                select: {posts_id: 0, bulletins_id: 0, _id: 0},
                 populate: {
-                    path: "auth",
+                    path: "auth_id",
                     select: {email: 1, _id: 0}
                 }
             })
@@ -101,48 +101,48 @@ class GuestServices {
     }
 
     async getBulletins() {
-        return Rescuer.find({}, {user: 0, posts: 0, blogs: 0})
+        return Rescuer.find({}, {user_id: 0, posts_id: 0, blogs_id: 0})
             .populate({
-                path: "bulletins",
-                select: {user: 0},
+                path: "bulletins_id",
+                select: {user_id: 0},
                 options: {
                     sort: {"identify.timestamp": -1}
                 }
             })
-            .populate("auth", {email: 1, _id: 0})
+            .populate("auth_id", {email: 1, _id: 0})
     }
 
     async getBulletin(id) {
         return Bulletin.findById(id)
             .populate({
-                path: "user",
-                select: {posts: 0, _id: 0, bulletins: 0, blogs: 0},
+                path: "user_id",
+                select: {posts_id: 0, _id: 0, bulletins_id: 0, blogs_id: 0},
                 populate: {
-                    path: "auth",
+                    path: "auth_id",
                     select: {email: 1, _id: 0}
                 }
             });
     }
 
     async getBlogs() {
-        return Rescuer.find({}, {user: 0, posts: 0, bulletins: 0})
+        return Rescuer.find({}, {user_id: 0, posts_id: 0, bulletins_id: 0})
             .populate({
-                path: "blogs",
-                select: {user: 0},
+                path: "blogs_id",
+                select: {user_id: 0},
                 options: {
                     sort: {"markers.timestamp": -1}
                 }
             })
-            .populate("auth", {email: 1, _id: 0})
+            .populate("auth_id", {email: 1, _id: 0})
     }
 
     async getBlog(id) {
         return Blog.findById(id)
             .populate({
-                path: "user",
-                select: {posts: 0, _id: 0, bulletins: 0, blogs: 0},
+                path: "user_id",
+                select: {posts_id: 0, _id: 0, bulletins_id: 0, blogs_id: 0},
                 populate: {
-                    path: "auth",
+                    path: "auth_id",
                     select: {email: 1, _id: 0}
                 }
             });

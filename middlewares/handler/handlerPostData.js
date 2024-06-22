@@ -1,28 +1,14 @@
-const {setRescuerSchema} = require("../../schemas/rescuerSchema");
+const {setPostSchema} = require("../../schemas/postSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
-const {setAuthSchema} = require("../../schemas/authSchema");
 const {patternSelector} = require("./patternSelector");
 
 
-const validateRescuerData = async (req, res, next) => {
+const validatePostData = async (req, res, next) => {
     try {
-        const {name, address, identifier, description, email, password} = req.body;
-
-        await setRescuerSchema.validateAsync({
-            name: name,
-            address: address,
-            identifier: identifier,
-            description: description
-        });
-
-        if (req.method === "POST") {
-            await setAuthSchema.validateAsync({
-                email: email,
-                password: password
-            });
-        }
-
+        await setPostSchema.validateAsync(
+            JSON.parse(JSON.stringify(req.body))
+        );
         next();
 
     } catch (err) {
@@ -46,5 +32,4 @@ const validateRescuerData = async (req, res, next) => {
     }
 }
 
-
-module.exports = {validateRescuerData}
+module.exports = {validatePostData}

@@ -101,7 +101,7 @@ exports.actionRequest = async (req, res) => {
                 message = "Activated request ✅";
                 break;
 
-            case "deactivate":
+            case "disable":
                 response_body = await admin.deactivateRequest(req.params.req_id);
                 message = "Deactivated request ✅";
                 break;

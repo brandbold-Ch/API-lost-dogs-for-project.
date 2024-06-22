@@ -6,7 +6,9 @@ const {patternSelector} = require("./patternSelector");
 
 const validateBulletinData = async (req, res, next) => {
     try {
-        await setBulletinsSchema.validateAsync(JSON.parse(JSON.stringify(req.body)));
+        await setBulletinsSchema.validateAsync(
+            JSON.parse(JSON.stringify(req.body))
+        );
         next();
 
     } catch (err) {

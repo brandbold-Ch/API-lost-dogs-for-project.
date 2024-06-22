@@ -1,19 +1,18 @@
-const {setUserSchema} = require("../../schemas/userSchema");
-const {setAuthSchema} = require("../../schemas/authSchema");
+const {setRescuerSchema} = require("../../schemas/rescuerSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
+const {setAuthSchema} = require("../../schemas/authSchema");
 const {patternSelector} = require("./patternSelector");
 
 
-const validateUserData = async (req, res, next) => {
+const validateRescuerData = async (req, res, next) => {
     try {
-        const {name, lastname, cellphone, social_networks, email, password} = req.body;
+        const {name , social_networks, description, email, password} = req.body;
 
-        await setUserSchema.validateAsync({
+        await setRescuerSchema.validateAsync({
             name: name,
-            lastname: lastname,
-            cellphone: cellphone,
-            social_networks: social_networks
+            social_networks: social_networks,
+            description: description
         });
 
         if (req.method === "POST") {
@@ -46,4 +45,5 @@ const validateUserData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateUserData}
+
+module.exports = {validateRescuerData}

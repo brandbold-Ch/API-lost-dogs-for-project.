@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const blogSchema = new Schema({
+const blogModel = new Schema({
     markdown_text: {
         type: String,
         required: true,
@@ -23,7 +23,7 @@ const blogSchema = new Schema({
             default: null
         },
     },
-    user: {
+    user_id: {
         type: Schema.Types.ObjectId,
         required: true,
         refPath: "doc_model"
@@ -33,12 +33,13 @@ const blogSchema = new Schema({
         required: true,
         enum: [
             "User",
-            "Rescuer"
+            "Rescuer",
+            "Association"
         ]
     }
 },{
     versionKey: false
 });
 
-const Blog = mongoose.model("Blog", blogSchema);
+const Blog = mongoose.model("Blog", blogModel);
 module.exports = {Blog}

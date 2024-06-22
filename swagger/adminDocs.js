@@ -318,7 +318,7 @@ module.exports = {
                         "enum": [
                             "activate",
                             "reject",
-                            "deactivate"
+                            "disable"
                         ]
                     }
                 }
@@ -365,7 +365,7 @@ module.exports = {
                         "enum": [
                             "active",
                             "rejected",
-                            "deactivated",
+                            "disabled",
                             "pending"
                         ]
                     }

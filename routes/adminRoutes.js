@@ -1,8 +1,8 @@
 const {Authenticate} = require("../middlewares/authenticator");
 const adminControllers = require("../controllers/adminControllers");
 const {authRouter} = require("./authRoutes");
-const {validateQueryAction} = require("../middlewares/handlerInputData/handlerAnyData");
-const {validateSetAdminData} = require("../middlewares/handlerInputData/handlerAdminData");
+const {validateQueryAction} = require("../middlewares/handler/handlerAnyData");
+const {validateSetAdminData} = require("../middlewares/handler/handlerAdminData");
 const express = require("express");
 const adminRouter = express.Router();
 const {

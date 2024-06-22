@@ -2,19 +2,13 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const rescuerSchema = new Schema({
+const rescuerModel = new Schema({
     name: {
         type: String,
-        required: false,
-        default: null
+        required: true
     },
-    address: {
-        type: String,
-        required: false,
-        default: null
-    },
-    identifier: {
-        type: String,
+    image: {
+        type: Object,
         required: false,
         default: null
     },
@@ -23,21 +17,26 @@ const rescuerSchema = new Schema({
         required: false,
         default: null
     },
-    auth: {
+    social_networks: {
+        type: Array,
+        required: true,
+        default: []
+    },
+    auth_id: {
         type: Schema.Types.ObjectId,
         required: false,
         default: null,
         ref: "Auth"
     },
-    posts: [{
+    posts_id: [{
         type: Schema.Types.ObjectId,
         ref: "Post"
     }],
-    bulletins: [{
+    bulletins_id: [{
         type: Schema.Types.ObjectId,
         ref: "Bulletin"
     }],
-    blogs: [{
+    blogs_id: [{
         type: Schema.Types.ObjectId,
         ref: "Blog"
     }]
@@ -46,13 +45,13 @@ const rescuerSchema = new Schema({
 });
 
 
-const requestsSchema = new Schema({
+const requestsModel = new Schema({
     timestamp: {
         type: Date,
         required: true,
         default: Date.now()
     },
-    role: [{
+    requester_role: [{
         type: String,
         required: true,
         enum: [
@@ -60,6 +59,14 @@ const requestsSchema = new Schema({
             "USER"
         ]
     }],
+    requested_role: {
+        type: String,
+        required: true,
+        enum: [
+            "RESCUER",
+            "ASSOCIATION"
+        ]
+    },
     status: {
         type: String,
         enum: [
@@ -70,12 +77,7 @@ const requestsSchema = new Schema({
         ],
         default: "pending"
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    user: {
+    user_id: {
         type: mongoose.Schema.Types.ObjectId,
         refPath: "doc_model",
         required: true,
@@ -83,17 +85,26 @@ const requestsSchema = new Schema({
     doc_model: {
         type: String,
         required: true,
-        enum: ["User", "Rescuer"]
+        enum: [
+            "User",
+            "Rescuer",
+            "Association"
+        ]
     }
 }, {
     versionKey: false
 });
 
-requestsSchema.index({user: 1}, {unique: true});
+requestsModel.pre("save", function(next) {
+    delete this.lastname;
+    next();
+})
 
-const Request = mongoose.model("Request", requestsSchema);
-const Rescuer = mongoose.model("Rescuer", rescuerSchema);
+requestsModel.index({user_id: 1}, {unique: true});
+const Request = mongoose.model("Request", requestsModel);
+const Rescuer = mongoose.model("Rescuer", rescuerModel);
 module.exports = {
     Rescuer,
-    Request
+    Request,
+    rescuerSchema: rescuerModel
 }

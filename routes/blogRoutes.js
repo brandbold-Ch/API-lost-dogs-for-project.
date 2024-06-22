@@ -3,7 +3,7 @@ const blogControllers = require("../controllers/blogControllers");
 const express = require("express");
 const blogRouter = express.Router();
 const processFormData = require("../middlewares/formData");
-const {validateBlogData} = require("../middlewares/handlerInputData/handlerBlogData");
+const {validateBlogData} = require("../middlewares/handler/handlerBlogData");
 
 
 blogRouter.use(rescuerRolePermission);

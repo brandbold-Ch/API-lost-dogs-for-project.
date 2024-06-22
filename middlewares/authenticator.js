@@ -14,21 +14,27 @@ require("dotenv").config();
 const roles = [
     "USER",
     "RESCUER",
-    "ADMINISTRATOR"
+    "ADMINISTRATOR",
+    "ASSOCIATION"
 ];
 
-const routes = {
+const pathPermissions = {
     USER: [
-        '/api/v2/users',
-        '/api/v2/auth'
+        "/api/v2/users",
+        "/api/v2/auth"
     ],
     RESCUER: [
-        '/api/v2/rescuers',
-        '/api/v2/auth',
+        "/api/v2/rescuers",
+        "/api/v2/rescuers",
+        "/api/v2/auth",
     ],
     ADMINISTRATOR: [
-        '/api/v2/admins',
-        '/api/v2/auth'
+        "/api/v2/admins",
+        "/api/v2/auth"
+    ],
+    ASSOCIATION: [
+        "/api/v2/associations",
+        "/api/v2/auth"
     ]
 };
 
@@ -42,6 +48,9 @@ const rolePermissions = (url) => {
 
         case "/api/v2/admins":
             return "ADMINISTRATOR";
+
+        case "/api/v2/associations":
+            return "ASSOCIATION";
     }
 }
 
@@ -49,7 +58,7 @@ const routesPermissions = (userData, url) => {
     return new Promise((resolve, reject) => {
         const key = userData["role"];
 
-        if (routes[key[0]].includes(url)) {
+        if (pathPermissions[key[0]].includes(url)) {
             resolve(userData);
 
         } else {
@@ -114,7 +123,7 @@ const Authenticate = (req, res, next) => {
         .then(role => routesPermissions(role, req.baseUrl))
         .then(data => {
 
-            req.id = data["user"];
+            req.id = data["user_id"];
             req.role = data["role"];
             next();
 

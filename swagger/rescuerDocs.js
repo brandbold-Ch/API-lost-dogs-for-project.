@@ -14,17 +14,13 @@ module.exports = {
             "requestBody": {
                 "required": true,
                 "content": {
-                    "application/x-www-form-urlencoded": {
+                    "multipart/form-data": {
                         "schema": {
                             "type": "object",
                             "properties": {
                                 "name": {
                                     "type": "string",
                                     "description": "Nombre del rescatista."
-                                },
-                                "address": {
-                                    "type": "string",
-                                    "description": "Dirección del rescatista."
                                 },
                                 "email": {
                                     "type": "string",
@@ -34,13 +30,14 @@ module.exports = {
                                     "type": "string",
                                     "description": "Contraseña del rescatista"
                                 },
-                                "identifier": {
-                                    "type": "string",
-                                    "description": "Redes sociales del rescatista."
-                                },
                                 "description": {
                                     "type": "string",
                                     "description": "Descripción de la institución."
+                                },
+                                "image": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Imagen del rescatista."
                                 }
                             }
                         }
@@ -131,7 +128,7 @@ module.exports = {
             "requestBody": {
                 "required": true,
                 "content": {
-                    "application/x-www-form-urlencoded": {
+                    "multipart/form-data": {
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -139,26 +136,19 @@ module.exports = {
                                     "type": "string",
                                     "description": "Nombre del rescatista."
                                 },
-                                "address": {
-                                    "type": "string",
-                                    "description": "Dirección del rescatista."
-                                },
-                                "identifier": {
+                                "social_networks": {
                                     "type": "string",
                                     "description": "Redes sociales del rescatista."
                                 },
                                 "description": {
                                     "type": "string",
                                     "description": "Descripción de la institución."
+                                },
+                                "image": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Imagen del rescatista."
                                 }
-                            },
-                            "example": {
-                                "name": "MarvicS",
-                                "address": "Av. Tulipanes 14",
-                                "identifier": "facebook: @lokote / tiktok: @LaLokaForYou",
-                                "email": "john@example.com",
-                                "password": "secretpassword",
-                                "description": "Empresa dedicada al rescate animal"
                             }
                         }
                     }

@@ -8,24 +8,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-/**
- * Schema to store information about a user.
- * @typedef {Object} UserSchema
- * @property {string} name - Name of the user.
- * @property {string} lastname - Last name of the user.
- * @property {string} cellphone - User's phone number.
- * @property {string} email - User's email address.
- * @property {Array} my_networks - Array that stores user's social media networks.
- * @property {Array} my_lost_dogs - Array that stores lost pets associated with the user.
- * @property {Array} the_lost_pets - Array that stores lost pets associated with other users.
- */
 
 /**
  * Mongoose schema for the user model.
  * @type {mongoose.Schema}
  */
 
-const userSchema = new Schema({
+const userModel = new Schema({
     name: {
         type: String,
         required: true
@@ -34,7 +23,7 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    cellphone: {
+    phone_number: {
         type: String,
         required: false,
         default: null,
@@ -45,30 +34,21 @@ const userSchema = new Schema({
         required: true,
         default: []
     },
-    auth: {
+    auth_id: {
         type: Schema.Types.ObjectId,
         required: false,
         default: null,
         ref: "Auth"
     },
-    posts: [{
+    posts_id: [{
         type: Schema.Types.ObjectId,
         ref: "Post"
-    }],
-    bulletins: [{
-        type: Schema.Types.ObjectId,
-        ref: "Bulletin"
-    }],
-    blogs: [{
-        type: Schema.Types.ObjectId,
-        ref: "Blog"
     }]
 }, {
     versionKey: false
-});
+})
 
-
-userSchema.pre("save", function (next) {
+userModel.pre("save", function (next) {
     try {
         const socials = this.social_networks[0];
         this.social_networks = [];
@@ -83,10 +63,8 @@ userSchema.pre("save", function (next) {
     }
 });
 
-/**
- * Mongoose model for the user model.
- * @type {mongoose.Model<UserSchema>}
- */
-
-const User = mongoose.model("User", userSchema);
-module.exports = { User }
+const User = mongoose.model("User", userModel);
+module.exports = {
+    User,
+    userSchema: userModel
+}

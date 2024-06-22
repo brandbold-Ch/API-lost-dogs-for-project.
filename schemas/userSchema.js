@@ -10,7 +10,7 @@ const setUserSchema = Joi.object({
         .max(50)
         .required(),
 
-    cellphone: Joi.string()
+    phone_number: Joi.string()
         .regex(new RegExp(/^\d{10}$/))
         .max(10)
         .min(10)

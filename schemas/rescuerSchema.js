@@ -5,10 +5,15 @@ const setRescuerSchema = Joi.object({
     name: Joi.string()
         .required(),
 
-    address: Joi.string()
-        .required(),
+    social_networks: Joi.object()
+        .pattern(
+            Joi.string()
+                .pattern(new RegExp("^[a-zA-Z0-9_]+$"))
+                .required(),
 
-    identifier: Joi.string()
+            Joi.string()
+                .required()
+        )
         .optional(),
 
     description: Joi.string()

@@ -35,6 +35,7 @@ class PostServices {
 
     async addGalleryToAPost(id, post_id, images) {
         await Promise.all(images.map(async (key) => {
+            //await sharp(key["buffer"]).webp().toBuffer()
             let new_image = await this.imageTools.uploadImage(key["buffer"]);
             let selector;
 
@@ -53,16 +54,16 @@ class PostServices {
                 }
             }
 
-            await Post.updateOne({_id: post_id, user: id}, selector);
+            await Post.updateOne({_id: post_id, user_id: id}, selector);
         }));
     }
 
     async allPosts(id) {
-        return Post.find({user: id}).sort({"publication.lost_date": -1});
+        return Post.find({user_id: id}).sort({"publication.lost_date": -1});
     }
 
     async getPost(id, post_id) {
-        return Post.findOne({_id: post_id, user: id});
+        return Post.findOne({_id: post_id, user_id: id});
     }
 
     async getPostForGuest(id) {
@@ -97,7 +98,7 @@ class PostServices {
                     status: {
                         owner: obj_data["owner"]
                     },
-                    user: id,
+                    user_id: id,
                     doc_model: collection[0]
                 }
             ], {session})
@@ -111,7 +112,7 @@ class PostServices {
                 },
                 {
                     $push: {
-                        posts: output_post["_id"]
+                        posts_id: output_post["_id"]
                     }
                 },
                 {session}
@@ -207,11 +208,10 @@ class PostServices {
         }
 
         await session.withTransaction(async () => {
-
             await Post.updateOne(
                 {
                     _id: post_id,
-                    user: id,
+                    user_id: id,
                     ...selector
                 },
                 chunk,
@@ -236,11 +236,10 @@ class PostServices {
         let output_post;
 
         await session.withTransaction(async () => {
-
             await Post.findOneAndDelete(
                 {
                     _id: post_id,
-                    user: id
+                    user_id: id
                 },
                 {session}
             )
@@ -254,7 +253,7 @@ class PostServices {
                 },
                 {
                     $pull: {
-                        posts: post_id
+                        posts_id: post_id
                     }
                 }, {session}
             );
@@ -280,11 +279,10 @@ class PostServices {
         let output_post;
 
         await session.withTransaction(async () => {
-
             await Post.findOneAndUpdate(
                 {
                     _id: post_id,
-                    user: id
+                    user_id: id
                 },
                 {
                     $set: {
@@ -340,7 +338,7 @@ class PostServices {
     async insertComment(id, post_id, data, role) {
         const collection = this.modelDetector(role);
         const entity = await collection[1].findById(id, {name: 1});
-        const comment = {title: data, timestamp: Date.now(), user: entity}
+        const comment = {title: data, timestamp: Date.now(), user_id: entity}
 
         await Post.updateOne(
             {
@@ -359,7 +357,7 @@ class PostServices {
     async getUrlsImages(id) {
         return Post.aggregate([
             {
-                $match: {user: new mongoose.Types.ObjectId(id)}
+                $match: {user_id: new mongoose.Types.ObjectId(id)}
             },
             {
                 $project: {

@@ -26,7 +26,7 @@ const Schema = mongoose.Schema;
  * @property {Array<string>} tags - Tags associated with the dog.
  */
 
-const postSchema = new Schema({
+const postModel = new Schema({
 
     name: {
         type: String,
@@ -133,7 +133,7 @@ const postSchema = new Schema({
             default: []
         }
     },
-    user: {
+    user_id: {
         type: Schema.Types.ObjectId,
         required: true,
         refPath: "doc_model"
@@ -143,14 +143,14 @@ const postSchema = new Schema({
         required: true,
         enum: [
             "User",
-            "Rescuer"
+            "Rescuer",
+            "Association"
         ]
     }
 }, {
     versionKey: false
 });
 
-postSchema.index({user: 1});
-
-const Post = mongoose.model("Post", postSchema);
+postModel.index({user: 1});
+const Post = mongoose.model("Post", postModel);
 module.exports = {Post}

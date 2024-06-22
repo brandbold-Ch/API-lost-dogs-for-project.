@@ -32,7 +32,7 @@ class BulletinServices {
                 }
             }
 
-            await Bulletin.updateOne({_id: bulletin_id, user: id}, chunk);
+            await Bulletin.updateOne({_id: bulletin_id, user_id: id}, chunk);
         }));
     };
 
@@ -63,10 +63,9 @@ class BulletinServices {
                     },
                     identify: {
                         name_company: obj_data["name_company"],
-                        address: obj_data["address"],
-                        te_number: obj_data["te_number"],
+                        phone_number: obj_data["te_number"],
                     },
-                    user: id,
+                    user_id: id,
                     doc_model: collection[0]
                 }
             ], {session})
@@ -80,7 +79,7 @@ class BulletinServices {
                 },
                 {
                     $push: {
-                        bulletins: output_bulletin["_id"]
+                        bulletins_id: output_bulletin["_id"]
                     }
                 }, {session}
             );
@@ -128,7 +127,7 @@ class BulletinServices {
             await Bulletin.updateOne(
                 {
                     _id: bulletin_id,
-                    user: id,
+                    user_id: id,
                     ...selector
                 },
                 chunk,
@@ -148,11 +147,11 @@ class BulletinServices {
     }
 
     async getBulletins(id) {
-        return Bulletin.find({user: id}).sort({"identify.timestamp": -1});
+        return Bulletin.find({user_id: id}).sort({"identify.timestamp": -1});
     }
 
     async getBulletin(id, bulletin_id) {
-        return Bulletin.findOne({_id: bulletin_id, user: id});
+        return Bulletin.findOne({_id: bulletin_id, user_id: id});
     }
 
     async getBulletinForGuest(bulletin_id) {
@@ -169,7 +168,7 @@ class BulletinServices {
             await Bulletin.findOneAndDelete(
                 {
                     _id: bulletin_id,
-                    user: id
+                    user_id: id
                 },
                 {session}
             )
@@ -183,7 +182,7 @@ class BulletinServices {
                 },
                 {
                     $pull: {
-                        bulletins: bulletin_id
+                        bulletins_id: bulletin_id
                     }
                 }, {session}
             );
@@ -203,7 +202,7 @@ class BulletinServices {
 
     async updateBulletin(id, bulletin_id, bulletin_data) {
         const session = await connection.startSession();
-        const context_bulletin = await Bulletin.findOne({_id: bulletin_id, user: id});
+        const context_bulletin = await Bulletin.findOne({_id: bulletin_id, user_id: id});
         const obj_data = bulletin_data[0];
         const array_images = bulletin_data[1];
         let output_bulletin;
@@ -213,7 +212,7 @@ class BulletinServices {
             await Bulletin.findOneAndUpdate(
                 {
                     _id: bulletin_id,
-                    user: id
+                    user_id: id
                 },
                 {
                     $set: {
@@ -225,12 +224,11 @@ class BulletinServices {
                         },
                         identify: {
                             name_company: obj_data["name_company"],
-                            address: obj_data["address"],
-                            te_number: obj_data["te_number"],
+                            phone_number: obj_data["te_number"],
                             timestamp: context_bulletin["identify"]["timestamp"],
                             update: Date.now()
                         },
-                        user: context_bulletin["user"]
+                        user_id: context_bulletin["user"]
                     }
                 },
                 {

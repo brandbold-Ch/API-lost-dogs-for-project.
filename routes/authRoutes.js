@@ -1,6 +1,6 @@
 const authControllers = require('../controllers/authControllers');
 const express = require('express');
-const {validateUpdateAuthData} = require("../middlewares/handlerInputData/handlerAuthData");
+const {validateUpdateAuthData} = require("../middlewares/handler/handlerAuthData");
 const {verifyUpdateAuth} = require("../middlewares/anyMiddlewares");
 const authRouter = express.Router();
 

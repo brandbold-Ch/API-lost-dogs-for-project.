@@ -10,15 +10,15 @@ const { userRouter } = require("./routes/userRoutes");
 const { authRouter } = require("./routes/authRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
-const {HandlerHttpVerbs} = require("./errors/handlerHttpVerbs");
+const { HandlerHttpVerbs } = require("./errors/handlerHttpVerbs");
 const mainDocs = require("./swagger/mainDocs");
 const swaggerUi = require("swagger-ui-express");
 const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
 const  express = require("express");
-const {postsRouter, bulletinsRouter, blogsRouter} = require("./routes/guestRoutes");
-const {errorsCodes} = require("./utils/codes");
+const { postsRouter, bulletinsRouter, blogsRouter } = require("./routes/guestRoutes");
+const { errorsCodes } = require("./utils/codes");
 const app = express();
 
 
@@ -47,7 +47,7 @@ app.use(morgan('dev'));
 app.get("/", (req, res) => {
     res.status(200).json(
         HandlerHttpVerbs.ok(
-            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.0 🦮🐩🐈🦜",
+            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.1 🦮🐩🐈🦜",
             undefined, {
                 url: req.baseUrl,
                 verb: req.method

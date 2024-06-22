@@ -26,6 +26,10 @@ module.exports = {
                                     "type": "string",
                                     "description": "Apellido del usuario."
                                 },
+                                "phone_number": {
+                                    "type": "string",
+                                    "description": "Número de celular del usuario."
+                                },
                                 "email": {
                                     "type": "string",
                                     "description": "Correo electrónico del usuario."
@@ -38,6 +42,7 @@ module.exports = {
                             "example": {
                                 "name": "John",
                                 "lastname": "Doe",
+                                "phone_number": "9876543210",
                                 "email": "john@example.com",
                                 "password": "secretpassword"
                             }
@@ -141,7 +146,7 @@ module.exports = {
                                     "type": "string",
                                     "description": "Apellido del usuario."
                                 },
-                                "cellphone": {
+                                "phone_number": {
                                     "type": "string",
                                     "description": "Número de celular del usuario."
                                 },
@@ -153,7 +158,7 @@ module.exports = {
                             "example": {
                                 "name": "John",
                                 "lastname": "Doe",
-                                "cellphone": "123456789",
+                                "phone_number": "1234567890",
                                 "social_networks": {
                                     "facebook": "john.doe",
                                     "twitter": "@john_doe"
@@ -230,6 +235,34 @@ module.exports = {
         }
     },
     "/api/v2/users/requests": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "User controllers"
+            ],
+            "summary": "Ver solicitudes.",
+            "description": "Ver solicitudes pendientes.",
+            "responses": {
+                "201": {
+                    "description": "Solicitud ."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "404": {
+                    "description": "Solicitudes no encontradas o Usuario no encontrado."
+                }
+            }
+        }
+    },
+    "/api/v2/users/requests/rescuer": {
         "post": {
             "security": [
                 {
@@ -255,8 +288,10 @@ module.exports = {
                     "description": "Usuario no encontrado."
                 }
             }
-        },
-        "get": {
+        }
+    },
+    "/api/v2/users/requests/association": {
+        "post": {
             "security": [
                 {
                     "bearerAuth": []
@@ -265,11 +300,11 @@ module.exports = {
             "tags": [
                 "User controllers"
             ],
-            "summary": "Ver solicitudes.",
-            "description": "Ver solicitudes pendientes.",
+            "summary": "Crear solcitud de asociación.",
+            "description": "Creación de solicitud para ser una asociación.",
             "responses": {
                 "201": {
-                    "description": "Solicitud ."
+                    "description": "Solicitud creada correctamente."
                 },
                 "500": {
                     "description": "Error interno del servidor."
@@ -278,7 +313,7 @@ module.exports = {
                     "description": "Error del cliente."
                 },
                 "404": {
-                    "description": "Solicitudes no encontradas o Usuario no encontrado."
+                    "description": "Usuario no encontrado."
                 }
             }
         }

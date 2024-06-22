@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const bulletinSchema = new Schema({
+const bulletinModel = new Schema({
 
     title: {
         type: String,
@@ -34,7 +34,7 @@ const bulletinSchema = new Schema({
             default: null,
             required: false
         },
-        te_number: {
+        phone_number: {
             type: String,
             default: null,
             required: false
@@ -49,7 +49,7 @@ const bulletinSchema = new Schema({
             default: Date.now()
         }
     },
-    user: {
+    user_id: {
         type: Schema.Types.ObjectId,
         required: true,
         refPath: "doc_model"
@@ -59,12 +59,13 @@ const bulletinSchema = new Schema({
         required: true,
         enum: [
             "User",
-            "Rescuer"
+            "Rescuer",
+            "Association"
         ]
     }
 }, {
     versionKey: false
 });
 
-const Bulletin = mongoose.model("Bulletin", bulletinSchema);
+const Bulletin = mongoose.model("Bulletin", bulletinModel);
 module.exports = {Bulletin}

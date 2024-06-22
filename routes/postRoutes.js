@@ -3,8 +3,8 @@ const postControllers = require("../controllers/postControllers");
 const express = require("express");
 const postRouter = express.Router();
 const processFormData = require("../middlewares/formData");
-const {validatePostData} = require("../middlewares/handlerInputData/handlerPostData");
-const {validateQueryDeleteImage} = require("../middlewares/handlerInputData/handlerAnyData");
+const {validatePostData} = require("../middlewares/handler/handlerPostData");
+const {validateQueryDeleteImage} = require("../middlewares/handler/handlerAnyData");
 
 
 postRouter.post("/posts", processFormData, validatePostData, postControllers.setPost);

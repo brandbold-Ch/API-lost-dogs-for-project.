@@ -125,7 +125,31 @@ exports.deleteSocialMedia = async (req, res) => {
 
 exports.makeRescuer = async (req, res) => {
     try {
-        const response_body = await user.makeRescuer(req.id, req.role);
+        const response_body = await user.changeRole(req.id, req.role, "RESCUER");
+
+        res.status(201).json(
+            HandlerHttpVerbs.created(
+                "Request sent successfully ✅",
+                undefined, {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+exports.makeAssociation = async (req, res) => {
+    try {
+        const response_body = await user.changeRole(req.id, req.role, "ASSOCIATION");
 
         res.status(201).json(
             HandlerHttpVerbs.created(

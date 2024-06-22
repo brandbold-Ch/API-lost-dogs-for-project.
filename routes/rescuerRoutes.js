@@ -1,8 +1,9 @@
 const rescuerControllers = require("../controllers/rescuerControllers");
-const {validateRescuerData} = require("../middlewares/handlerInputData/handlerRescuerData");
+const {validateRescuerData} = require("../middlewares/handler/handlerRescuerData");
 const {Authenticate} = require('../middlewares/authenticator');
 const {postRouter} = require("./postRoutes");
 const {bulletinRouter} = require("./bulletinRoutes");
+const processFormData = require("../middlewares/formData");
 const {blogRouter} = require("./blogRoutes");
 const {authRouter} = require("./authRoutes");
 const express = require("express");
@@ -14,7 +15,7 @@ const {
 } = require("../middlewares/anyMiddlewares");
 
 
-rescuerRouter.post("/", express.urlencoded({extended: true}), validateRescuerData, checkAccountExists, rescuerControllers.setRescuer);
+rescuerRouter.post("/", processFormData, validateRescuerData, checkAccountExists, rescuerControllers.setRescuer);
 
 rescuerRouter.use([
     Authenticate,

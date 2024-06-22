@@ -4,7 +4,10 @@ const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 exports.setRescuer = async (req, res) => {
     try {
-        const response_body = await rescuer.setRescuer(req.body);
+        const response_body = await rescuer.setRescuer([
+            JSON.parse(JSON.stringify(req.body)),
+            req.files
+        ]);
 
         res.status(201).json(
             HandlerHttpVerbs.created(

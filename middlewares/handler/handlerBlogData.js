@@ -1,19 +1,17 @@
-const {setPostSchema} = require("../../schemas/postSchema");
+const {setBlogSchema} = require("../../schemas/blogSchema");
 const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
 const {ValidationError} = require("joi");
 const {patternSelector} = require("./patternSelector");
 
 
-const validatePostData = async (req, res, next) => {
+const validateBlogData = async (req, res, next) => {
     try {
-        await setPostSchema.validateAsync(
+        await setBlogSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
         );
-
         next();
 
     } catch (err) {
-
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
@@ -33,4 +31,4 @@ const validatePostData = async (req, res, next) => {
     }
 }
 
-module.exports = {validatePostData}
+module.exports = {validateBlogData}
