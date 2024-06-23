@@ -57,6 +57,7 @@ app.get("/", (req, res) => {
         )
     );
 });
+/*
 app.use((req, res, next) => {
     const isConnected = () => {
         if (connection.readyState !== 1) {
@@ -67,6 +68,7 @@ app.use((req, res, next) => {
     }
     isConnected();
 });
+ */
 app.use("/api/v2/users", userRouter);
 app.use("/api/v2/auth", authRouter);
 app.use("/api/v2/admins", adminRouter);

@@ -1,7 +1,7 @@
 {
   "name": "api_pets",
-  "version": "3.0",
-  "description": "API for pets",
+  "version": "3.1",
+  "description": "API for lost pets",
   "engines": {
     "node": "20.x"
   },
