@@ -1,13 +1,13 @@
-const {checkPostExists, checkQueryParameters, userRolePermission} = require("../middlewares/anyMiddlewares");
+const { checkPostExists, checkQueryParameters } = require("../middlewares/anyMiddlewares");
 const postControllers = require("../controllers/postControllers");
 const express = require("express");
 const postRouter = express.Router();
 const processFormData = require("../middlewares/formData");
-const {validatePostData} = require("../middlewares/handler/handlerPostData");
-const {validateQueryDeleteImage} = require("../middlewares/handler/handlerAnyData");
+const { validatePostData } = require("../middlewares/handler/handlerPostData");
+const { validateQueryDeleteImage } = require("../middlewares/handler/handlerAnyData");
 
 
-postRouter.post("/posts", processFormData, validatePostData, postControllers.setPost);
+postRouter.post("/posts", processFormData, validatePostData, postControllers.createPost);
 postRouter.get("/posts/:pet_id", checkPostExists, postControllers.getPost);
 postRouter.put("/posts/:pet_id", checkPostExists, processFormData, validatePostData, postControllers.updatePost);
 postRouter.delete("/posts/:pet_id", checkPostExists, postControllers.deletePost);

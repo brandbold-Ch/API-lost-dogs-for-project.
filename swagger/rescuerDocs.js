@@ -1,6 +1,6 @@
-const {postDocs} = require("./postDocs");
-const {bulletinDocs} = require("./bulletinDocs");
-const {blogDocs} = require("./blogDocs");
+const { postDocs } = require("./postDocs");
+const { bulletinDocs } = require("./bulletinDocs");
+const { blogDocs } = require("./blogDocs");
 
 
 module.exports = {
@@ -218,6 +218,93 @@ module.exports = {
                 },
                 "404": {
                     "description": "Rescatista no encontrado."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        }
+    },
+    "/api/v2/rescuers/networks": {
+        "delete": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Rescuer controllers"
+            ],
+            "summary": "Eliminar una red social.",
+            "description": "Eliminar una red social de rescatista.",
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "key",
+                    "description": "Nombre de la red social (key).",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "in": "query",
+                    "name": "value",
+                    "description": "Usuario de la red social (value).",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "404": {
+                    "description": "Rescatista no encontrado."
+                },
+                "204": {
+                    "description": "Red social eliminada."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        }
+    },
+    "/api/v2/rescuers/image/{image_id}": {
+        "delete": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Rescuer controllers"
+            ],
+            "summary": "Eliminar una imagen.",
+            "description": "Eliminar una imagen del perfil de rescatista.",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "image_id",
+                    "description": "Id de la imagen.",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "404": {
+                    "description": "Rescatista no encontrado."
+                },
+                "204": {
+                    "description": "Imagen eliminada."
                 },
                 "401": {
                     "description": "Sin permisos para ver esta ruta."

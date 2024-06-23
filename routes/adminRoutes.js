@@ -14,7 +14,7 @@ const {
 } = require("../middlewares/anyMiddlewares");
 
 
-adminRouter.post("/", express.urlencoded({extended: true}), validateSetAdminData, checkAccountExists, adminControllers.setAdmin);
+adminRouter.post("/", express.urlencoded({extended: true}), validateSetAdminData, checkAccountExists, adminControllers.createAdmin);
 
 adminRouter.use([
     Authenticate,
@@ -36,4 +36,4 @@ adminRouter.get("/users/:user_id", entityExists, adminControllers.getUser);
 adminRouter.delete("/users/:user_id", entityExists, adminControllers.deleteUser);
 adminRouter.use(authRouter);
 
-module.exports = {adminRouter}
+module.exports = { adminRouter }

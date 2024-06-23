@@ -5,9 +5,9 @@
  * @module authSchema
  */
 
+const { baseUserModel } = require("./baseUser");
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-
+const { Schema } = mongoose;
 
 /**
  * Mongoose schema for the user model.
@@ -15,10 +15,7 @@ const Schema = mongoose.Schema;
  */
 
 const userModel = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
+    ...baseUserModel.obj,
     lastname: {
         type: String,
         required: true
@@ -28,43 +25,11 @@ const userModel = new Schema({
         required: false,
         default: null,
         maxLength: 10,
-    },
-    social_networks: {
-        type: Array,
-        required: true,
-        default: []
-    },
-    auth_id: {
-        type: Schema.Types.ObjectId,
-        required: false,
-        default: null,
-        ref: "Auth"
-    },
-    posts_id: [{
-        type: Schema.Types.ObjectId,
-        ref: "Post"
-    }]
+        minLength: 10
+    }
 }, {
     versionKey: false
 })
 
-userModel.pre("save", function (next) {
-    try {
-        const socials = this.social_networks[0];
-        this.social_networks = [];
-
-        for (const key in socials) {
-            this.social_networks.push({[key]: socials[key]});
-        }
-        next();
-
-    } catch (err) {
-        next(err);
-    }
-});
-
 const User = mongoose.model("User", userModel);
-module.exports = {
-    User,
-    userSchema: userModel
-}
+module.exports = { User }

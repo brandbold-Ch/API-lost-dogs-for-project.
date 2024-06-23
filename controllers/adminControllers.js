@@ -1,10 +1,10 @@
-const {admin} = require("../utils/instances");
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const { admin } = require("../utils/instances");
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
 
 
-exports.setAdmin = async (req, res) => {
+exports.createAdmin = async (req, res) => {
     try {
-        const response_body = await admin.setAdmin(req.body);
+        const response_body = await admin.createAdmin(req.body);
 
         res.status(201).json(
             HandlerHttpVerbs.created(

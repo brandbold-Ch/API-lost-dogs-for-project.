@@ -8,9 +8,9 @@ const {post} = require("../utils/instances");
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
-exports.setPost = async (req, res) => {
+exports.createPost = async (req, res) => {
     try {
-        const response_body = await post.setPost(
+        const response_body = await post.createPost(
             req.id,
             [
                 JSON.parse(JSON.stringify(req.body)),

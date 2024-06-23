@@ -5,11 +5,11 @@
  * functionality to authenticated users
  */
 
-const {User} = require("../models/user");
-const {Rescuer} = require("../models/rescuer");
-const {Post} = require("../models/post");
-const {ImageTools} = require("../utils/imageTools");
-const {connection} = require("../configurations/connections");
+const { User } = require("../models/user");
+const { Rescuer } = require("../models/rescuer");
+const { Post } = require("../models/post");
+const { ImageTools } = require("../utils/imageTools");
+const { connection } = require("../configurations/connections");
 const mongoose = require("mongoose");
 
 /**
@@ -70,7 +70,7 @@ class PostServices {
         return Post.findById(id);
     }
 
-    async setPost(id, post_data, role) {
+    async createPost(id, post_data, role) {
         const session = await connection.startSession();
         const collection = this.modelDetector(role);
         const obj_data = post_data[0];
@@ -337,8 +337,8 @@ class PostServices {
 
     async insertComment(id, post_id, data, role) {
         const collection = this.modelDetector(role);
-        const entity = await collection[1].findById(id, {name: 1});
-        const comment = {title: data, timestamp: Date.now(), user_id: entity}
+        const entity = await collection[1].findById(id, { name: 1 });
+        const comment = { title: data, timestamp: Date.now(), user_id: entity }
 
         await Post.updateOne(
             {
@@ -391,4 +391,4 @@ class PostServices {
     }
 }
 
-module.exports = {PostServices};
+module.exports = { PostServices };

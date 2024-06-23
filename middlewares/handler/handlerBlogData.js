@@ -1,12 +1,12 @@
-const {setBlogSchema} = require("../../schemas/blogSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { blogCreationSchema } = require("../../schemas/blogSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateBlogData = async (req, res, next) => {
     try {
-        await setBlogSchema.validateAsync(
+        await blogCreationSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
         );
         next();
@@ -31,4 +31,4 @@ const validateBlogData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateBlogData}
+module.exports = { validateBlogData }

@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const setRescuerSchema = Joi.object({
+const rescuerCreationSchema = Joi.object({
     name: Joi.string()
         .required(),
 
@@ -23,4 +23,4 @@ const setRescuerSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = {setRescuerSchema}
+module.exports = { rescuerCreationSchema }

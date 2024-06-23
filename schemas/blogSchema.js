@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const setBlogSchema = Joi.object({
+const blogCreationSchema = Joi.object({
 
     markdown_text: Joi.string()
         .required()
@@ -11,4 +11,4 @@ const setBlogSchema = Joi.object({
     abortEarly: true
 })
 
-module.exports = {setBlogSchema}
+module.exports = { blogCreationSchema }

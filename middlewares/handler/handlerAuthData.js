@@ -1,12 +1,12 @@
-const {updateAuthSchema} = require("../../schemas/authSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { authUpdateSchema } = require("../../schemas/authSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateUpdateAuthData = async (req, res, next) => {
     try {
-        await updateAuthSchema.validateAsync(req.body);
+        await authUpdateSchema.validateAsync(req.body);
         next();
 
     } catch (err) {
@@ -16,18 +16,18 @@ const validateUpdateAuthData = async (req, res, next) => {
                 HandlerHttpVerbs.badRequest(
                     err.message,
                     patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
     }
 }
 
-module.exports = {validateUpdateAuthData};
+module.exports = { validateUpdateAuthData };

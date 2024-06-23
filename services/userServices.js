@@ -5,17 +5,13 @@
  * functionality to authenticated users
  */
 
-const {User} = require("../models/user");
-const {Post} = require("../models/post");
-const {Blog} = require("../models/blog");
-const {Auth} = require("../models/auth");
-const {Request} = require("../models/rescuer");
-const {PostServices} = require("../services/postServices");
-const {BulletinServices} = require("../services/bulletinServices");
-const {BlogServices} = require("../services/blogServices");
-const {connection} = require("../configurations/connections");
-const {ImageTools} = require("../utils/imageTools");
-const {Bulletin} = require("../models/bulletin");
+const { User } = require("../models/user");
+const { Post } = require("../models/post");
+const { Auth } = require("../models/auth");
+const { Request } = require("../models/rescuer");
+const { PostServices } = require("../services/postServices");
+const { connection } = require("../configurations/connections");
+const { ImageTools } = require("../utils/imageTools");
 
 
 /**
@@ -27,38 +23,32 @@ class UserServices {
 
     constructor() {
         this.posts = new PostServices();
-        this.bulletins = new BulletinServices();
-        this.blogs = new BlogServices();
         this.imageTools = new ImageTools();
     }
 
-    async setUser(user_data) {
-        const {name, lastname, phone_number, email, password} = user_data;
+    async createUser(user_data) {
+        const { name, lastname, phone_number, email, password, social_networks } = user_data;
         const session = await connection.startSession();
         let output_user, output_auth;
 
         await session.withTransaction(async () => {
-            await User.create([
-                {
-                    name: name,
-                    lastname: lastname,
-                    phone_number: phone_number,
-                    social_networks: user_data["social_networks"]
-                }
-            ], {session})
+            await User.create([{
+                name: name,
+                lastname: lastname,
+                phone_number: phone_number,
+                social_networks: social_networks
+            }], { session })
                 .then((user) => {
                     output_user = user[0];
                 });
 
-            await Auth.create([
-                {
-                    email: email,
-                    password: password,
-                    user_id: output_user["_id"],
-                    role: "USER",
-                    doc_model: "User"
-                }
-            ], {session})
+            await Auth.create([{
+                email: email,
+                password: password,
+                user_id: output_user["_id"],
+                role: "USER",
+                doc_model: "User"
+            }], { session })
                 .then((auth) => {
                     output_auth = auth[0];
                 });
@@ -66,16 +56,12 @@ class UserServices {
             await User.findByIdAndUpdate(
                 output_user["_id"],
                 {
-                    $set: {
-                        auth_id: output_auth["_id"]
-                    }
+                    $set: { auth_id: output_auth["_id"] }
                 },
-                {
-                    new: true
-                }
+                { new: true }
             ).session(session)
-                .then((newUser) => {
-                    output_user = newUser;
+                .then((user) => {
+                    output_user = user;
                 });
         });
 
@@ -91,8 +77,8 @@ class UserServices {
      */
 
     async getUsers() {
-        return User.find({}, {posts_id: 0, bulletins_id: 0})
-            .populate("auth_id", {email: 1, password: 1, _id: 0});
+        return User.find({}, { posts_id: 0, bulletins_id: 0 })
+            .populate("auth_id", { email: 1, password: 1, _id: 0 });
     }
 
     /**
@@ -104,14 +90,12 @@ class UserServices {
      */
 
     async getUser(id) {
-        return User.findById(id)
-            .populate("auth_id",
-                {email: 1, password: 1, _id: 0}
-            )
+        return User.findById(id, { posts_id: 0 })
+            .populate("auth_id", { email: 1, password: 1, _id: 0 });
     }
 
     /**
-     * Delete a user by their ID and also delete their credentials.
+     * Delete a user  by their ID and also delete their credentials.
      * @async
      * @function
      * @param {string} id - User ID.
@@ -121,30 +105,18 @@ class UserServices {
     async deleteUser(id) {
         const session = await connection.startSession();
         const array_urls_posts = await this.posts.getUrlsImages(id);
-        const array_urls_bulletins = await this.bulletins.getUrlsImages(id);
-        const array_urls_blogs = await this.blogs.getUrlsImages(id);
 
         await session.withTransaction(async () => {
             await Promise.all([
-                Auth.deleteOne({user_id: id}, {session}),
-                User.deleteOne({_id: id}, {session}),
-                Post.deleteMany({user_id: id}, {session}),
-                Request.deleteMany({user_id: id}, {session}),
-                Bulletin.deleteMany({user_id: id}, {session}),
-                Blog.deleteMany({user_id: id}, {session})
+                Auth.deleteOne({ user_id: id }, { session }),
+                User.deleteOne({ _id: id }, { session }),
+                Post.deleteMany({ user_id: id }, { session }),
+                Request.deleteMany({ user_id: id }, { session }),
             ]);
         })
             .then(async () => {
-                if (array_urls_bulletins.length) {
-                    await this.imageTools.deleteImages(array_urls_bulletins[0]["allIds"]);
-                }
-
                 if (array_urls_posts.length) {
                     await this.imageTools.deleteImages(array_urls_posts[0]["allIds"]);
-                }
-
-                if (array_urls_blogs.length) {
-                    await this.imageTools.deleteImages(array_urls_blogs[0]["allIds"]);
                 }
             })
 
@@ -161,14 +133,13 @@ class UserServices {
      */
 
     async updateUser(id, user_data) {
-        const {name, lastname, phone_number, social_networks} = user_data;
-        const socials = [];
+        const { name, lastname, phone_number, social_networks } = user_data;
+        const socials = (social_networks)? Object.keys(social_networks).map(
+            key => ({ [key]: social_networks[key] })
+        ): undefined;
 
-        for (const key in social_networks) {
-            socials.push({[key]: social_networks[key]})
-        }
-
-        return User.findByIdAndUpdate(id, {
+        return User.findByIdAndUpdate(id,
+            {
                 $set: {
                     name: name,
                     lastname: lastname,
@@ -176,40 +147,27 @@ class UserServices {
                     social_networks: socials
                 }
             },
-            {
-                new: true
-            }
+            { new: true }
         );
     }
 
     async deleteSocialMedia(id, key, value) {
-        await User.updateOne(
-            {
-                _id: id
-            },
-            {
-                $pull: {
-                    social_networks: {[key]: value}
-                }
-            }
-        );
+        await User.updateOne({ _id: id }, { $pull: { social_networks: { [key]: value } } });
     }
 
     async getRequests (id) {
-        return Request.find({user_id: id});
+        return Request.find({ user_id: id });
     }
 
     async changeRole(id, role, change) {
         let output_request;
 
-        await Request.create([
-            {
-                requester_role: role,
-                requested_role: change,
-                user_id: id,
-                doc_model: "User"
-            }
-        ])
+        await Request.create([{
+            requester_role: role,
+            requested_role: change,
+            user_id: id,
+            doc_model: "User"
+        }])
             .then((request) => {
                 output_request = request[0]
             });
@@ -218,4 +176,4 @@ class UserServices {
     }
 }
 
-module.exports = {UserServices};
+module.exports = { UserServices };

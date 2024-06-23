@@ -7,7 +7,7 @@ const supportedDomains = [
     "org"
 ]
 
-const setAuthSchema = Joi.object({
+const authCreationSchema = Joi.object({
     email: Joi.string()
         .email({
             minDomainSegments: 2,
@@ -23,7 +23,7 @@ const setAuthSchema = Joi.object({
     abortEarly: true
 });
 
-const updateAuthSchema = Joi.object({
+const authUpdateSchema = Joi.object({
     email: Joi.string()
         .email({
             minDomainSegments: 2,
@@ -44,6 +44,6 @@ const updateAuthSchema = Joi.object({
 })
 
 module.exports = {
-    setAuthSchema,
-    updateAuthSchema
+    authCreationSchema,
+    authUpdateSchema
 };

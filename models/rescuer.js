@@ -1,8 +1,10 @@
+const { baseUserModel } = require("./baseUser");
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 
 const rescuerModel = new Schema({
+    ...baseUserModel.obj,
     name: {
         type: String,
         required: true
@@ -17,21 +19,6 @@ const rescuerModel = new Schema({
         required: false,
         default: null
     },
-    social_networks: {
-        type: Array,
-        required: true,
-        default: []
-    },
-    auth_id: {
-        type: Schema.Types.ObjectId,
-        required: false,
-        default: null,
-        ref: "Auth"
-    },
-    posts_id: [{
-        type: Schema.Types.ObjectId,
-        ref: "Post"
-    }],
     bulletins_id: [{
         type: Schema.Types.ObjectId,
         ref: "Bulletin"
@@ -51,14 +38,14 @@ const requestsModel = new Schema({
         required: true,
         default: Date.now()
     },
-    requester_role: [{
+    requester_role: {
         type: String,
         required: true,
         enum: [
             "RESCUER",
             "USER"
         ]
-    }],
+    },
     requested_role: {
         type: String,
         required: true,
@@ -95,16 +82,11 @@ const requestsModel = new Schema({
     versionKey: false
 });
 
-requestsModel.pre("save", function(next) {
-    delete this.lastname;
-    next();
-})
 
 requestsModel.index({user_id: 1}, {unique: true});
 const Request = mongoose.model("Request", requestsModel);
 const Rescuer = mongoose.model("Rescuer", rescuerModel);
 module.exports = {
     Rescuer,
-    Request,
-    rescuerSchema: rescuerModel
+    Request
 }

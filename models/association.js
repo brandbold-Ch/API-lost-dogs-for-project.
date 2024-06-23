@@ -1,8 +1,10 @@
+const { baseUserModel } = require("./baseUser");
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 
 const associationModel = new Schema({
+    ...baseUserModel.obj,
     image: {
         type: Object,
         required: false,

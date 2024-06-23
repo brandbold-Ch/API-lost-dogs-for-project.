@@ -1,13 +1,12 @@
-const {statusCodes, errorsCodes} = require("../utils/codes");
+const { statusCodes, errorsCodes } = require("../utils/codes");
 
 
 class HandlerHttpVerbs {
 
-    constructor() {
-    }
+    constructor() {}
 
-    static templateForErrors(message, bodyError) {
-        const {status, url, role, codes, verb} = bodyError;
+    static errorTemplate(message, bodyError) {
+        const { status, url, role, codes, verb } = bodyError;
 
         return {
             status: status,
@@ -23,8 +22,8 @@ class HandlerHttpVerbs {
         }
     }
 
-    static templateForSuccess(message, bodySuccess) {
-        const {data, status, codes, url, verb} = bodySuccess;
+    static successTemplate(message, bodySuccess) {
+        const { data, status, codes, url, verb } = bodySuccess;
 
         return {
             status: status,
@@ -42,7 +41,7 @@ class HandlerHttpVerbs {
 
     static forbidden(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.errorTemplate(message, {
             status: "Forbidden 💥",
             codes: {
                 statusCode: statusCodes.FORBIDDEN,
@@ -54,7 +53,7 @@ class HandlerHttpVerbs {
 
     static internalServerError(message, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.errorTemplate(message, {
             status: "Internal server error 💀",
             codes: {
                 statusCode: statusCodes.INTERNAL_SERVER_ERROR,
@@ -66,7 +65,7 @@ class HandlerHttpVerbs {
 
     static notFound(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.errorTemplate(message, {
             status: "Not found 🤷‍♂️",
             codes: {
                 statusCode: statusCodes.NOT_FOUND,
@@ -78,7 +77,7 @@ class HandlerHttpVerbs {
 
     static badRequest(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.errorTemplate(message, {
             status: "Bad request 🤨",
             codes: {
                 statusCode: statusCodes.BAD_REQUEST,
@@ -90,7 +89,7 @@ class HandlerHttpVerbs {
 
     static unauthorized(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForErrors(message, {
+        return HandlerHttpVerbs.errorTemplate(message, {
             status: "Unauthorized 🔒",
             codes: {
                 statusCode: statusCodes.UNAUTHORIZED,
@@ -102,7 +101,7 @@ class HandlerHttpVerbs {
 
     static ok(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForSuccess(message, {
+        return HandlerHttpVerbs.successTemplate(message, {
             status: "Ok 👍",
             codes: {
                 statusCode: statusCodes.OK,
@@ -114,7 +113,7 @@ class HandlerHttpVerbs {
 
     static created(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForSuccess(message, {
+        return HandlerHttpVerbs.successTemplate(message, {
             status: "Created 🎊",
             codes: {
                 statusCode: statusCodes.CREATED,
@@ -126,7 +125,7 @@ class HandlerHttpVerbs {
 
     static accepted(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForSuccess(message, {
+        return HandlerHttpVerbs.successTemplate(message, {
             status: "Accepted 🤝",
             codes: {
                 statusCode: statusCodes.ACCEPTED,
@@ -138,7 +137,7 @@ class HandlerHttpVerbs {
 
     static continue(message, extraError, bodyParam) {
 
-        return HandlerHttpVerbs.templateForSuccess(message, {
+        return HandlerHttpVerbs.successTemplate(message, {
             status: "Continue ⏭️",
             codes: {
                 statusCode: statusCodes.CONTINUE,
@@ -167,4 +166,4 @@ class HandlerHttpVerbs {
     }
 }
 
-module.exports = {HandlerHttpVerbs}
+module.exports = { HandlerHttpVerbs }

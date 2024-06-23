@@ -8,9 +8,9 @@ const {user} = require("../utils/instances");
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
-exports.setUser = async (req, res) => {
+exports.createUser = async (req, res) => {
     try {
-        const response_body = await user.setUser(req.body);
+        const response_body = await user.createUser(req.body);
 
         res.status(201).json(
             HandlerHttpVerbs.created(

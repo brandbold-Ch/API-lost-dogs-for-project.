@@ -2,7 +2,7 @@ const Joi = require("joi");
 require("dotenv").config();
 
 
-const setAdminSchema = Joi.object({
+const adminCreationSchema = Joi.object({
     name: Joi.string()
         .max(50)
         .required(),
@@ -22,4 +22,4 @@ const setAdminSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = {setAdminSchema}
+module.exports = { adminCreationSchema }

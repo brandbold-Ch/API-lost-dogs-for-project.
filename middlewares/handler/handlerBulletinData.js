@@ -1,12 +1,12 @@
-const {setBulletinsSchema} = require("../../schemas/bulletinSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { bulletinCreationSchema } = require("../../schemas/bulletinSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateBulletinData = async (req, res, next) => {
     try {
-        await setBulletinsSchema.validateAsync(
+        await bulletinCreationSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
         );
         next();
@@ -32,4 +32,4 @@ const validateBulletinData = async (req, res, next) => {
     }
 }
 
-module.exports = {validateBulletinData}
+module.exports = { validateBulletinData }

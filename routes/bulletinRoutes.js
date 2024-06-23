@@ -9,7 +9,7 @@ const {validateQueryDeleteImage} = require("../middlewares/handler/handlerAnyDat
 
 bulletinRouter.use(rescuerRolePermission);
 
-bulletinRouter.post("/bulletins", processFormData, validateBulletinData, bulletinControllers.setBulletin);
+bulletinRouter.post("/bulletins", processFormData, validateBulletinData, bulletinControllers.createBulletin);
 bulletinRouter.get("/bulletins", bulletinControllers.getBulletins);
 bulletinRouter.get("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.getBulletin);
 bulletinRouter.delete("/bulletins/:bulletin_id", checkBulletinExists, bulletinControllers.deleteBulletin);

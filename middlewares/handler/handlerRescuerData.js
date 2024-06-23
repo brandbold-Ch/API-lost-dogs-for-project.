@@ -1,22 +1,22 @@
-const {setRescuerSchema} = require("../../schemas/rescuerSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {setAuthSchema} = require("../../schemas/authSchema");
-const {patternSelector} = require("./patternSelector");
+const { rescuerCreationSchema } = require("../../schemas/rescuerSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { authCreationSchema } = require("../../schemas/authSchema");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateRescuerData = async (req, res, next) => {
     try {
-        const {name , social_networks, description, email, password} = req.body;
+        const { name , social_networks, description, email, password } = req.body;
 
-        await setRescuerSchema.validateAsync({
+        await rescuerCreationSchema.validateAsync({
             name: name,
-            social_networks: social_networks,
+            social_networks: (social_networks)? JSON.parse(social_networks) : undefined,
             description: description
         });
 
         if (req.method === "POST") {
-            await setAuthSchema.validateAsync({
+            await authCreationSchema.validateAsync({
                 email: email,
                 password: password
             });
@@ -31,14 +31,14 @@ const validateRescuerData = async (req, res, next) => {
                 HandlerHttpVerbs.badRequest(
                     err.message,
                     patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
@@ -46,4 +46,4 @@ const validateRescuerData = async (req, res, next) => {
 }
 
 
-module.exports = {validateRescuerData}
+module.exports = { validateRescuerData }

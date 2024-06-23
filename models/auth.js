@@ -6,7 +6,7 @@
  */
 
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 const bcrypt = require("bcrypt");
 
 /**
@@ -44,7 +44,7 @@ const authModel = new Schema({
         refPath: "doc_model",
         required: true
     },
-    role: [{
+    role: {
         type: String,
         required: true,
         enum: [
@@ -52,15 +52,8 @@ const authModel = new Schema({
             "RESCUER",
             "ADMINISTRATOR",
             "ASSOCIATION"
-        ],
-        validate: {
-            validator: function (role) {
-                if (this.role.length <= 2) {
-                    return role
-                }
-            }
-        }
-    }],
+        ]
+    },
     doc_model: {
         type: String,
         required: true,
@@ -100,4 +93,4 @@ authModel.pre("save", async function (next) {
 
 authModel.index({user_id: 1}, {unique: true});
 const Auth = mongoose.model("Auth", authModel);
-module.exports = {Auth}
+module.exports = { Auth }

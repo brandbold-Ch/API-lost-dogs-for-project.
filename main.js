@@ -23,10 +23,12 @@ const app = express();
 
 
 app.use(express.json());
+/*
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
+ */
 app.use(
     "/api-docs",
     swaggerUi.serve,
@@ -47,7 +49,7 @@ app.use(morgan('dev'));
 app.get("/", (req, res) => {
     res.status(200).json(
         HandlerHttpVerbs.ok(
-            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v2.1 🦮🐩🐈🦜",
+            "🦮🐩🐈🦜 Welcome to the Lost in Tapachula (PET) API v3.1 🦮🐩🐈🦜",
             undefined, {
                 url: req.baseUrl,
                 verb: req.method

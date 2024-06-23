@@ -1,6 +1,4 @@
-const {postDocs} = require("./postDocs");
-const {bulletinDocs} = require("./bulletinDocs");
-const {blogDocs} = require("./blogDocs");
+const { postDocs } = require("./postDocs");
 
 
 module.exports = {
@@ -387,23 +385,5 @@ module.exports = {
     },
     "/api/v2/users/posts/comment/{pet_id}": {
         ...postDocs("User controllers")["/api/v2/posts/comment/{pet_id}"]
-    },
-    "/api/v2/users/bulletins": {
-        ...bulletinDocs("User controllers")["/api/v2/bulletins"]
-    },
-    "/api/v2/users/bulletins/{bulletin_id}": {
-        ...bulletinDocs("User controllers")["/api/v2/bulletins/{bulletin_id}"]
-    },
-    "/api/v2/users/bulletins/{bulletin_id}/images": {
-        ...bulletinDocs("User controllers")["/api/v2/bulletins/{bulletin_id}/images"]
-    },
-    "/api/v2/users/blogs": {
-        ...blogDocs("User controllers")["/api/v2/blogs"]
-    },
-    "/api/v2/users/blogs/{blog_id}": {
-        ...blogDocs("User controllers")["/api/v2/blogs/{blog_id}"]
-    },
-    "/api/v2/users/blogs/{blog_id}/images": {
-        ...blogDocs("User controllers")["/api/v2/blogs/{blog_id}/images"]
     }
 }

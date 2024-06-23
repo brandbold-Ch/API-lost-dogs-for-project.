@@ -1,13 +1,13 @@
-const {Request, Rescuer} = require('../models/rescuer');
-const {Auth} = require('../models/auth');
-const {Bulletin} = require("../models/bulletin");
-const {Post} = require("../models/post");
-const {Blog} = require("../models/blog");
-const {PostServices} = require("../services/postServices");
-const {BulletinServices} = require("../services/bulletinServices");
-const {ImageTools} = require("../utils/imageTools");
-const {connection} = require("../configurations/connections");
-const {BlogServices} = require("./blogServices");
+const { Request, Rescuer } = require('../models/rescuer');
+const { Auth } = require('../models/auth');
+const { Bulletin } = require("../models/bulletin");
+const { Post } = require("../models/post");
+const { Blog } = require("../models/blog");
+const { PostServices } = require("../services/postServices");
+const { BulletinServices } = require("../services/bulletinServices");
+const { ImageTools } = require("../utils/imageTools");
+const { connection } = require("../configurations/connections");
+const { BlogServices } = require("./blogServices");
 
 
 class RescuerServices {
@@ -21,39 +21,47 @@ class RescuerServices {
 
     async addImage(rescuer_id, image) {
         //await sharp(key["buffer"]).webp().toBuffer()
-        let new_image = await this.imageTools.uploadImage(image["buffer"]);
 
-        await Rescuer.updateOne(
-            {
-                _id: rescuer_id
-            },
-            {
-                $set: {
-                    image: new_image
+        if (image.length) {
+            let new_image = await this.imageTools.uploadImage(image[0]["buffer"]);
+            await Rescuer.updateOne({ _id: rescuer_id }, { $set: { image: new_image } });
+        }
+    }
+
+    async deleteImage(id, image_id) {
+        const session = await connection.startSession();
+        let output_update;
+
+        await session.withTransaction(async () => {
+            await Rescuer.updateOne({ _id: id }, { $set: { image: null } }, { session })
+                .then((update) => {
+                    output_update = update;
+                });
+        })
+            .then(async () => {
+                if (output_update["modifiedCount"] !== 0) {
+                    await this.imageTools.deleteImages(image_id);
                 }
-            }
-        );
+            });
     }
 
     async getRescuers() {
-        return Rescuer.find({}, {posts_id: 0, bulletins_id: 0})
-            .populate("auth_id",  {email: 1, password: 1, _id: 0});
+        return Rescuer.find({}, { posts_id: 0, bulletins_id: 0 })
+            .populate("auth_id",  { email: 1, password: 1, _id: 0 });
     }
 
-    async setRescuer(rescuer_data) {
-        const {name, email, password, social_networks, description} = rescuer_data[0];
+    async createRescuer(rescuer_data) {
+        const { name, email, password, social_networks, description } = rescuer_data[0];
         const image = rescuer_data[1];
         const session = await connection.startSession();
         let output_rescuer, output_auth;
 
         await session.withTransaction(async () => {
-            await Rescuer.create([
-                {
-                    name: name,
-                    social_networks: social_networks,
-                    description: description
-                }
-            ], {session})
+            await Rescuer.create([{
+                name: name,
+                social_networks: JSON.parse(social_networks),
+                description: description
+            }], { session })
                 .then((rescuer) => {
                     output_rescuer = rescuer[0];
                 });
@@ -63,39 +71,33 @@ class RescuerServices {
                     email: email,
                     password: password,
                     user_id: output_rescuer["_id"],
-                    role: ["RESCUER", "USER"],
+                    role: "RESCUER",
                     doc_model: "Rescuer"
                 }
-            ], {session})
+            ], { session })
                 .then((auth) => {
                     output_auth = auth[0];
                 });
 
-            await Request.create([
-                {
-                    requested_role: "RESCUER",
-                    requester_role: ["RESCUER", "USER"],
-                    user_id: output_rescuer["_id"],
-                    doc_model: "Rescuer"
-                }
-            ], {session});
+            await Request.create([{
+                requested_role: "RESCUER",
+                requester_role: "RESCUER",
+                user_id: output_rescuer["_id"],
+                doc_model: "Rescuer"
+            }], { session });
 
             await Rescuer.updateOne(
                 {
                     _id: output_rescuer["_id"]
                 },
                 {
-                    $set: {
-                        auth_id: output_auth["_id"]
-                    }
+                    $set: { auth_id: output_auth["_id"] }
                 },
                 {session}
             );
         })
             .then(async () => {
-                if (image.length) {
-                    await this.addImage(output_rescuer["_id"], image[0]);
-                }
+                await this.addImage(output_rescuer["_id"], image[0]);
             });
 
         await session.endSession();
@@ -103,22 +105,60 @@ class RescuerServices {
     }
 
     async getRescuer(id) {
-        return Rescuer.findById(id)
+        return Rescuer.findById(id, {
+            posts_id: 0,
+            blogs_id: 0,
+            bulletins_id: 0
+        })
             .populate("auth_id",
-                {email: 1, password: 1, _id: 0}
+                { email: 1, password: 1, _id: 0 }
             )
     }
 
+    async deleteSocialMedia(id, key, value) {
+        await Rescuer.updateOne({ _id: id }, { $pull: { social_networks: { [key]: value } } });
+    }
+
+
     async updateRescuer(id, rescuer_data) {
-        return Rescuer.findByIdAndUpdate(id,
-            {
-                $set: rescuer_data
-            },
-            {
-                runValidators: true,
-                new: true
+        const session = await connection.startSession();
+        const { name, social_networks, description } = rescuer_data[0];
+        const image = rescuer_data[1];
+        let output_rescuer;
+        const parsedNetworks = () => {
+            if (social_networks) {
+                const socials = JSON.parse(social_networks);
+                return Object.keys(socials).map(
+                    key => ({ [key]: socials[key] })
+                );
             }
-        );
+            return undefined;
+        }
+
+        await session.withTransaction(async () => {
+            return Rescuer.findByIdAndUpdate(id,
+                {
+                    $set: {
+                        name: name,
+                        social_networks: parsedNetworks(),
+                        description: description
+                    }
+                },
+                {
+                    runValidators: true,
+                    new: true
+                }
+            )
+                .then((rescuer) => {
+                    output_rescuer = rescuer;
+                });
+        })
+            .then(async () => {
+                await this.addImage(id, image);
+            })
+
+        await session.endSession();
+        return output_rescuer;
     }
 
     async deleteRescuer(id) {
@@ -126,18 +166,16 @@ class RescuerServices {
         const array_urls_bulletins = await this.bulletins.getUrlsImages(id);
         const array_urls_posts = await this.posts.getUrlsImages(id);
         const array_urls_blogs = await this.blogs.getUrlsImages(id);
-        const rescuer_image = await Rescuer.findById(id, {image: 1});
-        console.log(rescuer_image)
+        const rescuer_image = await Rescuer.findById(id, { image: 1 });
 
         await session.withTransaction(async () => {
-
             await Promise.all([
-                Request.deleteOne({user_id: id}, {session}),
-                Auth.deleteOne({user_id: id}, {session}),
-                Rescuer.deleteOne({_id: id}, {session}),
-                Bulletin.deleteMany({user_id: id}, {session}),
-                Post.deleteMany({user_id: id}, {session}),
-                Blog.deleteMany({user_id: id}, {session})
+                Request.deleteOne({ user_id: id }, { session }),
+                Auth.deleteOne({ user_id: id }, { session }),
+                Rescuer.deleteOne({ _id: id }, { session }),
+                Bulletin.deleteMany({ user_id: id }, { session }),
+                Post.deleteMany({ user_id: id }, { session }),
+                Blog.deleteMany({ user_id: id }, { session })
             ]);
         })
             .then(async () => {
@@ -162,4 +200,4 @@ class RescuerServices {
     }
 }
 
-module.exports = {RescuerServices};
+module.exports = { RescuerServices };

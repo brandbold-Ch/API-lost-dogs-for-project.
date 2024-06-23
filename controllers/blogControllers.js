@@ -2,7 +2,7 @@ const {blog} = require("../utils/instances");
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
-exports.setBlog = async (req, res) => {
+exports.createBlog = async (req, res) => {
     try {
         const response_body = await blog.setBlog(
             req.id,

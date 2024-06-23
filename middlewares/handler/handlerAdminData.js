@@ -1,21 +1,21 @@
-const {setAdminSchema} = require("../../schemas/adminSchema");
-const {setAuthSchema} = require("../../schemas/authSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { adminCreationSchema } = require("../../schemas/adminSchema");
+const { authCreationSchema } = require("../../schemas/authSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateSetAdminData = async (req, res, next) => {
     try {
-        const {name, lastname, token, email, password} = req.body;
+        const { name, lastname, token, email, password } = req.body;
 
-        await setAdminSchema.validateAsync({
+        await adminCreationSchema.validateAsync({
             name: name,
             lastname: lastname,
             token: token
         });
 
-        await setAuthSchema.validateAsync({
+        await authCreationSchema.validateAsync({
             email: email,
             password: password
         });
@@ -29,18 +29,18 @@ const validateSetAdminData = async (req, res, next) => {
                 HandlerHttpVerbs.badRequest(
                     err.message,
                     patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
     }
 }
 
-module.exports = {validateSetAdminData}
+module.exports = { validateSetAdminData }

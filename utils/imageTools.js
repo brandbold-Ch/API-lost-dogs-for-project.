@@ -1,4 +1,4 @@
-const {cloudinary} = require("../configurations/connections");
+const { cloudinary } = require("../configurations/connections");
 
 
 class ImageTools {
@@ -51,4 +51,4 @@ class ImageTools {
     }
 }
 
-module.exports = {ImageTools};
+module.exports = { ImageTools };

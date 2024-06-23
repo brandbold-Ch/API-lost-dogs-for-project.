@@ -8,7 +8,7 @@ const {validateBlogData} = require("../middlewares/handler/handlerBlogData");
 
 blogRouter.use(rescuerRolePermission);
 
-blogRouter.post("/blogs", processFormData, validateBlogData, blogControllers.setBlog);
+blogRouter.post("/blogs", processFormData, validateBlogData, blogControllers.createBlog);
 blogRouter.get("/blogs", blogControllers.getBlogs);
 blogRouter.get("/blogs/:blog_id", checkBlogExists, blogControllers.getBlog);
 blogRouter.put("/blogs/:blog_id", checkBlogExists, processFormData, blogControllers.updateBlog);

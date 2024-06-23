@@ -1,12 +1,12 @@
-const {setPostSchema} = require("../../schemas/postSchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { postCreationSchema} = require("../../schemas/postSchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validatePostData = async (req, res, next) => {
     try {
-        await setPostSchema.validateAsync(
+        await postCreationSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
         );
         next();
@@ -32,4 +32,4 @@ const validatePostData = async (req, res, next) => {
     }
 }
 
-module.exports = {validatePostData}
+module.exports = { validatePostData }

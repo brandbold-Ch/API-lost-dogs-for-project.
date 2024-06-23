@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const setUserSchema = Joi.object({
+const userCreationSchema = Joi.object({
     name: Joi.string()
         .max(50)
         .required(),
@@ -34,4 +34,4 @@ const setUserSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = {setUserSchema};
+module.exports = { userCreationSchema };

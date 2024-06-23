@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const setBulletinsSchema = Joi.object({
+const bulletinCreationSchema = Joi.object({
     title: Joi.string()
         .required(),
 
@@ -28,4 +28,4 @@ const setBulletinsSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = {setBulletinsSchema}
+module.exports = { bulletinCreationSchema }

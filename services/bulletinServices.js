@@ -1,8 +1,8 @@
-const {Bulletin} = require("../models/bulletin");
-const {Rescuer} = require("../models/rescuer");
-const {User} = require("../models/user");
-const {ImageTools} = require("../utils/imageTools");
-const {connection} = require("../configurations/connections");
+const { Bulletin } = require("../models/bulletin");
+const { Rescuer } = require("../models/rescuer");
+const { User } = require("../models/user");
+const { ImageTools } = require("../utils/imageTools");
+const { connection } = require("../configurations/connections");
 const mongoose = require("mongoose");
 
 
@@ -12,27 +12,19 @@ class BulletinServices {
         this.imageTools = new ImageTools();
     }
 
-    async addGalleryToABulletin(id, bulletin_id, images) {
+    async addGalleryToBulletin(id, bulletin_id, images) {
         await Promise.all(images.map(async (key) => {
             let new_image = await this.imageTools.uploadImage(key["buffer"]);
             let chunk;
 
             if (key["fieldname"] === "image") {
-                chunk = {
-                    $set: {
-                        "body.image": new_image
-                    }
-                }
+                chunk = { $set: { "body.image": new_image } };
 
             } else {
-                chunk = {
-                    $push: {
-                        "body.gallery": new_image
-                    }
-                }
+                chunk = { $push: { "body.gallery": new_image } };
             }
 
-            await Bulletin.updateOne({_id: bulletin_id, user_id: id}, chunk);
+            await Bulletin.updateOne({ _id: bulletin_id, user_id: id }, chunk);
         }));
     };
 
@@ -46,7 +38,7 @@ class BulletinServices {
         }
     }
 
-    async setBulletin(id, bulletin_data, role) {
+    async createBulletin(id, bulletin_data, role) {
         const session = await connection.startSession();
         const collection = this.modelDetector(role);
         const obj_data = bulletin_data[0];
@@ -68,7 +60,7 @@ class BulletinServices {
                     user_id: id,
                     doc_model: collection[0]
                 }
-            ], {session})
+            ], { session })
                 .then((bulletin) => {
                     output_bulletin = bulletin[0];
                 });
@@ -81,13 +73,13 @@ class BulletinServices {
                     $push: {
                         bulletins_id: output_bulletin["_id"]
                     }
-                }, {session}
+                }, { session }
             );
 
         })
             .then(async () => {
                 if (array_images.length) {
-                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images);
+                    await this.addGalleryToBulletin(id, output_bulletin["_id"], array_images);
                 }
             })
 
@@ -95,31 +87,17 @@ class BulletinServices {
         return output_bulletin;
     }
 
-    async deletePartialGallery(id, bulletin_id, queries) {
+    async deleteImageGallery(id, bulletin_id, queries) {
         const session = await connection.startSession();
         let output_update, chunk, selector;
 
         if (queries["tag"] === "image") {
-            selector = {
-                "body.image.id": queries["id"]
-            }
-            chunk = {
-                $set: {
-                    "body.image": null
-                }
-            }
+            selector = { "body.image.id": queries["id"] };
+            chunk = { $set: { "body.image": null } };
 
         } else {
-            selector = {
-                "body.gallery.id": queries["id"]
-            }
-            chunk = {
-                $pull: {
-                    "body.gallery": {
-                        id: queries["id"]
-                    }
-                }
-            }
+            selector = {"body.gallery.id": queries["id"]};
+            chunk = { $pull: { "body.gallery": { id: queries["id"] } } };
         }
 
         await session.withTransaction(async () => {
@@ -131,7 +109,7 @@ class BulletinServices {
                     ...selector
                 },
                 chunk,
-                {session}
+                { session }
             )
                 .then((update) => {
                     output_update = update;
@@ -147,11 +125,11 @@ class BulletinServices {
     }
 
     async getBulletins(id) {
-        return Bulletin.find({user_id: id}).sort({"identify.timestamp": -1});
+        return Bulletin.find({ user_id: id }).sort({"identify.timestamp": -1});
     }
 
     async getBulletin(id, bulletin_id) {
-        return Bulletin.findOne({_id: bulletin_id, user_id: id});
+        return Bulletin.findOne({ _id: bulletin_id, user_id: id });
     }
 
     async getBulletinForGuest(bulletin_id) {
@@ -243,7 +221,7 @@ class BulletinServices {
         })
             .then(async () => {
                 if (array_images.length) {
-                    await this.addGalleryToABulletin(id, output_bulletin["_id"], array_images);
+                    await this.addGalleryToBulletin(id, output_bulletin["_id"], array_images);
                 }
             })
 

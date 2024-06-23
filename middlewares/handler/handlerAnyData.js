@@ -1,7 +1,7 @@
-const {deleteImageSchema, checkQueryStatus} = require("../../schemas/anySchema");
-const {HandlerHttpVerbs} = require("../../errors/handlerHttpVerbs");
-const {ValidationError} = require("joi");
-const {patternSelector} = require("./patternSelector");
+const { deleteImageSchema, checkQueryStatus} = require("../../schemas/anySchema");
+const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
+const { ValidationError } = require("joi");
+const { patternSelector } = require("./patternSelector");
 
 
 const validateQueryDeleteImage = async (req, res, next) => {

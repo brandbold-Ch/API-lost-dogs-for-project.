@@ -2,9 +2,9 @@ const {bulletin} = require("../utils/instances");
 const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
 
 
-exports.setBulletin = async (req, res) => {
+exports.createBulletin = async (req, res) => {
     try {
-        const response_body = await bulletin.setBulletin(
+        const response_body = await bulletin.createBulletin(
             req.id,
             [JSON.parse(JSON.stringify(req.body)), req.files],
             req.role
@@ -86,7 +86,7 @@ exports.updateBulletin = async (req, res) => {
 
 exports.deleteImage = async (req, res) => {
     try {
-        await bulletin.deletePartialGallery(req.id, req.params.bulletin_id, req.query);
+        await bulletin.deleteImageGallery(req.id, req.params.bulletin_id, req.query);
         res.status(204).end();
 
     } catch (err) {

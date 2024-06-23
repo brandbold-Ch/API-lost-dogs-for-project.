@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const setPostSchema = Joi.object({
+const postCreationSchema = Joi.object({
     name: Joi.string()
         .optional(),
 
@@ -46,4 +46,4 @@ const setPostSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = {setPostSchema}
+module.exports = { postCreationSchema }

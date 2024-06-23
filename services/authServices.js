@@ -25,7 +25,7 @@ class AuthServices {
      */
 
     async getAuthByUser(id) {
-        return Auth.findOne({user_id: id});
+        return Auth.findOne({ user_id: id });
     };
 
     /**
@@ -37,7 +37,7 @@ class AuthServices {
      */
 
     async getAuthByEmail(email) {
-        return Auth.findOne({email: email});
+        return Auth.findOne({ email: email });
     };
 
     /**
@@ -52,8 +52,8 @@ class AuthServices {
      */
 
     async updateAuth(id, auth_data) {
-        let {email, new_password, old_password} = auth_data;
-        const user = await Auth.findOne({user_id: id});
+        let { email, new_password, old_password } = auth_data;
+        const user = await Auth.findOne({ user_id: id });
 
         if (bcrypt.compareSync(old_password, user["password"])) {
             new_password = await bcrypt.hash(new_password, 10);

@@ -6,8 +6,8 @@
 
 // Authenticator.js
 const jwt = require("jsonwebtoken");
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
-const {TokenExpiredError} = require("jsonwebtoken");
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
+const { TokenExpiredError } = require("jsonwebtoken");
 require("dotenv").config();
 
 
@@ -56,9 +56,9 @@ const rolePermissions = (url) => {
 
 const routesPermissions = (userData, url) => {
     return new Promise((resolve, reject) => {
-        const key = userData["role"];
+        const role = userData["role"];
 
-        if (pathPermissions[key[0]].includes(url)) {
+        if (pathPermissions[role].includes(url)) {
             resolve(userData);
 
         } else {
@@ -71,13 +71,10 @@ const verifyRole = (tokenDecrypted) => {
     return new Promise((resolve, reject) => {
         const role = tokenDecrypted?.role;
 
-        if (role?.length) {
-
-            role.forEach(rol => {
-                if (!roles.includes(rol)) {
-                    reject([400, "Some of your roles do not exist in the system 😒"]);
-                }
-            });
+        if (role) {
+            if (!roles.includes(role)) {
+                reject([400, "Some of your roles do not exist in the system 😒"]);
+            }
             resolve(tokenDecrypted);
 
         } else {
