@@ -11,6 +11,7 @@ const { Post } = require("../models/post");
 const { ImageTools } = require("../utils/imageTools");
 const { connection } = require("../configurations/connections");
 const mongoose = require("mongoose");
+const {Association} = require("../models/association");
 
 /**
  *Class that provides CRUD services related to lost pets.
@@ -24,12 +25,15 @@ class PostServices {
     }
 
     modelDetector(role) {
-        switch (role[0]) {
+        switch (role) {
             case "USER":
                 return ["User", User];
 
             case "RESCUER":
                 return ["Rescuer", Rescuer];
+
+            case "ASSOCIATION":
+                return ["Association", Association];
         }
     }
 
@@ -76,6 +80,7 @@ class PostServices {
         const obj_data = post_data[0];
         const array_images = post_data[1];
         let output_post;
+
 
         await session.withTransaction(async () => {
 

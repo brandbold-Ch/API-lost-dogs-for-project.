@@ -4,8 +4,8 @@
  * @file This module is for creating pets services.
  */
 
-const {post} = require("../utils/instances");
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const { post } = require("../utils/instances");
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
 
 
 exports.createPost = async (req, res) => {

@@ -29,7 +29,7 @@ class BulletinServices {
     };
 
     modelDetector(role) {
-        switch (role[0]) {
+        switch (role) {
             case "USER":
                 return ["User", User];
 
