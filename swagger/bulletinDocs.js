@@ -1,6 +1,6 @@
 function bulletinDocs(tags) {
     return {
-        "/api/v2/bulletins": {
+        "/api/v3/bulletins": {
             "post": {
                 "security": [
                     {
@@ -35,7 +35,8 @@ function bulletinDocs(tags) {
                                         "type": "string"
                                     },
                                     "te_number": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "9618907654"
                                     },
                                     "image": {
                                         "type": "string",
@@ -92,7 +93,7 @@ function bulletinDocs(tags) {
                 }
             }
         },
-        "/api/v2/bulletins/{bulletin_id}": {
+        "/api/v3/bulletins/{bulletin_id}": {
             "get": {
                 "security": [
                     {
@@ -231,7 +232,7 @@ function bulletinDocs(tags) {
                 }
             }
         },
-        "/api/v2/bulletins/{bulletin_id}/images": {
+        "/api/v3/bulletins/{bulletin_id}/images": {
             "delete": {
                 "security": [
                     {
@@ -294,4 +295,4 @@ function bulletinDocs(tags) {
     }
 }
 
-module.exports = {bulletinDocs}
+module.exports = { bulletinDocs }

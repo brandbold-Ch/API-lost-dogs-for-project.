@@ -68,4 +68,4 @@ const bulletinModel = new Schema({
 });
 
 const Bulletin = mongoose.model("Bulletin", bulletinModel);
-module.exports = {Bulletin}
+module.exports = { Bulletin }

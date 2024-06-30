@@ -1,5 +1,5 @@
 module.exports = {
-    "/api/v2/admins": {
+    "/api/v3/admins": {
         "post": {
             "tags": [
                 "Admin controllers"
@@ -51,7 +51,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/": {
+    "/api/v3/admins/": {
         "get": {
             "security": [
                 {
@@ -160,7 +160,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/auth": {
+    "/api/v3/admins/auth": {
         "put": {
             "security": [
                 {
@@ -215,7 +215,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/requests": {
+    "/api/v3/admins/requests": {
         "get": {
             "security": [
                 {
@@ -246,7 +246,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/requests/{req_id}": {
+    "/api/v3/admins/requests/{req_id}": {
         "delete": {
             "security": [
                 {
@@ -342,7 +342,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/requests/search": {
+    "/api/v3/admins/requests/search": {
         "get": {
             "security": [
                 {
@@ -390,7 +390,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/rescuers": {
+    "/api/v3/admins/rescuers": {
         "get": {
             "security": [
                 {
@@ -421,7 +421,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/rescuers/{rescuer_id}": {
+    "/api/v3/admins/rescuers/{rescuer_id}": {
         "get": {
             "security": [
                 {
@@ -503,7 +503,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/users": {
+    "/api/v3/admins/users": {
         "get": {
             "security": [
                 {
@@ -534,7 +534,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/admins/users/{user_id}": {
+    "/api/v3/admins/users/{user_id}": {
         "get": {
             "security": [
                 {

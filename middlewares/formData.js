@@ -6,7 +6,7 @@ const processFormData = (req, res, next) => {
         if (!error) {
             next();
         } else {
-            return res.status(400).json({message: error.message});
+            return res.status(400).json({ message: error.message });
         }
     });
 };

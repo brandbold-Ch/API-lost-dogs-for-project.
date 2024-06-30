@@ -19,6 +19,7 @@ const authCreationSchema = Joi.object({
 
     password: Joi.string()
         .required()
+
 }).options({
     abortEarly: true
 });
@@ -46,4 +47,4 @@ const authUpdateSchema = Joi.object({
 module.exports = {
     authCreationSchema,
     authUpdateSchema
-};
+}

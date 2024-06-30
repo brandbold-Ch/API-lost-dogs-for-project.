@@ -2,7 +2,7 @@ const { Bulletin } = require("../models/bulletin");
 const { Rescuer } = require("../models/rescuer");
 const { User } = require("../models/user");
 const { ImageTools } = require("../utils/imageTools");
-const { connection } = require("../configurations/connections");
+const { connection } = require("../config/connections");
 const mongoose = require("mongoose");
 
 

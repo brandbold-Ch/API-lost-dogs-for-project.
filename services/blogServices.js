@@ -1,6 +1,6 @@
 const {ImageTools} = require("../utils/imageTools");
 const {Blog} = require("../models/blog");
-const {connection} = require("../configurations/connections");
+const {connection} = require("../config/connections");
 const {User} = require("../models/user");
 const {Rescuer} = require("../models/rescuer");
 const mongoose = require("mongoose");

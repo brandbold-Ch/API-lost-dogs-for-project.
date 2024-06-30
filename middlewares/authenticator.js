@@ -20,36 +20,35 @@ const roles = [
 
 const pathPermissions = {
     USER: [
-        "/api/v2/users",
-        "/api/v2/auth"
+        "/api/v3/users",
+        "/api/v3/auth"
     ],
     RESCUER: [
-        "/api/v2/rescuers",
-        "/api/v2/rescuers",
-        "/api/v2/auth",
+        "/api/v3/rescuers",
+        "/api/v3/auth",
     ],
     ADMINISTRATOR: [
-        "/api/v2/admins",
-        "/api/v2/auth"
+        "/api/v3/admins",
+        "/api/v3/auth"
     ],
     ASSOCIATION: [
-        "/api/v2/associations",
-        "/api/v2/auth"
+        "/api/v3/associations",
+        "/api/v3/auth"
     ]
 };
 
 const rolePermissions = (url) => {
     switch (url) {
-        case "/api/v2/users":
+        case "/api/v3/users":
             return "USER";
 
-        case "/api/v2/rescuers":
+        case "/api/v3/rescuers":
             return "RESCUER";
 
-        case "/api/v2/admins":
+        case "/api/v3/admins":
             return "ADMINISTRATOR";
 
-        case "/api/v2/associations":
+        case "/api/v3/associations":
             return "ASSOCIATION";
     }
 }
@@ -60,7 +59,6 @@ const routesPermissions = (userData, url) => {
 
         if (pathPermissions[role].includes(url)) {
             resolve(userData);
-
         } else {
             reject([401, "You don´t have access to this route 🚫"]);
         }
@@ -76,7 +74,6 @@ const verifyRole = (tokenDecrypted) => {
                 reject([400, "Some of your roles do not exist in the system 😒"]);
             }
             resolve(tokenDecrypted);
-
         } else {
             reject([400, "You are not sending me your roles 😒"]);
         }
@@ -119,18 +116,14 @@ const Authenticate = (req, res, next) => {
         .then(tokenDecrypted => verifyRole(tokenDecrypted))
         .then(role => routesPermissions(role, req.baseUrl))
         .then(data => {
-
             req.id = data["user_id"];
             req.role = data["role"];
             next();
-
         })
         .catch(err => {
-
             if (err instanceof Array) {
-
                 res.status(err[0]).json(
-                    HandlerHttpVerbs.automaticClientErrorSelection(
+                    HandlerHttpVerbs.automaticSelectionError(
                         err[1],
                         {
                             url: req.baseUrl,
@@ -145,11 +138,11 @@ const Authenticate = (req, res, next) => {
             } else {
                 res.status(500).json(
                     HandlerHttpVerbs.internalServerError(
-                        err.message, {url: req.baseUrl, verb: req.method}
+                        err.message, { url: req.baseUrl, verb: req.method }
                     )
                 );
             }
         })
 }
 
-module.exports = {Authenticate};
+module.exports = { Authenticate }

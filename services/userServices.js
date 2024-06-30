@@ -10,7 +10,7 @@ const { Post } = require("../models/post");
 const { Auth } = require("../models/auth");
 const { Request } = require("../models/rescuer");
 const { PostServices } = require("../services/postServices");
-const { connection } = require("../configurations/connections");
+const { connection } = require("../config/connections");
 const { ImageTools } = require("../utils/imageTools");
 
 

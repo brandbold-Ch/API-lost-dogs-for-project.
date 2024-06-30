@@ -2,10 +2,10 @@ const { adminCreationSchema } = require("../../schemas/adminSchema");
 const { authCreationSchema } = require("../../schemas/authSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validateSetAdminData = async (req, res, next) => {
+const adminDataValidator = async (req, res, next) => {
     try {
         const { name, lastname, token, email, password } = req.body;
 
@@ -28,7 +28,7 @@ const validateSetAdminData = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
+                    errorTypeSelector(err),
                     { url: req.baseUrl, verb: req.method }
                 )
             );
@@ -43,4 +43,4 @@ const validateSetAdminData = async (req, res, next) => {
     }
 }
 
-module.exports = { validateSetAdminData }
+module.exports = { adminDataValidator }

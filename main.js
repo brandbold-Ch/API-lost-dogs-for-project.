@@ -4,12 +4,13 @@
  * @file In this module are the API endpoints.
  */
 
-const { connection } = require("./configurations/connections");
+const { connection } = require("./config/connections");
 const { useTreblle } = require("treblle");
 const { userRouter } = require("./routes/userRoutes");
 const { authRouter } = require("./routes/authRoutes");
 const { adminRouter } = require("./routes/adminRoutes");
 const { rescuerRouter } = require("./routes/rescuerRoutes");
+const { associationRouter } = require("./routes/associationRoutes");
 const { HandlerHttpVerbs } = require("./errors/handlerHttpVerbs");
 const mainDocs = require("./swagger/mainDocs");
 const swaggerUi = require("swagger-ui-express");
@@ -69,13 +70,14 @@ app.use((req, res, next) => {
     isConnected();
 });
  */
-app.use("/api/v2/users", userRouter);
-app.use("/api/v2/auth", authRouter);
-app.use("/api/v2/admins", adminRouter);
-app.use("/api/v2/rescuers", rescuerRouter);
-app.use("/api/v2/posts", postsRouter);
-app.use("/api/v2/blogs", blogsRouter);
-app.use("/api/v2/bulletins", bulletinsRouter);
+app.use("/api/v3/users", userRouter);
+app.use("/api/v3/auth", authRouter);
+app.use("/api/v3/admins", adminRouter);
+app.use("/api/v3/rescuers", rescuerRouter);
+app.use("/api/v3/posts", postsRouter);
+app.use("/api/v3/blogs", blogsRouter);
+app.use("/api/v3/bulletins", bulletinsRouter);
+app.use("/api/v3/associations", associationRouter);
 app.use((req, res) => {
     res.status(404).json(
         HandlerHttpVerbs.notFound(

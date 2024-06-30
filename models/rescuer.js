@@ -26,7 +26,10 @@ const rescuerModel = new Schema({
     blogs_id: [{
         type: Schema.Types.ObjectId,
         ref: "Blog"
-    }]
+    }],
+    relationships: {
+
+    }
 }, {
     versionKey: false
 });
@@ -83,7 +86,7 @@ const requestsModel = new Schema({
 });
 
 
-requestsModel.index({user_id: 1}, {unique: true});
+requestsModel.index({ user_id: 1 }, { unique: true });
 const Request = mongoose.model("Request", requestsModel);
 const Rescuer = mongoose.model("Rescuer", rescuerModel);
 module.exports = {

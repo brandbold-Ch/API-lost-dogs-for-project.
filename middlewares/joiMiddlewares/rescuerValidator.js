@@ -2,10 +2,10 @@ const { rescuerCreationSchema } = require("../../schemas/rescuerSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
 const { authCreationSchema } = require("../../schemas/authSchema");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validateRescuerData = async (req, res, next) => {
+const rescuerDataValidator = async (req, res, next) => {
     try {
         const { name , social_networks, description, email, password } = req.body;
 
@@ -21,16 +21,14 @@ const validateRescuerData = async (req, res, next) => {
                 password: password
             });
         }
-
         next();
 
     } catch (err) {
-
         if (err instanceof ValidationError) {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
+                    errorTypeSelector(err),
                     { url: req.baseUrl, verb: req.method }
                 )
             );
@@ -46,4 +44,4 @@ const validateRescuerData = async (req, res, next) => {
 }
 
 
-module.exports = { validateRescuerData }
+module.exports = { rescuerDataValidator }

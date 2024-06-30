@@ -1,7 +1,7 @@
 const { deleteImageSchema, checkQueryStatus} = require("../../schemas/anySchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
 const validateQueryDeleteImage = async (req, res, next) => {
@@ -15,15 +15,15 @@ const validateQueryDeleteImage = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    errorTypeSelector(err),
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
@@ -41,15 +41,15 @@ const validateQueryAction = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    errorTypeSelector(err),
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }

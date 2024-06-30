@@ -7,7 +7,6 @@ class HandlerHttpVerbs {
 
     static errorTemplate(message, bodyError) {
         const { status, url, role, codes, verb } = bodyError;
-
         return {
             status: status,
             error: {
@@ -24,7 +23,6 @@ class HandlerHttpVerbs {
 
     static successTemplate(message, bodySuccess) {
         const { data, status, codes, url, verb } = bodySuccess;
-
         return {
             status: status,
             data: data,
@@ -40,7 +38,6 @@ class HandlerHttpVerbs {
     }
 
     static forbidden(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.errorTemplate(message, {
             status: "Forbidden 💥",
             codes: {
@@ -52,7 +49,6 @@ class HandlerHttpVerbs {
     }
 
     static internalServerError(message, bodyParam) {
-
         return HandlerHttpVerbs.errorTemplate(message, {
             status: "Internal server error 💀",
             codes: {
@@ -64,7 +60,6 @@ class HandlerHttpVerbs {
     }
 
     static notFound(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.errorTemplate(message, {
             status: "Not found 🤷‍♂️",
             codes: {
@@ -76,7 +71,6 @@ class HandlerHttpVerbs {
     }
 
     static badRequest(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.errorTemplate(message, {
             status: "Bad request 🤨",
             codes: {
@@ -88,7 +82,6 @@ class HandlerHttpVerbs {
     }
 
     static unauthorized(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.errorTemplate(message, {
             status: "Unauthorized 🔒",
             codes: {
@@ -100,7 +93,6 @@ class HandlerHttpVerbs {
     }
 
     static ok(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.successTemplate(message, {
             status: "Ok 👍",
             codes: {
@@ -112,7 +104,6 @@ class HandlerHttpVerbs {
     }
 
     static created(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.successTemplate(message, {
             status: "Created 🎊",
             codes: {
@@ -124,7 +115,6 @@ class HandlerHttpVerbs {
     }
 
     static accepted(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.successTemplate(message, {
             status: "Accepted 🤝",
             codes: {
@@ -136,7 +126,6 @@ class HandlerHttpVerbs {
     }
 
     static continue(message, extraError, bodyParam) {
-
         return HandlerHttpVerbs.successTemplate(message, {
             status: "Continue ⏭️",
             codes: {
@@ -147,8 +136,7 @@ class HandlerHttpVerbs {
         });
     }
 
-    static automaticClientErrorSelection(message, bodyParam, extraError, withHttpCode) {
-
+    static automaticSelectionError(message, bodyParam, extraError, withHttpCode) {
         switch (withHttpCode) {
 
             case 400:

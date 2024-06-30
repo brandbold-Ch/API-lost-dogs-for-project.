@@ -1,6 +1,6 @@
 function postDocs(tags) {
     return {
-        "/api/v2/posts": {
+        "/api/v3/posts": {
             "post": {
                 "security": [
                     {
@@ -121,7 +121,7 @@ function postDocs(tags) {
                 }
             }
         },
-        "/api/v2/posts/{pet_id}": {
+        "/api/v3/posts/{pet_id}": {
             "get": {
                 "security": [
                     {
@@ -298,7 +298,7 @@ function postDocs(tags) {
                 }
             }
         },
-        "/api/v2/posts/search/chrt": {
+        "/api/v3/posts/search/chrt": {
             "get": {
                 "security": [
                     {
@@ -335,7 +335,7 @@ function postDocs(tags) {
                 }
             }
         },
-        "/api/v2/posts/{pet_id}/images": {
+        "/api/v3/posts/{pet_id}/images": {
             "delete": {
                 "security": [
                     {
@@ -395,7 +395,7 @@ function postDocs(tags) {
                 }
             }
         },
-        "/api/v2/posts/comment/{pet_id}": {
+        "/api/v3/posts/comment/{pet_id}": {
             "post": {
                 "security": [
                     {
@@ -447,4 +447,4 @@ function postDocs(tags) {
     }
 }
 
-module.exports = {postDocs}
+module.exports = { postDocs }

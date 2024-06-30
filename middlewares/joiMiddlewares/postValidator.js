@@ -1,10 +1,10 @@
 const { postCreationSchema} = require("../../schemas/postSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validatePostData = async (req, res, next) => {
+const postDataValidator = async (req, res, next) => {
     try {
         await postCreationSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
@@ -17,19 +17,19 @@ const validatePostData = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    errorTypeSelector(err),
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
     }
 }
 
-module.exports = { validatePostData }
+module.exports = { postDataValidator }

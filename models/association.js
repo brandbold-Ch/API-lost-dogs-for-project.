@@ -31,5 +31,6 @@ const associationModel = new Schema({
     versionKey: false
 });
 
+associationModel.index({ name: 1 }, { unique: true })
 const Association = mongoose.model("Association", associationModel);
 module.exports = { Association }

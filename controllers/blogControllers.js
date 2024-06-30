@@ -33,8 +33,7 @@ exports.createBlog = async (req, res) => {
 exports.updateBlog = async (req, res) => {
     try {
         const response_body = await blog.updateBlog(
-            req.id,
-            req.params.blog_id,
+            req.id, req.params.blog_id,
             [JSON.parse(JSON.stringify(req.body)), req.files]
         );
 

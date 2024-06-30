@@ -91,6 +91,6 @@ authModel.pre("save", async function (next) {
  * @type {mongoose.Model<AuthSchema>}
  */
 
-authModel.index({user_id: 1}, {unique: true});
+authModel.index({ user_id: 1 }, { unique: true });
 const Auth = mongoose.model("Auth", authModel);
 module.exports = { Auth }

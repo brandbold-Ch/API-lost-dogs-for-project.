@@ -2,7 +2,7 @@ const { postDocs } = require("./postDocs");
 
 
 module.exports = {
-    "/api/v2/users": {
+    "/api/v3/users": {
         "post": {
             "tags": [
                 "User controllers"
@@ -185,7 +185,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/networks": {
+    "/api/v3/users/networks": {
         "delete": {
             "security": [
                 {
@@ -232,7 +232,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/requests": {
+    "/api/v3/users/requests": {
         "get": {
             "security": [
                 {
@@ -260,7 +260,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/requests/rescuer": {
+    "/api/v3/users/requests/rescuer": {
         "post": {
             "security": [
                 {
@@ -288,7 +288,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/requests/association": {
+    "/api/v3/users/requests/association": {
         "post": {
             "security": [
                 {
@@ -316,7 +316,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/auth": {
+    "/api/v3/users/auth": {
         "put": {
             "security": [
                 {
@@ -371,19 +371,19 @@ module.exports = {
             }
         }
     },
-    "/api/v2/users/posts": {
-        ...postDocs("User controllers")["/api/v2/posts"]
+    "/api/v3/users/posts": {
+        ...postDocs("User controllers")["/api/v3/posts"]
     },
-    "/api/v2/users/posts/{pet_id}": {
-        ...postDocs("User controllers")["/api/v2/posts/{pet_id}"]
+    "/api/v3/users/posts/{pet_id}": {
+        ...postDocs("User controllers")["/api/v3/posts/{pet_id}"]
     },
-    "/api/v2/users/posts/search/chrt": {
-        ...postDocs("User controllers")["/api/v2/posts/search/chrt"]
+    "/api/v3/users/posts/search/chrt": {
+        ...postDocs("User controllers")["/api/v3/posts/search/chrt"]
     },
-    "/api/v2/users/posts/{pet_id}/images": {
-        ...postDocs("User controllers")["/api/v2/posts/{pet_id}/images"]
+    "/api/v3/users/posts/{pet_id}/images": {
+        ...postDocs("User controllers")["/api/v3/posts/{pet_id}/images"]
     },
-    "/api/v2/users/posts/comment/{pet_id}": {
-        ...postDocs("User controllers")["/api/v2/posts/comment/{pet_id}"]
+    "/api/v3/users/posts/comment/{pet_id}": {
+        ...postDocs("User controllers")["/api/v3/posts/comment/{pet_id}"]
     }
 }

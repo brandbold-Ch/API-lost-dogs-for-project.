@@ -1,8 +1,8 @@
-const {Authenticate} = require("../middlewares/authenticator");
+const { Authenticate } = require("../middlewares/authenticator");
 const adminControllers = require("../controllers/adminControllers");
-const {authRouter} = require("./authRoutes");
-const {validateQueryAction} = require("../middlewares/handler/handlerAnyData");
-const {validateSetAdminData} = require("../middlewares/handler/handlerAdminData");
+const { authRouter } = require("./authRoutes");
+const { validateQueryAction } = require("../middlewares/joiMiddlewares/anyValidator");
+const { adminDataValidator } = require("../middlewares/joiMiddlewares/adminValidator");
 const express = require("express");
 const adminRouter = express.Router();
 const {
@@ -11,10 +11,10 @@ const {
     checkQueryStatus,
     checkAccountExists,
     entityExists
-} = require("../middlewares/anyMiddlewares");
+} = require("../middlewares/middlewaresFunctions");
 
 
-adminRouter.post("/", express.urlencoded({extended: true}), validateSetAdminData, checkAccountExists, adminControllers.createAdmin);
+adminRouter.post("/", express.urlencoded({extended: true}), adminDataValidator, checkAccountExists, adminControllers.createAdmin);
 
 adminRouter.use([
     Authenticate,

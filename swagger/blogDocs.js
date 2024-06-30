@@ -1,6 +1,6 @@
 function blogDocs(tags) {
     return {
-        "/api/v2/blogs": {
+        "/api/v3/blogs": {
             "post": {
                 "security": [
                     {
@@ -82,7 +82,7 @@ function blogDocs(tags) {
                 }
             }
         },
-        "/api/v2/blogs/{blog_id}": {
+        "/api/v3/blogs/{blog_id}": {
             "get": {
                 "security": [
                     {
@@ -220,7 +220,7 @@ function blogDocs(tags) {
                 }
             }
         },
-        "/api/v2/blogs/{blog_id}/images": {
+        "/api/v3/blogs/{blog_id}/images": {
             "delete": {
                 "security": [
                     {
@@ -270,4 +270,4 @@ function blogDocs(tags) {
     }
 }
 
-module.exports = {blogDocs}
+module.exports = { blogDocs }

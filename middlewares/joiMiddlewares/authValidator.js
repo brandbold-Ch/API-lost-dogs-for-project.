@@ -1,10 +1,10 @@
 const { authUpdateSchema } = require("../../schemas/authSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validateUpdateAuthData = async (req, res, next) => {
+const validatorUpdateAuth = async (req, res, next) => {
     try {
         await authUpdateSchema.validateAsync(req.body);
         next();
@@ -15,7 +15,7 @@ const validateUpdateAuthData = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
+                    errorTypeSelector(err),
                     { url: req.baseUrl, verb: req.method }
                 )
             );
@@ -30,4 +30,4 @@ const validateUpdateAuthData = async (req, res, next) => {
     }
 }
 
-module.exports = { validateUpdateAuthData };
+module.exports = { validatorUpdateAuth };

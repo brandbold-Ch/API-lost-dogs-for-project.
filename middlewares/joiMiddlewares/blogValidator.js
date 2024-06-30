@@ -1,10 +1,10 @@
 const { blogCreationSchema } = require("../../schemas/blogSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validateBlogData = async (req, res, next) => {
+const blogDataValidator = async (req, res, next) => {
     try {
         await blogCreationSchema.validateAsync(
             JSON.parse(JSON.stringify(req.body))
@@ -16,19 +16,19 @@ const validateBlogData = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
-                    {url: req.baseUrl, verb: req.method}
+                    errorTypeSelector(err),
+                    { url: req.baseUrl, verb: req.method }
                 )
             );
 
         } else {
             res.status(500).json(
                 HandlerHttpVerbs.internalServerError(
-                    err.message, {url: req.baseUrl, verb: req.method}
+                    err.message, { url: req.baseUrl, verb: req.method }
                 )
             );
         }
     }
 }
 
-module.exports = { validateBlogData }
+module.exports = { blogDataValidator }

@@ -3,6 +3,7 @@ const authDocs = require("./authDocs");
 const userDocs = require("./userDocs");
 const rescuerDocs = require("./rescuerDocs");
 const guestDocs = require("./guestDocs");
+const associationsDocs = require("./associationsDocs");
 
 
 module.exports = {
@@ -10,7 +11,7 @@ module.exports = {
     "info": {
         "title": "PET (Perdidos en Tapachula)",
         "version": "2.0",
-        "description": "API pets lost"
+        "description": "API para mascotas perdidas"
     },
     "servers": [
         {
@@ -34,6 +35,7 @@ module.exports = {
         ...authDocs,
         ...userDocs,
         ...rescuerDocs,
-        ...guestDocs
+        ...guestDocs,
+        ...associationsDocs
     }
 }

@@ -2,10 +2,10 @@ const { userCreationSchema } = require("../../schemas/userSchema");
 const { authCreationSchema } = require("../../schemas/authSchema");
 const { HandlerHttpVerbs } = require("../../errors/handlerHttpVerbs");
 const { ValidationError } = require("joi");
-const { patternSelector } = require("./patternSelector");
+const { errorTypeSelector } = require("./errorTypeSelector");
 
 
-const validateUserData = async (req, res, next) => {
+const userDataValidator = async (req, res, next) => {
     try {
         const { name, lastname, phone_number, social_networks, email, password } = req.body;
 
@@ -30,7 +30,7 @@ const validateUserData = async (req, res, next) => {
             res.status(400).json(
                 HandlerHttpVerbs.badRequest(
                     err.message,
-                    patternSelector(err),
+                    errorTypeSelector(err),
                     { url: req.baseUrl, verb: req.method }
                 )
             );
@@ -45,4 +45,4 @@ const validateUserData = async (req, res, next) => {
     }
 }
 
-module.exports = { validateUserData }
+module.exports = { userDataValidator }

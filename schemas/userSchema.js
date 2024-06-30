@@ -14,10 +14,7 @@ const userCreationSchema = Joi.object({
         .regex(new RegExp(/^\d{10}$/))
         .max(10)
         .min(10)
-        .optional()
-        .messages({
-            "string.pattern.base": "Invalid number. Must be a numeric string"
-        }),
+        .optional(),
 
     social_networks: Joi.object()
         .pattern(
@@ -34,4 +31,4 @@ const userCreationSchema = Joi.object({
     abortEarly: true
 });
 
-module.exports = { userCreationSchema };
+module.exports = { userCreationSchema }

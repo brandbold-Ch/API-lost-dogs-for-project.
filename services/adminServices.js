@@ -3,7 +3,7 @@ const { Auth } = require("../models/auth");
 const { User } = require("../models/user");
 const { Request, Rescuer } = require("../models/rescuer");
 const { Association } = require("../models/association");
-const { connection } = require("../configurations/connections");
+const { connection } = require("../config/connections");
 const { RescuerServices } = require("./rescuerServices");
 const { UserServices } = require("../services/userServices");
 const { Post } = require("../models/post");
@@ -237,15 +237,15 @@ class AdminServices {
     }
 
     async deactivateRequest(id) {
-        return Request.findByIdAndUpdate(id, {$set: {status: "disabled"}}, {new: true});
+        return Request.findByIdAndUpdate(id, { $set: { status: "disabled" } }, { new: true });
     }
 
     async rejectRequest(id) {
-        return Request.findByIdAndUpdate(id, {$set: {status: "rejected"}}, {new: true});
+        return Request.findByIdAndUpdate(id, { $set: { status: "rejected" } }, { new: true });
     }
 
     async filterRequests(filter) {
-        return Request.find({status: filter});
+        return Request.find({ status: filter });
     }
 
     async getRescuers() {
@@ -273,4 +273,4 @@ class AdminServices {
     }
 }
 
-module.exports = {AdminServices};
+module.exports = { AdminServices };

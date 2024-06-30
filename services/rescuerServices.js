@@ -6,7 +6,7 @@ const { Blog } = require("../models/blog");
 const { PostServices } = require("../services/postServices");
 const { BulletinServices } = require("../services/bulletinServices");
 const { ImageTools } = require("../utils/imageTools");
-const { connection } = require("../configurations/connections");
+const { connection } = require("../config/connections");
 const { BlogServices } = require("./blogServices");
 
 
@@ -119,7 +119,6 @@ class RescuerServices {
         await Rescuer.updateOne({ _id: id }, { $pull: { social_networks: { [key]: value } } });
     }
 
-
     async updateRescuer(id, rescuer_data) {
         const session = await connection.startSession();
         const { name, social_networks, description } = rescuer_data[0];
@@ -198,6 +197,22 @@ class RescuerServices {
 
         await session.endSession();
     }
+
+    async changeRole(id, role, change) {
+        let output_request;
+
+        await Request.create([{
+            requester_role: role,
+            requested_role: change,
+            user_id: id,
+            doc_model: "Rescuer"
+        }])
+            .then((request) => {
+                output_request = request[0]
+            });
+
+        return output_request;
+    }
 }
 
-module.exports = { RescuerServices };
+module.exports = { RescuerServices }

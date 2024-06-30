@@ -27,7 +27,7 @@ exports.createRescuer = async (req, res) => {
             )
         );
     }
-};
+}
 
 exports.getRescuer = async (req, res) => {
     try {

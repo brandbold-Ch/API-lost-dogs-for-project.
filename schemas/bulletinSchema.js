@@ -19,9 +19,6 @@ const bulletinCreationSchema = Joi.object({
         .max(10)
         .min(10)
         .optional()
-        .messages({
-            "string.pattern.base": "Invalid number. Must be a numeric string"
-        })
 
 }).options({
     allowUnknown: true,

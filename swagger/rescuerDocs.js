@@ -4,7 +4,7 @@ const { blogDocs } = require("./blogDocs");
 
 
 module.exports = {
-    "/api/v2/rescuers": {
+    "/api/v3/rescuers": {
         "post": {
             "tags": [
                 "Rescuer controllers"
@@ -173,7 +173,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/rescuers/auth": {
+    "/api/v3/rescuers/auth": {
         "put": {
             "security": [
                 {
@@ -228,7 +228,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/rescuers/networks": {
+    "/api/v3/rescuers/networks": {
         "delete": {
             "security": [
                 {
@@ -275,7 +275,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/rescuers/image/{image_id}": {
+    "/api/v3/rescuers/image/{image_id}": {
         "delete": {
             "security": [
                 {
@@ -315,37 +315,37 @@ module.exports = {
             }
         }
     },
-    "/api/v2/rescuers/posts": {
-        ...postDocs("Rescuer controllers")["/api/v2/posts"]
+    "/api/v3/rescuers/posts": {
+        ...postDocs("Rescuer controllers")["/api/v3/posts"]
     },
-    "/api/v2/rescuers/posts/{pet_id}": {
-        ...postDocs("Rescuer controllers")["/api/v2/posts/{pet_id}"]
+    "/api/v3/rescuers/posts/{pet_id}": {
+        ...postDocs("Rescuer controllers")["/api/v3/posts/{pet_id}"]
     },
-    "/api/v2/rescuers/posts/search/chrt": {
-        ...postDocs("Rescuer controllers")["/api/v2/posts/search/chrt"]
+    "/api/v3/rescuers/posts/search/chrt": {
+        ...postDocs("Rescuer controllers")["/api/v3/posts/search/chrt"]
     },
-    "/api/v2/rescuers/posts/{pet_id}/images": {
-        ...postDocs("Rescuer controllers")["/api/v2/posts/{pet_id}/images"]
+    "/api/v3/rescuers/posts/{pet_id}/images": {
+        ...postDocs("Rescuer controllers")["/api/v3/posts/{pet_id}/images"]
     },
-    "/api/v2/rescuers/posts/comment/{pet_id}": {
-        ...postDocs("Rescuer controllers")["/api/v2/posts/comment/{pet_id}"]
+    "/api/v3/rescuers/posts/comment/{pet_id}": {
+        ...postDocs("Rescuer controllers")["/api/v3/posts/comment/{pet_id}"]
     },
-    "/api/v2/rescuers/bulletins": {
-        ...bulletinDocs("Rescuer controllers")["/api/v2/bulletins"]
+    "/api/v3/rescuers/bulletins": {
+        ...bulletinDocs("Rescuer controllers")["/api/v3/bulletins"]
     },
-    "/api/v2/rescuers/bulletins/{bulletin_id}": {
-        ...bulletinDocs("Rescuer controllers")["/api/v2/bulletins/{bulletin_id}"]
+    "/api/v3/rescuers/bulletins/{bulletin_id}": {
+        ...bulletinDocs("Rescuer controllers")["/api/v3/bulletins/{bulletin_id}"]
     },
-    "/api/v2/rescuers/bulletins/{bulletin_id}/images": {
-        ...bulletinDocs("Rescuer controllers")["/api/v2/bulletins/{bulletin_id}/images"]
+    "/api/v3/rescuers/bulletins/{bulletin_id}/images": {
+        ...bulletinDocs("Rescuer controllers")["/api/v3/bulletins/{bulletin_id}/images"]
     },
-    "/api/v2/rescuers/blogs": {
-        ...blogDocs("Rescuer controllers")["/api/v2/blogs"]
+    "/api/v3/rescuers/blogs": {
+        ...blogDocs("Rescuer controllers")["/api/v3/blogs"]
     },
-    "/api/v2/rescuers/blogs/{blog_id}": {
-        ...blogDocs("Rescuer controllers")["/api/v2/blogs/{blog_id}"]
+    "/api/v3/rescuers/blogs/{blog_id}": {
+        ...blogDocs("Rescuer controllers")["/api/v3/blogs/{blog_id}"]
     },
-    "/api/v2/rescuers/blogs/{blog_id}/images": {
-        ...blogDocs("Rescuer controllers")["/api/v2/blogs/{blog_id}/images"]
+    "/api/v3/rescuers/blogs/{blog_id}/images": {
+        ...blogDocs("Rescuer controllers")["/api/v3/blogs/{blog_id}/images"]
     }
 }

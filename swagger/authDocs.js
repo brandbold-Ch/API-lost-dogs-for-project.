@@ -1,5 +1,5 @@
 module.exports = {
-    "/api/v2/auth/login": {
+    "/api/v3/auth/login": {
         "post": {
             "tags": [
                 "Auth controllers"
@@ -49,7 +49,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/auth/token/status": {
+    "/api/v3/auth/token/status": {
         "get": {
             "security": [
                 {
@@ -80,7 +80,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/auth/token/gen": {
+    "/api/v3/auth/token/gen": {
         "get": {
             "security": [
                 {

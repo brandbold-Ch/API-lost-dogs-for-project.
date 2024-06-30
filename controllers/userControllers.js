@@ -4,8 +4,8 @@
  * @file This module is for creating user services.
  */
 
-const {user} = require("../utils/instances");
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const { user } = require("../utils/instances");
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
 
 
 exports.createUser = async (req, res) => {
@@ -26,7 +26,7 @@ exports.createUser = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -39,7 +39,7 @@ exports.getUsers = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -52,7 +52,7 @@ exports.getUser = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -65,7 +65,7 @@ exports.getRequests = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -79,7 +79,7 @@ exports.deleteUser = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -103,7 +103,7 @@ exports.updateUser = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -117,7 +117,7 @@ exports.deleteSocialMedia = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -141,7 +141,7 @@ exports.makeRescuer = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }
@@ -165,7 +165,7 @@ exports.makeAssociation = async (req, res) => {
     } catch (err) {
         res.status(500).json(
             HandlerHttpVerbs.internalServerError(
-                err.message, {url: req.baseUrl, verb: req.method}
+                err.message, { url: req.baseUrl, verb: req.method }
             )
         );
     }

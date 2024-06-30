@@ -1,5 +1,5 @@
 module.exports = {
-    "/api/v2/posts/search/chrt": {
+    "/api/v3/posts/search/chrt": {
         "get": {
             "tags": [
                 "Post controllers"
@@ -31,7 +31,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/posts": {
+    "/api/v3/posts": {
         "get": {
             "summary": "Ver todos las mascotas",
             "description": "Ver todas las mascotas de todos los usuarios",
@@ -51,7 +51,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/posts/search": {
+    "/api/v3/posts/search": {
         "get": {
             "summary": "Ver mascota con su dueño",
             "description": "Ver mascota con su dueño",
@@ -79,7 +79,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/bulletins": {
+    "/api/v3/bulletins": {
         "get": {
             "summary": "Ver todos los anuncios",
             "description": "Ver todas las anuncios de todos los rescatistas",
@@ -99,7 +99,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/bulletins/search": {
+    "/api/v3/bulletins/search": {
         "get": {
             "summary": "Ver anuncio con su dueño",
             "description": "Ver anuncio con su dueño",
@@ -127,7 +127,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/blogs": {
+    "/api/v3/blogs": {
         "get": {
             "summary": "Ver todos los blogs",
             "description": "Ver todos los blogs de rescatistas",
@@ -147,7 +147,7 @@ module.exports = {
             }
         }
     },
-    "/api/v2/blogs/search": {
+    "/api/v3/blogs/search": {
         "get": {
             "summary": "Ver blog con su dueño",
             "description": "Ver blog con su dueño",

@@ -9,7 +9,7 @@ const { User } = require("../models/user");
 const { Rescuer } = require("../models/rescuer");
 const { Post } = require("../models/post");
 const { ImageTools } = require("../utils/imageTools");
-const { connection } = require("../configurations/connections");
+const { connection } = require("../config/connections");
 const mongoose = require("mongoose");
 const {Association} = require("../models/association");
 

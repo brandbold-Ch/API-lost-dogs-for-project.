@@ -173,7 +173,7 @@ exports.login = async (req, res) => {
                 }
 
                 res.status(err[0]).json(
-                    HandlerHttpVerbs.automaticClientErrorSelection(
+                    HandlerHttpVerbs.automaticSelectionError(
                         err[1], {url: req.baseUrl, verb: req.method},
                         errorMsg, err[0]
                     )
