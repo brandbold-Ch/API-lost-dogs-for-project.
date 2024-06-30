@@ -1,4 +1,4 @@
-const {errorsCodes} = require("../../utils/codes");
+const { errorsCodes } = require("../../utils/codes");
 
 
 function patternSelector(pattern) {
@@ -12,4 +12,4 @@ function patternSelector(pattern) {
     }
 }
 
-module.exports = {patternSelector}
+module.exports = { patternSelector }

@@ -4,9 +4,9 @@
  * @file This module is for user middleware.
  */
 
-const {post, auth, admin, bulletin, blog} = require('../utils/instances');
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
-const {errorsCodes} = require("../utils/codes");
+const { post, auth, admin, bulletin, blog } = require('../utils/instances');
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
+const { errorsCodes } = require("../utils/codes");
 
 /**
  * Middleware to check if a user with the specified ID exists.
