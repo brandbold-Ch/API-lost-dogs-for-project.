@@ -35,6 +35,9 @@ class BulletinServices {
 
             case "RESCUER":
                 return ["Rescuer", Rescuer];
+
+            case "ASSOCIATION":
+                return ["Association", Rescuer];
         }
     }
 

@@ -19,7 +19,7 @@ associationRouter.post(
     "/", processFormData,
     rescuerDataValidator,
     checkAccountExists,
-    associationControllers.createRescuer
+    associationControllers.createAssociation
 );
 
 associationRouter.use([
@@ -28,11 +28,13 @@ associationRouter.use([
     specialPermissions
 ]);
 
-associationRouter.get("/", associationControllers.getRescuer);
-associationRouter.delete("/", associationControllers.deleteRescuer);
+associationRouter.get("/", associationControllers.getAssociation);
+associationRouter.delete("/", associationControllers.deleteAssociation);
 associationRouter.delete("/networks", associationControllers.deleteSocialMedia);
 associationRouter.delete("/image/:image_id", associationControllers.deleteImage);
-associationRouter.put("/", processFormData, rescuerDataValidator, associationControllers.updateRescuer);
+associationRouter.put("/", processFormData, rescuerDataValidator, associationControllers.updateAssociation);
+associationRouter.post("/rescuers/:rescuer_id", associationControllers.addResCollab);
+associationRouter.get("/rescuers", associationControllers.getRescuers);
 
 associationRouter.use([
     authRouter,

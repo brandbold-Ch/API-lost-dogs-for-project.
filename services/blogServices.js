@@ -1,8 +1,9 @@
-const {ImageTools} = require("../utils/imageTools");
-const {Blog} = require("../models/blog");
-const {connection} = require("../config/connections");
-const {User} = require("../models/user");
-const {Rescuer} = require("../models/rescuer");
+const { ImageTools } = require("../utils/imageTools");
+const { Blog } = require("../models/blog");
+const { connection } = require("../config/connections");
+const { User } = require("../models/user");
+const { Rescuer } = require("../models/rescuer");
+const { Association } = require("../models/association");
 const mongoose = require("mongoose");
 
 
@@ -37,6 +38,9 @@ class BlogServices {
 
             case "RESCUER":
                 return ["Rescuer", Rescuer];
+
+            case "ASSOCIATION":
+                return ["Association", Association]
         }
     }
 

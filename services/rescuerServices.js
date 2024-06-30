@@ -47,7 +47,8 @@ class RescuerServices {
 
     async getRescuers() {
         return Rescuer.find({}, { posts_id: 0, bulletins_id: 0 })
-            .populate("auth_id",  { email: 1, password: 1, _id: 0 });
+            .populate("auth_id",  { email: 1, password: 1, _id: 0 })
+            .populate("ext_relat", {name: 1, description: 1});
     }
 
     async createRescuer(rescuer_data) {
@@ -56,10 +57,14 @@ class RescuerServices {
         const session = await connection.startSession();
         let output_rescuer, output_auth;
 
+        const socials = (social_networks)? Object.keys(social_networks).map(
+            key => ({ [key]: social_networks[key] })
+        ): undefined;
+
         await session.withTransaction(async () => {
             await Rescuer.create([{
                 name: name,
-                social_networks: JSON.parse(social_networks),
+                social_networks: socials,
                 description: description
             }], { session })
                 .then((rescuer) => {
@@ -97,7 +102,7 @@ class RescuerServices {
             );
         })
             .then(async () => {
-                await this.addImage(output_rescuer["_id"], image[0]);
+                await this.addImage(output_rescuer["_id"], image);
             });
 
         await session.endSession();
@@ -147,7 +152,7 @@ class RescuerServices {
                     runValidators: true,
                     new: true
                 }
-            )
+            ).session(session)
                 .then((rescuer) => {
                     output_rescuer = rescuer;
                 });
@@ -196,22 +201,6 @@ class RescuerServices {
             })
 
         await session.endSession();
-    }
-
-    async changeRole(id, role, change) {
-        let output_request;
-
-        await Request.create([{
-            requester_role: role,
-            requested_role: change,
-            user_id: id,
-            doc_model: "Rescuer"
-        }])
-            .then((request) => {
-                output_request = request[0]
-            });
-
-        return output_request;
     }
 }
 

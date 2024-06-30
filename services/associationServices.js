@@ -52,10 +52,14 @@ class AssociationServices {
         const session = await connection.startSession();
         let output_association, output_auth;
 
+        const socials = (social_networks)? Object.keys(social_networks).map(
+            key => ({ [key]: social_networks[key] })
+        ): undefined;
+
         await session.withTransaction(async () => {
             await Rescuer.create([{
                 name: name,
-                social_networks: JSON.parse(social_networks),
+                social_networks: socials,
                 description: description
             }], { session })
                 .then((association) => {
@@ -86,7 +90,7 @@ class AssociationServices {
             );
         })
             .then(async () => {
-                await this.addImage(output_association["_id"], image[0]);
+                await this.addImage(output_association["_id"], image);
             });
 
         await session.endSession();
@@ -97,7 +101,8 @@ class AssociationServices {
         return Association.findById(id, {
             posts_id: 0,
             blogs_id: 0,
-            bulletins_id: 0
+            bulletins_id: 0,
+            rescuers_id: 0
         })
             .populate("auth_id",
                 { email: 1, password: 1, _id: 0 }
@@ -137,7 +142,7 @@ class AssociationServices {
                     runValidators: true,
                     new: true
                 }
-            )
+            ).session(session)
                 .then((rescuer) => {
                     output_rescuer = rescuer;
                 });
@@ -186,6 +191,48 @@ class AssociationServices {
             })
 
         await session.endSession();
+    }
+
+    async addResCollab(id, rescuer_id) {
+        const session = await connection.startSession();
+        let output_association;
+
+        await session.withTransaction(async () => {
+            await Rescuer.updateOne(
+                {
+                    _id: rescuer_id
+                },
+                {
+                    $set: { ext_relat: id }
+                },
+                { session }
+            )
+
+            await Association.findByIdAndUpdate(id,
+                {
+                    $addToSet: {
+                        rescuers_id: rescuer_id
+                    }
+                },
+                {
+                    runValidators: true,
+                    new: true
+                }
+                ).session(session)
+                    .then((association) => {
+                        output_association = association;
+                    })
+        });
+
+        await session.endSession();
+        return output_association
+    }
+
+    async getRescuers(id) {
+        return Rescuer.find({ ext_relat: id }, { posts_id: 0, bulletins_id: 0, blogs_id: 0 })
+            .populate(
+                "auth_id", { email: 1, password: 1, _id: 0 }
+            );
     }
 }
 

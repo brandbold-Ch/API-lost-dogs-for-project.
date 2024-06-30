@@ -27,8 +27,11 @@ const rescuerModel = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Blog"
     }],
-    relationships: {
-
+    ext_relat: {
+        type: Schema.Types.ObjectId,
+        required: false,
+        default: null,
+        ref: "Association"
     }
 }, {
     versionKey: false

@@ -42,7 +42,7 @@ const checkBlogExists = async (req, res, next) => {
 const checkEntityExists = async (req, res, next) => {
     try {
         await handleNotFoundResponse(
-            await auth.getAuthByUser(req.id || req.query.user),
+            await auth.getAuthByUser(req.id || req.query.user || req.params.rescuer_id),
             req, res, "user", next
         );
     } catch (err) {

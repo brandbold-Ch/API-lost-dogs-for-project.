@@ -2,7 +2,7 @@ const { association } = require('../utils/instances');
 const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
 
 
-exports.createRescuer = async (req, res) => {
+exports.createAssociation = async (req, res) => {
     try {
         const response_body = await association.createAssociation([
             JSON.parse(JSON.stringify(req.body)),
@@ -29,7 +29,7 @@ exports.createRescuer = async (req, res) => {
     }
 }
 
-exports.getRescuer = async (req, res) => {
+exports.getAssociation = async (req, res) => {
     try {
         res.status(200).json(await association.getAssociation(req.id));
 
@@ -42,7 +42,7 @@ exports.getRescuer = async (req, res) => {
     }
 }
 
-exports.deleteRescuer = async (req, res) => {
+exports.deleteAssociation = async (req, res) => {
     try {
         await association.deleteAssociation(req.id);
         res.status(204).end();
@@ -56,7 +56,7 @@ exports.deleteRescuer = async (req, res) => {
     }
 }
 
-exports.updateRescuer = async (req, res) => {
+exports.updateAssociation = async (req, res) => {
     try {
         const response_body = await association.updateAssociation(
             req.id,
@@ -104,6 +104,44 @@ exports.deleteImage = async (req, res) => {
     try {
         await association.deleteImage(req.id, req.params.image_id);
         res.status(204).end();
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+exports.addResCollab = async (req, res) => {
+    try {
+        const response_body = await association.addResCollab(req.id, req.params.rescuer_id);
+        console.log(response_body)
+
+        res.status(201).json(
+            HandlerHttpVerbs.accepted(
+                "Added rescuer ✅",
+                undefined, {
+                    data: response_body,
+                    url: req.baseUrl,
+                    verb: req.method
+                }
+            )
+        );
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, { url: req.baseUrl, verb: req.method }
+            )
+        );
+    }
+}
+
+exports.getRescuers = async (req, res) => {
+    try {
+        res.status(200).json(await association.getRescuers(req.id));
 
     } catch (err) {
         res.status(500).json(

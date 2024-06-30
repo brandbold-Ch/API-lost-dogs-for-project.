@@ -317,6 +317,71 @@ module.exports = {
             }
         }
     },
+    "/api/v3/associations/rescuers/{rescuer_id}": {
+        "post": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Association controllers"
+            ],
+            "summary": "Agregar rescatista.",
+            "description": "Agregar colaboración con rescatista.",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "rescuer_id",
+                    "description": "Id del rescatista.",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Rescatista agregado correctamente."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                },
+                "400": {
+                    "description": "Error del cliente."
+                }
+            }
+        }
+    },
+    "/api/v3/associations/rescuers": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Association controllers"
+            ],
+            "summary": "Obtener todos los rescatistas.",
+            "description": "Obtener todos los rescatistas.",
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "200": {
+                    "description": "Todos las solicitudes."
+                },
+                "404": {
+                    "description": "Asociación no encontrado."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        }
+    },
     "/api/v3/associations/posts": {
         ...postDocs("Association controllers")["/api/v3/posts"]
     },

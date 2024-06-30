@@ -81,9 +81,7 @@ class PostServices {
         const array_images = post_data[1];
         let output_post;
 
-
         await session.withTransaction(async () => {
-
             await Post.create([
                 {
                     name: obj_data["name"],
