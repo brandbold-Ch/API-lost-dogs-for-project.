@@ -32,7 +32,7 @@ const postCreationSchema = Joi.object({
     lost_date: Joi.date()
         .required(),
 
-    location: Joi.string()
+    location: Joi.object()
         .optional(),
 
     last_seen: Joi.string()

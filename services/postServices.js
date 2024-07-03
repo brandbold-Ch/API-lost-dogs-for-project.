@@ -80,6 +80,12 @@ class PostServices {
         const obj_data = post_data[0];
         const array_images = post_data[1];
         let output_post;
+        const parsedInfo = () => {
+            if (obj_data["location"]) {
+                return JSON.parse(obj_data["location"])
+            }
+            return undefined;
+        }
 
         await session.withTransaction(async () => {
             await Post.create([
@@ -95,7 +101,7 @@ class PostServices {
                     },
                     publication: {
                         lost_date: obj_data["lost_date"],
-                        location: JSON.parse(obj_data["location"]),
+                        location: parsedInfo(),
                         last_seen: obj_data["last_seen"]
                     },
                     status: {
@@ -280,6 +286,12 @@ class PostServices {
         const obj_data = post_data[0];
         const array_images = post_data[1];
         let output_post;
+        const parsedInfo = () => {
+            if (obj_data["location"]) {
+                return JSON.parse(obj_data["location"])
+            }
+            return undefined;
+        }
 
         await session.withTransaction(async () => {
             await Post.findOneAndUpdate(
@@ -300,7 +312,7 @@ class PostServices {
                         },
                         publication: {
                             lost_date: obj_data["lost_date"],
-                            location: JSON.parse(obj_data["location"]),
+                            location: parsedInfo(),
                             update: Date.now(),
                             published: context_post["publication"]["published"],
                             last_seen: obj_data["last_seen"]

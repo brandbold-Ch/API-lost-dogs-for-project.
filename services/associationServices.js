@@ -118,7 +118,6 @@ class AssociationServices {
         const { name, social_networks, description } = association_data[0];
         const image = association_data[1];
         let output_rescuer;
-
         const parsedNetworks = () => {
             if (social_networks) {
                 const socials = JSON.parse(social_networks);
@@ -225,7 +224,7 @@ class AssociationServices {
         });
 
         await session.endSession();
-        return output_association
+        return output_association;
     }
 
     async getRescuers(id) {

@@ -1,5 +1,5 @@
 const associationControllers = require("../controllers/associationControllers");
-const { rescuerDataValidator } = require("../middlewares/joiMiddlewares/rescuerValidator");
+const { associationDataValidator } = require("../middlewares/joiMiddlewares/associatonValidator");
 const { Authenticate } = require('../middlewares/authenticator');
 const { postRouter } = require("./postRoutes");
 const { bulletinRouter } = require("./bulletinRoutes");
@@ -17,7 +17,7 @@ const {
 
 associationRouter.post(
     "/", processFormData,
-    rescuerDataValidator,
+    associationDataValidator,
     checkAccountExists,
     associationControllers.createAssociation
 );
@@ -32,7 +32,7 @@ associationRouter.get("/", associationControllers.getAssociation);
 associationRouter.delete("/", associationControllers.deleteAssociation);
 associationRouter.delete("/networks", associationControllers.deleteSocialMedia);
 associationRouter.delete("/image/:image_id", associationControllers.deleteImage);
-associationRouter.put("/", processFormData, rescuerDataValidator, associationControllers.updateAssociation);
+associationRouter.put("/", processFormData, associationDataValidator, associationControllers.updateAssociation);
 associationRouter.post("/rescuers/:rescuer_id", associationControllers.addResCollab);
 associationRouter.get("/rescuers", associationControllers.getRescuers);
 

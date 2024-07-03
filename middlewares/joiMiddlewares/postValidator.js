@@ -5,10 +5,35 @@ const { errorTypeSelector } = require("./errorTypeSelector");
 
 
 const postDataValidator = async (req, res, next) => {
+
     try {
-        await postCreationSchema.validateAsync(
-            JSON.parse(JSON.stringify(req.body))
-        );
+        const {
+            name,
+            specie,
+            gender,
+            age,
+            description,
+            size,
+            breed,
+            lost_date,
+            location,
+            last_seen,
+            owner
+        } = JSON.parse(JSON.stringify(req.body));
+
+        await postCreationSchema.validateAsync({
+            name: name,
+            specie: specie,
+            gender: gender,
+            age: age,
+            description: description,
+            size: size,
+            breed: breed,
+            lost_date: lost_date,
+            location: (location)? JSON.parse(location) : undefined,
+            last_seen: last_seen,
+            owner: owner
+        });
         next();
 
     } catch (err) {
