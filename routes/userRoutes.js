@@ -1,16 +1,16 @@
-const userControllers = require('../controllers/userControllers');
+const userControllers = require("../controllers/userControllers");
 const { postRouter } = require("./postRoutes");
-const { Authenticate } = require('../middlewares/authenticator');
+const { Authenticate } = require("../middlewares/authenticator");
 const { authRouter } = require("./authRoutes");
 const { userDataValidator } = require("../middlewares/joiMiddlewares/userValidator");
-const express = require('express');
+const express = require("express");
 const userRouter = express.Router();
 const {
     checkEntityExists,
     checkAccountExists,
     checkRequestExistsForUser,
     showRequest
-} = require('../middlewares/middlewaresFunctions');
+} = require("../middlewares/middlewaresFunctions");
 
 userRouter.post("/", userDataValidator, checkAccountExists, userControllers.createUser);
 

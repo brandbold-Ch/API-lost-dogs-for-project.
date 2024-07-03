@@ -95,7 +95,7 @@ class PostServices {
                     },
                     publication: {
                         lost_date: obj_data["lost_date"],
-                        coordinates: JSON.parse(obj_data["coordinates"]),
+                        location: JSON.parse(obj_data["location"]),
                         last_seen: obj_data["last_seen"]
                     },
                     status: {
@@ -300,7 +300,7 @@ class PostServices {
                         },
                         publication: {
                             lost_date: obj_data["lost_date"],
-                            coordinates: JSON.parse(obj_data["coordinates"]),
+                            location: JSON.parse(obj_data["location"]),
                             update: Date.now(),
                             published: context_post["publication"]["published"],
                             last_seen: obj_data["last_seen"]

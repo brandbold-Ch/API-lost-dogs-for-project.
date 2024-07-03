@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 
-const rescuerCreationSchema = Joi.object({
+const associationUpdateSchema = Joi.object({
     name: Joi.string()
         .required(),
 
@@ -24,4 +24,4 @@ const rescuerCreationSchema = Joi.object({
     allowUnknown: true
 });
 
-module.exports = { rescuerCreationSchema }
+module.exports = { associationUpdateSchema }

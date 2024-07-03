@@ -69,7 +69,7 @@ const postModel = new Schema({
             type: Date,
             required: true
         },
-        coordinates: {
+        location: {
             type: Object,
             required: false,
             default: null
@@ -133,6 +133,6 @@ const postModel = new Schema({
     versionKey: false
 });
 
-postModel.index({user_id: 1});
+postModel.index({ user_id: 1 });
 const Post = mongoose.model("Post", postModel);
 module.exports = { Post }

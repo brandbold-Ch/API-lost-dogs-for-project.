@@ -56,7 +56,7 @@ function postDocs(tags) {
                                         "type": "string",
                                         "example": "2021-04-24"
                                     },
-                                    "coordinates": {
+                                    "location": {
                                         "type": "string",
                                         "example": "{\"x\": 34234243223123, \"y\": 1234123422346}"
                                     },
@@ -221,7 +221,7 @@ function postDocs(tags) {
                                         "type": "string",
                                         "example": "2021-04-24"
                                     },
-                                    "coordinates": {
+                                    "location": {
                                         "type": "string",
                                         "example": "{\"x\": 34234243223123, \"y\": 1234123422346}"
                                     },

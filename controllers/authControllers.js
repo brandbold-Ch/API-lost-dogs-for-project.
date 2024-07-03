@@ -65,9 +65,8 @@ exports.updateAuth = async (req, res) => {
 
 const typeUser = (data) => {
     return new Promise(async (resolve, reject) => {
-
-        if (data[1]["role"][0] === "RESCUER") {
-            const request = await Request.findOne({user_id: data[1]["user_id"]});
+        if (data[1]["role"] === "RESCUER") {
+            const request = await Request.findOne({ user_id: data[1]["user_id"] });
 
             switch (request["status"]) {
                 case "pending":
@@ -174,7 +173,7 @@ exports.login = async (req, res) => {
 
                 res.status(err[0]).json(
                     HandlerHttpVerbs.automaticSelectionError(
-                        err[1], {url: req.baseUrl, verb: req.method},
+                        err[1], { url: req.baseUrl, verb: req.method },
                         errorMsg, err[0]
                     )
                 );
@@ -182,7 +181,7 @@ exports.login = async (req, res) => {
             } else {
                 res.status(500).json(
                     HandlerHttpVerbs.internalServerError(
-                        err.message, {url: req.baseUrl, verb: req.method}
+                        err.message, { url: req.baseUrl, verb: req.method }
                     )
                 );
             }

@@ -14,7 +14,7 @@ const {
 } = require("../middlewares/middlewaresFunctions");
 
 
-adminRouter.post("/", express.urlencoded({extended: true}), adminDataValidator, checkAccountExists, adminControllers.createAdmin);
+adminRouter.post("/", express.urlencoded({ extended: true }), adminDataValidator, checkAccountExists, adminControllers.createAdmin);
 
 adminRouter.use([
     Authenticate,
