@@ -8,7 +8,7 @@
 const { Auth } = require('../models/auth');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+require("dotenv").config();
 
 
 class AuthServices {
@@ -57,9 +57,8 @@ class AuthServices {
 
         if (bcrypt.compareSync(old_password, user["password"])) {
             new_password = await bcrypt.hash(new_password, 10);
-
         } else {
-            throw Error('Incorrect');
+            throw Error("Incorrect");
         }
 
         return Auth.findOneAndUpdate(

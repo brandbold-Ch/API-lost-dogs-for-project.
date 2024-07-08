@@ -24,12 +24,12 @@ const app = express();
 
 
 app.use(express.json());
-
+/*
 useTreblle(app, {
     apiKey: process.env.API_KEY,
     projectId: process.env.PROJECT_ID
 });
-
+ */
 app.use(
     "/api-docs",
     swaggerUi.serve,

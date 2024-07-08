@@ -85,12 +85,9 @@ const verifyToken = (token) => {
         if (token) {
             try {
                 resolve(jwt.verify(token.substring(7), process.env.SECRET_KEY));
-
             } catch (err) {
-
                 if (err instanceof TokenExpiredError) {
                     reject([401, "Expired token 💨"]);
-
                 } else {
                     reject(err);
                 }

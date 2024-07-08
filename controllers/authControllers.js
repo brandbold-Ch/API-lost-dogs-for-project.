@@ -4,12 +4,12 @@
  * @file This module is for creating auth services.
  */
 
-const {auth} = require('../utils/instances');
-const {Request} = require("../models/rescuer");
-const {HandlerHttpVerbs} = require("../errors/handlerHttpVerbs");
+const { auth } = require('../utils/instances');
+const { Request } = require("../models/rescuer");
+const { HandlerHttpVerbs } = require("../errors/handlerHttpVerbs");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {errorsCodes} = require("../utils/codes");
+const { errorsCodes } = require("../utils/codes");
 
 
 exports.getAuth = async (req, res) => {
@@ -90,10 +90,8 @@ const typeUser = (data) => {
 
 const validateRequest = (body) => {
     return new Promise((resolve, reject) => {
-
         if (body.email && body.password) {
             resolve(body);
-
         } else {
             reject([400, "You did not send your credentials correctly 🙅‍♂️"]);
         }
@@ -103,10 +101,8 @@ const validateRequest = (body) => {
 const validateEmail = (body) => {
     return new Promise((resolve, reject) => {
         const parseEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(body.email);
-
         if (parseEmail) {
             resolve(body);
-
         } else {
             reject([400, "Invalid email field 🤦‍♂️"]);
         }
@@ -116,10 +112,8 @@ const validateEmail = (body) => {
 const validateUser = (body) => {
     return new Promise(async (resolve, reject) => {
         const entity = await auth.getAuthByEmail(body.email);
-
         if (entity) {
             resolve([body, entity]);
-
         } else {
             reject([404, "Not found account 👻", errorsCodes.DB_NOT_FOUND]);
         }
@@ -129,9 +123,7 @@ const validateUser = (body) => {
 const validatePassword = (data) => {
     return new Promise(async (resolve, reject) => {
         const match = bcrypt.compareSync(data[0].password, data[1].password);
-
         if (match) {
-
             const token = jwt.sign(
                 {user_id: data[1]["user_id"], role: data[1]["role"]},
                 process.env.SECRET_KEY,
