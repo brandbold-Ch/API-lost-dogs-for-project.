@@ -211,6 +211,46 @@ exports.getUsers = async (req, res) => {
     }
 }
 
+exports.getAssociations = async (req, res) => {
+    try {
+        res.status(200).json(await admin.getAssociations());
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+exports.getAssociation = async (req, res) => {
+    try {
+        res.status(200).json(await admin.getAssociation(req.params.association_id));
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
+exports.deleteAssociation = async (req, res) => {
+    try {
+        await admin.deleteAssociation(req.params.association_id);
+        res.status(204).end();
+
+    } catch (err) {
+        res.status(500).json(
+            HandlerHttpVerbs.internalServerError(
+                err.message, {url: req.baseUrl, verb: req.method}
+            )
+        );
+    }
+}
+
 exports.getUser = async (req, res) => {
     try {
         res.status(200).json(await admin.getUser(req.params.user_id));

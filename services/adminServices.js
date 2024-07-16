@@ -1,6 +1,7 @@
 const { Admin } = require('../models/administrator');
 const { Auth } = require("../models/auth");
 const { User } = require("../models/user");
+const { AssociationServices } = require("./associationServices")
 const { Request, Rescuer } = require("../models/rescuer");
 const { Association } = require("../models/association");
 const { connection } = require("../config/connections");
@@ -14,6 +15,7 @@ class AdminServices {
     constructor() {
         this.rescuer = new RescuerServices();
         this.users = new UserServices();
+        this.associations = new AssociationServices();
     }
 
     async createAdmin(admin_data) {
@@ -270,6 +272,18 @@ class AdminServices {
 
     async deleteUser(user_id) {
         await this.users.deleteUser(user_id);
+    }
+
+    async getAssociations() {
+        return await this.associations.getAssociations();
+    }
+
+    async getAssociation(id) {
+        return await this.associations.getAssociation(id);
+    }
+
+    async deleteAssociation(id) {
+        await this.associations.deleteAssociation(id);
     }
 }
 

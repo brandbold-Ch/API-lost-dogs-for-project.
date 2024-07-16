@@ -401,13 +401,13 @@ module.exports = {
                 "Admin controllers"
             ],
             "summary": "Obtener todos los rescatistas.",
-            "description": "Obtener todas las solicitudes.",
+            "description": "Obtener a todos los rescatistas.",
             "responses": {
                 "400": {
                     "description": "Error del cliente."
                 },
                 "200": {
-                    "description": "Todos las solicitudes."
+                    "description": "Todos los rescatistas."
                 },
                 "404": {
                     "description": "Administrador no encontrado."
@@ -478,6 +478,119 @@ module.exports = {
                     "in": "path",
                     "name": "rescuer_id",
                     "description": "Id de rescatista.",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "404": {
+                    "description": "Administrador no encontrado o Rescatista no encontrado."
+                },
+                "204": {
+                    "description": "Rescatista eliminado."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        }
+    },
+    "/api/v3/admins/associations": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Admin controllers"
+            ],
+            "summary": "Obtener todos las asociaciones.",
+            "description": "Obtener a todas las asociaciones.",
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "200": {
+                    "description": "Todas las asociaciones."
+                },
+                "404": {
+                    "description": "Administrador no encontrado."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        }
+    },
+    "/api/v3/admins/associations/{association_id}": {
+        "get": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Admin controllers"
+            ],
+            "summary": "Obener una asociación.",
+            "description": "Obtener los datos de una asociación.",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "association_id",
+                    "description": "Id de asociación.",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "responses": {
+                "400": {
+                    "description": "Error del cliente."
+                },
+                "404": {
+                    "description": "Administrador no encontrado o Asociación no encontrado."
+                },
+                "200": {
+                    "description": "Datos de la asociación."
+                },
+                "401": {
+                    "description": "Sin permisos para ver esta ruta."
+                },
+                "500": {
+                    "description": "Error interno del servidor."
+                }
+            }
+        },
+        "delete": {
+            "security": [
+                {
+                    "bearerAuth": []
+                }
+            ],
+            "tags": [
+                "Admin controllers"
+            ],
+            "summary": "Eliminar una asociación.",
+            "description": "Eliminar una asociación.",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "association_id",
+                    "description": "Id de asociación.",
                     "required": true,
                     "schema": {
                         "type": "string"

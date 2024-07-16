@@ -33,6 +33,9 @@ adminRouter.get("/rescuers/:rescuer_id", entityExists, adminControllers.getRescu
 adminRouter.delete("/rescuers/:rescuer_id", entityExists, adminControllers.deleteRescuer);
 adminRouter.get("/users", adminControllers.getUsers);
 adminRouter.get("/users/:user_id", entityExists, adminControllers.getUser);
+adminRouter.get("/associations", adminControllers.getAssociations);
+adminRouter.get("/associations/:association_id", entityExists, adminControllers.getAssociation);
+adminRouter.delete("/associations/:association_id", entityExists, adminControllers.deleteAssociation);
 adminRouter.delete("/users/:user_id", entityExists, adminControllers.deleteUser);
 adminRouter.use(authRouter);
 

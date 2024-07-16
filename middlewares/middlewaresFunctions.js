@@ -57,7 +57,7 @@ const checkEntityExists = async (req, res, next) => {
 
 const entityExists = async (req, res, next) => {
     try {
-        const entity = await auth.getAuthByUser(req.params.rescuer_id || req.params.user_id);
+        const entity = await auth.getAuthByUser(req.params.rescuer_id || req.params.user_id || req.params.association_id);
         const route = req.path.split("/");
 
         if (route.includes("users")) {
@@ -79,6 +79,19 @@ const entityExists = async (req, res, next) => {
                 res.status(404).json(
                     HandlerHttpVerbs.notFound(
                         "Not found rescuer 🚫",
+                        errorsCodes.DB_NOT_FOUND,
+                        { url: req.baseUrl, verb: req.method }
+                    )
+                );
+            }
+        }
+        else if (route.includes("associations")) {
+            if (entity?.role === "ASSOCIATION") {
+                next();
+            } else {
+                res.status(404).json(
+                    HandlerHttpVerbs.notFound(
+                        "Not found association 🚫",
                         errorsCodes.DB_NOT_FOUND,
                         { url: req.baseUrl, verb: req.method }
                     )

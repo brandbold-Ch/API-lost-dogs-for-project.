@@ -109,6 +109,10 @@ class AssociationServices {
             )
     }
 
+    async getAssociations() {
+        return Association.find({}, { posts_id: 0, rescuers_id: 0, bulletins_id: 0, blogs_id: 0 });
+    }
+
     async deleteSocialMedia(id, key, value) {
         await Association.updateOne({ _id: id }, { $pull: { social_networks: { [key]: value } } });
     }
