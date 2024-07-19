@@ -143,6 +143,15 @@ function bulletinDocs(tags) {
                 "consumes": [
                     "multipart/form-data"
                 ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "bulletin_id",
+                        "description": "Id del bulletin.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {

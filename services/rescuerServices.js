@@ -48,7 +48,7 @@ class RescuerServices {
     async getRescuers() {
         return Rescuer.find({}, { posts_id: 0, bulletins_id: 0 })
             .populate("auth_id",  { email: 1, password: 1, _id: 0 })
-            .populate("ext_relat", {name: 1, description: 1});
+            .populate("ext_relat", { name: 1, description: 1 });
     }
 
     async createRescuer(rescuer_data) {
